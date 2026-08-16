@@ -31,13 +31,13 @@ it either due to existing user code API behavior expectations (Hyrum's Law).
 It serves as a useful guide when making changes.
 """
 
+from collections import namedtuple
 import functools
 import ipaddress
 import math
 import re
 import types
 import warnings
-from collections import namedtuple
 
 __all__ = [
     "DefragResult",
@@ -565,10 +565,7 @@ def _checknetloc(netloc):
     for c in "/?#@:":
         if c in netloc2:
             raise ValueError(
-                "netloc '"
-                + netloc
-                + "' contains invalid "
-                + "characters under NFKC normalization"
+                "netloc '" + netloc + "' contains invalid " + "characters under NFKC normalization"
             )
 
 
@@ -647,9 +644,7 @@ def urlsplit(url, scheme="", allow_fragments=True):
             scheme, url = url[:i].lower(), url[i + 1 :]
     if url[:2] == "//":
         netloc, url = _splitnetloc(url, 2)
-        if ("[" in netloc and "]" not in netloc) or (
-            "]" in netloc and "[" not in netloc
-        ):
+        if ("[" in netloc and "]" not in netloc) or ("]" in netloc and "[" not in netloc):
             raise ValueError("Invalid IPv6 URL")
         if "[" in netloc and "]" in netloc:
             _check_bracketed_netloc(netloc)
@@ -667,9 +662,7 @@ def urlunparse(components):
     slightly different, but equivalent URL, if the URL that was parsed
     originally had redundant delimiters, e.g. a ? with an empty query
     (the draft states that these are equivalent)."""
-    scheme, netloc, url, params, query, fragment, _coerce_result = _coerce_args(
-        *components
-    )
+    scheme, netloc, url, params, query, fragment, _coerce_result = _coerce_args(*components)
     if params:
         url = f"{url};{params}"
     return _coerce_result(urlunsplit((scheme, netloc, url, query, fragment)))
@@ -686,12 +679,7 @@ def urlunsplit(components):
         if url and url[:1] != "/":
             url = "/" + url
         url = "//" + netloc + url
-    elif (
-        url[:2] == "//"
-        or scheme
-        and scheme in uses_netloc
-        and (not url or url[:1] == "/")
-    ):
+    elif url[:2] == "//" or scheme and scheme in uses_netloc and (not url or url[:1] == "/"):
         url = "//" + url
     if scheme:
         url = scheme + ":" + url
@@ -711,20 +699,14 @@ def urljoin(base, url, allow_fragments=True):
         return base
 
     base, url, _coerce_result = _coerce_args(base, url)
-    bscheme, bnetloc, bpath, bparams, bquery, _bfragment = urlparse(
-        base, "", allow_fragments
-    )
-    scheme, netloc, path, params, query, fragment = urlparse(
-        url, bscheme, allow_fragments
-    )
+    bscheme, bnetloc, bpath, bparams, bquery, _bfragment = urlparse(base, "", allow_fragments)
+    scheme, netloc, path, params, query, fragment = urlparse(url, bscheme, allow_fragments)
 
     if scheme != bscheme or scheme not in uses_relative:
         return _coerce_result(url)
     if scheme in uses_netloc:
         if netloc:
-            return _coerce_result(
-                urlunparse((scheme, netloc, path, params, query, fragment))
-            )
+            return _coerce_result(urlunparse((scheme, netloc, path, params, query, fragment)))
         netloc = bnetloc
 
     if not path and not params:
@@ -732,9 +714,7 @@ def urljoin(base, url, allow_fragments=True):
         params = bparams
         if not query:
             query = bquery
-        return _coerce_result(
-            urlunparse((scheme, netloc, path, params, query, fragment))
-        )
+        return _coerce_result(urlunparse((scheme, netloc, path, params, query, fragment)))
 
     base_parts = bpath.split("/")
     if base_parts[-1] != "":
@@ -772,9 +752,7 @@ def urljoin(base, url, allow_fragments=True):
         resolved_path.append("")
 
     return _coerce_result(
-        urlunparse(
-            (scheme, netloc, "/".join(resolved_path) or "/", params, query, fragment)
-        )
+        urlunparse((scheme, netloc, "/".join(resolved_path) or "/", params, query, fragment))
     )
 
 
@@ -822,9 +800,7 @@ def _unquote_impl(string: bytes | bytearray | str) -> bytes | bytearray:
     # if the function is never called
     global _hextobyte
     if _hextobyte is None:
-        _hextobyte = {
-            (a + b).encode(): bytes.fromhex(a + b) for a in _hexdig for b in _hexdig
-        }
+        _hextobyte = {(a + b).encode(): bytes.fromhex(a + b) for a in _hexdig for b in _hexdig}
     for item in bits[1:]:
         try:
             append(_hextobyte[item[:2]])
@@ -1020,9 +996,7 @@ def unquote_plus(string, encoding="utf-8", errors="replace"):
     return unquote(string, encoding, errors)
 
 
-_ALWAYS_SAFE = frozenset(
-    b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.-~"
-)
+_ALWAYS_SAFE = frozenset(b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.-~")
 _ALWAYS_SAFE_BYTES = bytes(_ALWAYS_SAFE)
 
 
@@ -1166,15 +1140,12 @@ def quote_from_bytes(bs, safe="/"):
         # This saves memory - https://github.com/python/cpython/issues/95865
         chunk_size = math.isqrt(bs_len)
         chunks = [
-            "".join(map(quoter, bs[i : i + chunk_size]))
-            for i in range(0, bs_len, chunk_size)
+            "".join(map(quoter, bs[i : i + chunk_size])) for i in range(0, bs_len, chunk_size)
         ]
         return "".join(chunks)
 
 
-def urlencode(
-    query, doseq=False, safe="", encoding=None, errors=None, quote_via=quote_plus
-):
+def urlencode(query, doseq=False, safe="", encoding=None, errors=None, quote_via=quote_plus):
     """Encode a dict or sequence of two-element tuples into a URL query string.
 
     If any values in the query arg are sequences and doseq is true, each
@@ -1205,9 +1176,7 @@ def urlencode(
             # allowed empty dicts that type of behavior probably should be
             # preserved for consistency
         except TypeError as err:
-            raise TypeError(
-                "not a valid non-string sequence or mapping object"
-            ) from err
+            raise TypeError("not a valid non-string sequence or mapping object") from err
 
     l = []
     if not doseq:
@@ -1291,8 +1260,7 @@ def unwrap(url):
 
 def splittype(url):
     warnings.warn(
-        "urllib.parse.splittype() is deprecated as of 3.8, "
-        "use urllib.parse.urlparse() instead",
+        "urllib.parse.splittype() is deprecated as of 3.8, use urllib.parse.urlparse() instead",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -1317,8 +1285,7 @@ def _splittype(url):
 
 def splithost(url):
     warnings.warn(
-        "urllib.parse.splithost() is deprecated as of 3.8, "
-        "use urllib.parse.urlparse() instead",
+        "urllib.parse.splithost() is deprecated as of 3.8, use urllib.parse.urlparse() instead",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -1345,8 +1312,7 @@ def _splithost(url):
 
 def splituser(host):
     warnings.warn(
-        "urllib.parse.splituser() is deprecated as of 3.8, "
-        "use urllib.parse.urlparse() instead",
+        "urllib.parse.splituser() is deprecated as of 3.8, use urllib.parse.urlparse() instead",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -1361,8 +1327,7 @@ def _splituser(host):
 
 def splitpasswd(user):
     warnings.warn(
-        "urllib.parse.splitpasswd() is deprecated as of 3.8, "
-        "use urllib.parse.urlparse() instead",
+        "urllib.parse.splitpasswd() is deprecated as of 3.8, use urllib.parse.urlparse() instead",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -1377,8 +1342,7 @@ def _splitpasswd(user):
 
 def splitport(host):
     warnings.warn(
-        "urllib.parse.splitport() is deprecated as of 3.8, "
-        "use urllib.parse.urlparse() instead",
+        "urllib.parse.splitport() is deprecated as of 3.8, use urllib.parse.urlparse() instead",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -1405,8 +1369,7 @@ def _splitport(host):
 
 def splitnport(host, defport=-1):
     warnings.warn(
-        "urllib.parse.splitnport() is deprecated as of 3.8, "
-        "use urllib.parse.urlparse() instead",
+        "urllib.parse.splitnport() is deprecated as of 3.8, use urllib.parse.urlparse() instead",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -1432,8 +1395,7 @@ def _splitnport(host, defport=-1):
 
 def splitquery(url):
     warnings.warn(
-        "urllib.parse.splitquery() is deprecated as of 3.8, "
-        "use urllib.parse.urlparse() instead",
+        "urllib.parse.splitquery() is deprecated as of 3.8, use urllib.parse.urlparse() instead",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -1450,8 +1412,7 @@ def _splitquery(url):
 
 def splittag(url):
     warnings.warn(
-        "urllib.parse.splittag() is deprecated as of 3.8, "
-        "use urllib.parse.urlparse() instead",
+        "urllib.parse.splittag() is deprecated as of 3.8, use urllib.parse.urlparse() instead",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -1468,8 +1429,7 @@ def _splittag(url):
 
 def splitattr(url):
     warnings.warn(
-        "urllib.parse.splitattr() is deprecated as of 3.8, "
-        "use urllib.parse.urlparse() instead",
+        "urllib.parse.splitattr() is deprecated as of 3.8, use urllib.parse.urlparse() instead",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -1485,8 +1445,7 @@ def _splitattr(url):
 
 def splitvalue(attr):
     warnings.warn(
-        "urllib.parse.splitvalue() is deprecated as of 3.8, "
-        "use urllib.parse.parse_qsl() instead",
+        "urllib.parse.splitvalue() is deprecated as of 3.8, use urllib.parse.parse_qsl() instead",
         DeprecationWarning,
         stacklevel=2,
     )

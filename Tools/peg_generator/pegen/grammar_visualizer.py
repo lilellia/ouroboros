@@ -1,6 +1,6 @@
 import argparse
-import sys
 from collections.abc import Callable, Iterator
+import sys
 from typing import Any
 
 from pegen.build import build_parser
@@ -25,15 +25,11 @@ class ASTGrammarPrinter:
             return repr(node)
         return node.__class__.__name__
 
-    def print_grammar_ast(
-        self, grammar: Grammar, printer: Callable[..., None] = print
-    ) -> None:
+    def print_grammar_ast(self, grammar: Grammar, printer: Callable[..., None] = print) -> None:
         for rule in grammar.rules.values():
             printer(self.print_nodes_recursively(rule))
 
-    def print_nodes_recursively(
-        self, node: Rule, prefix: str = "", istail: bool = True
-    ) -> str:
+    def print_nodes_recursively(self, node: Rule, prefix: str = "", istail: bool = True) -> str:
 
         children = list(self.children(node))
         value = self.name(node)

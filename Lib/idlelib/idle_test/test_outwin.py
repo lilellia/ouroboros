@@ -1,11 +1,11 @@
 "Test outwin, coverage 76%."
 
-import sys
-import unittest
 from idlelib import outwin
 from idlelib.idle_test.mock_idle import Func
 from idlelib.idle_test.mock_tk import Mbox_func
+import sys
 from tkinter import Text, Tk
+import unittest
 from unittest import mock
 
 from test.support import requires

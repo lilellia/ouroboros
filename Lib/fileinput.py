@@ -379,9 +379,7 @@ class FileInput:
             self._isstdin = True
         else:
             if self._inplace:
-                self._backupfilename = os.fspath(self._filename) + (
-                    self._backup or ".bak"
-                )
+                self._backupfilename = os.fspath(self._filename) + (self._backup or ".bak")
                 try:
                     os.unlink(self._backupfilename)
                 except OSError:
@@ -470,9 +468,7 @@ class FileInput:
 
 
 def hook_compressed(filename, mode, *, encoding=None, errors=None):
-    if (
-        encoding is None and "b" not in mode
-    ):  # EncodingWarning is emitted in FileInput() already.
+    if encoding is None and "b" not in mode:  # EncodingWarning is emitted in FileInput() already.
         encoding = "locale"
     ext = os.path.splitext(filename)[1]
     if ext == ".gz":

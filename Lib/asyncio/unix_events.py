@@ -233,9 +233,7 @@ class _UnixSelectorEventLoop(selector_events.BaseSelectorEventLoop):
                 extra=extra,
                 **kwargs,
             )
-            watcher.add_child_handler(
-                transp.get_pid(), self._child_watcher_callback, transp
-            )
+            watcher.add_child_handler(transp.get_pid(), self._child_watcher_callback, transp)
             try:
                 await waiter
             except (SystemExit, KeyboardInterrupt):
@@ -290,9 +288,7 @@ class _UnixSelectorEventLoop(selector_events.BaseSelectorEventLoop):
             if sock is None:
                 raise ValueError("no path and sock were specified")
             if sock.family != socket.AF_UNIX or sock.type != socket.SOCK_STREAM:
-                raise ValueError(
-                    f"A UNIX Domain Stream Socket was expected, got {sock!r}"
-                )
+                raise ValueError(f"A UNIX Domain Stream Socket was expected, got {sock!r}")
             sock.setblocking(False)
 
         transport, protocol = await self._create_connection_transport(
@@ -342,9 +338,7 @@ class _UnixSelectorEventLoop(selector_events.BaseSelectorEventLoop):
                     pass
                 except OSError as err:
                     # Directory may have permissions only to create socket.
-                    logger.error(
-                        "Unable to check or remove stale UNIX socket %r: %r", path, err
-                    )
+                    logger.error("Unable to check or remove stale UNIX socket %r: %r", path, err)
 
             try:
                 sock.bind(path)
@@ -365,9 +359,7 @@ class _UnixSelectorEventLoop(selector_events.BaseSelectorEventLoop):
                 raise ValueError("path was not specified, and no sock specified")
 
             if sock.family != socket.AF_UNIX or sock.type != socket.SOCK_STREAM:
-                raise ValueError(
-                    f"A UNIX Domain Stream Socket was expected, got {sock!r}"
-                )
+                raise ValueError(f"A UNIX Domain Stream Socket was expected, got {sock!r}")
 
         sock.setblocking(False)
         server = base_events.Server(
@@ -405,9 +397,7 @@ class _UnixSelectorEventLoop(selector_events.BaseSelectorEventLoop):
             return 0  # empty file
 
         fut = self.create_future()
-        self._sock_sendfile_native_impl(
-            fut, None, sock, fileno, offset, count, blocksize, 0
-        )
+        self._sock_sendfile_native_impl(fut, None, sock, fileno, offset, count, blocksize, 0)
         return await fut
 
     def _sock_sendfile_native_impl(
@@ -674,9 +664,7 @@ class _UnixWritePipeTransport(transports._FlowControlMixin, transports.WriteTran
             self._pipe = None
             self._fileno = None
             self._protocol = None
-            raise ValueError(
-                "Pipe transport is only for pipes, sockets and character devices"
-            )
+            raise ValueError("Pipe transport is only for pipes, sockets and character devices")
 
         os.set_blocking(self._fileno, False)
         self._loop.call_soon(self._protocol.connection_made, self)
@@ -738,9 +726,7 @@ class _UnixWritePipeTransport(transports._FlowControlMixin, transports.WriteTran
 
         if self._conn_lost or self._closing:
             if self._conn_lost >= constants.LOG_THRESHOLD_FOR_CONNLOST_WRITES:
-                logger.warning(
-                    "pipe closed by peer or os.write(pipe, data) raised exception."
-                )
+                logger.warning("pipe closed by peer or os.write(pipe, data) raised exception.")
             self._conn_lost += 1
             return
 
@@ -918,8 +904,7 @@ class AbstractChildWatcher:
         if cls.__module__ != __name__:
             warnings._deprecated(
                 "AbstractChildWatcher",
-                "{name!r} is deprecated as of Python 3.12 and will be "
-                "removed in Python {remove}.",
+                "{name!r} is deprecated as of Python 3.12 and will be removed in Python {remove}.",
                 remove=(3, 14),
             )
 
@@ -1021,8 +1006,7 @@ class PidfdChildWatcher(AbstractChildWatcher):
             # (may happen if waitpid() is called elsewhere).
             returncode = 255
             logger.warning(
-                "child process pid %d exit status already read: "
-                " will report returncode 255",
+                "child process pid %d exit status already read:  will report returncode 255",
                 pid,
             )
         else:
@@ -1107,8 +1091,7 @@ class SafeChildWatcher(BaseChildWatcher):
         super().__init__()
         warnings._deprecated(
             "SafeChildWatcher",
-            "{name!r} is deprecated as of Python 3.12 and will be "
-            "removed in Python {remove}.",
+            "{name!r} is deprecated as of Python 3.12 and will be removed in Python {remove}.",
             remove=(3, 14),
         )
 
@@ -1150,9 +1133,7 @@ class SafeChildWatcher(BaseChildWatcher):
             # (may happen if waitpid() is called elsewhere).
             pid = expected_pid
             returncode = 255
-            logger.warning(
-                "Unknown child process pid %d, will report returncode 255", pid
-            )
+            logger.warning("Unknown child process pid %d, will report returncode 255", pid)
         else:
             if pid == 0:
                 # The child process is still alive.
@@ -1160,9 +1141,7 @@ class SafeChildWatcher(BaseChildWatcher):
 
             returncode = waitstatus_to_exitcode(status)
             if self._loop.get_debug():
-                logger.debug(
-                    "process %s exited with returncode %s", expected_pid, returncode
-                )
+                logger.debug("process %s exited with returncode %s", expected_pid, returncode)
 
         try:
             callback, args = self._callbacks.pop(pid)
@@ -1170,9 +1149,7 @@ class SafeChildWatcher(BaseChildWatcher):
             # May happen if .remove_child_handler() is called
             # after os.waitpid() returns.
             if self._loop.get_debug():
-                logger.warning(
-                    "Child watcher got an unexpected pid: %r", pid, exc_info=True
-                )
+                logger.warning("Child watcher got an unexpected pid: %r", pid, exc_info=True)
         else:
             callback(pid, returncode, *args)
 
@@ -1195,8 +1172,7 @@ class FastChildWatcher(BaseChildWatcher):
         self._forks = 0
         warnings._deprecated(
             "FastChildWatcher",
-            "{name!r} is deprecated as of Python 3.12 and will be "
-            "removed in Python {remove}.",
+            "{name!r} is deprecated as of Python 3.12 and will be removed in Python {remove}.",
             remove=(3, 14),
         )
 
@@ -1221,9 +1197,7 @@ class FastChildWatcher(BaseChildWatcher):
             collateral_victims = str(self._zombies)
             self._zombies.clear()
 
-        logger.warning(
-            "Caught subprocesses termination from unknown pids: %s", collateral_victims
-        )
+        logger.warning("Caught subprocesses termination from unknown pids: %s", collateral_victims)
 
     def add_child_handler(self, pid, callback, *args):
         assert self._forks, "Must use the context manager"
@@ -1280,9 +1254,7 @@ class FastChildWatcher(BaseChildWatcher):
                     callback = None
                 else:
                     if self._loop.get_debug():
-                        logger.debug(
-                            "process %s exited with returncode %s", pid, returncode
-                        )
+                        logger.debug("process %s exited with returncode %s", pid, returncode)
 
             if callback is None:
                 logger.warning(
@@ -1318,8 +1290,7 @@ class MultiLoopChildWatcher(AbstractChildWatcher):
         self._saved_sighandler = None
         warnings._deprecated(
             "MultiLoopChildWatcher",
-            "{name!r} is deprecated as of Python 3.12 and will be "
-            "removed in Python {remove}.",
+            "{name!r} is deprecated as of Python 3.12 and will be removed in Python {remove}.",
             remove=(3, 14),
         )
 
@@ -1391,9 +1362,7 @@ class MultiLoopChildWatcher(AbstractChildWatcher):
             # (may happen if waitpid() is called elsewhere).
             pid = expected_pid
             returncode = 255
-            logger.warning(
-                "Unknown child process pid %d, will report returncode 255", pid
-            )
+            logger.warning("Unknown child process pid %d, will report returncode 255", pid)
             debug_log = False
         else:
             if pid == 0:
@@ -1407,17 +1376,13 @@ class MultiLoopChildWatcher(AbstractChildWatcher):
         except KeyError:  # pragma: no cover
             # May happen if .remove_child_handler() is called
             # after os.waitpid() returns.
-            logger.warning(
-                "Child watcher got an unexpected pid: %r", pid, exc_info=True
-            )
+            logger.warning("Child watcher got an unexpected pid: %r", pid, exc_info=True)
         else:
             if loop.is_closed():
                 logger.warning("Loop %r that handles pid %r is closed", loop, pid)
             else:
                 if debug_log and loop.get_debug():
-                    logger.debug(
-                        "process %s exited with returncode %s", expected_pid, returncode
-                    )
+                    logger.debug("process %s exited with returncode %s", expected_pid, returncode)
                 loop.call_soon_threadsafe(callback, pid, returncode, *args)
 
     def _sig_chld(self, signum, frame):
@@ -1459,9 +1424,7 @@ class ThreadedChildWatcher(AbstractChildWatcher):
         pass
 
     def __del__(self, _warn=warnings.warn):
-        threads = [
-            thread for thread in list(self._threads.values()) if thread.is_alive()
-        ]
+        threads = [thread for thread in list(self._threads.values()) if thread.is_alive()]
         if threads:
             _warn(
                 f"{self.__class__} has registered but not finished child processes",
@@ -1499,15 +1462,11 @@ class ThreadedChildWatcher(AbstractChildWatcher):
             # (may happen if waitpid() is called elsewhere).
             pid = expected_pid
             returncode = 255
-            logger.warning(
-                "Unknown child process pid %d, will report returncode 255", pid
-            )
+            logger.warning("Unknown child process pid %d, will report returncode 255", pid)
         else:
             returncode = waitstatus_to_exitcode(status)
             if loop.get_debug():
-                logger.debug(
-                    "process %s exited with returncode %s", expected_pid, returncode
-                )
+                logger.debug("process %s exited with returncode %s", expected_pid, returncode)
 
         if loop.is_closed():
             logger.warning("Loop %r that handles pid %r is closed", loop, pid)
@@ -1556,10 +1515,7 @@ class _UnixDefaultEventLoopPolicy(events.BaseDefaultEventLoopPolicy):
 
         super().set_event_loop(loop)
 
-        if (
-            self._watcher is not None
-            and threading.current_thread() is threading.main_thread()
-        ):
+        if self._watcher is not None and threading.current_thread() is threading.main_thread():
             self._watcher.attach_loop(loop)
 
     def get_child_watcher(self):
@@ -1572,8 +1528,7 @@ class _UnixDefaultEventLoopPolicy(events.BaseDefaultEventLoopPolicy):
 
         warnings._deprecated(
             "get_child_watcher",
-            "{name!r} is deprecated as of Python 3.12 and will be "
-            "removed in Python {remove}.",
+            "{name!r} is deprecated as of Python 3.12 and will be removed in Python {remove}.",
             remove=(3, 14),
         )
         return self._watcher
@@ -1589,8 +1544,7 @@ class _UnixDefaultEventLoopPolicy(events.BaseDefaultEventLoopPolicy):
         self._watcher = watcher
         warnings._deprecated(
             "set_child_watcher",
-            "{name!r} is deprecated as of Python 3.12 and will be "
-            "removed in Python {remove}.",
+            "{name!r} is deprecated as of Python 3.12 and will be removed in Python {remove}.",
             remove=(3, 14),
         )
 

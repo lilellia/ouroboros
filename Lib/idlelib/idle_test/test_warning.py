@@ -6,10 +6,12 @@ Revise if output destination changes (http://bugs.python.org/issue18318).
 Make sure warnings module is left unaltered (http://bugs.python.org/issue18081).
 """
 
+from idlelib import (
+    pyshell as shell,
+    run,
+)
 import unittest
 import warnings
-from idlelib import pyshell as shell
-from idlelib import run
 
 from test.support import captured_stderr
 
@@ -59,16 +61,12 @@ class ShellWarnTest(unittest.TestCase):
 
     def test_idle_formatter(self):
         # Will fail if format changed without regenerating idlemsg
-        s = shell.idle_formatwarning(
-            "Test", UserWarning, "test_warning.py", 99, "Line of code"
-        )
+        s = shell.idle_formatwarning("Test", UserWarning, "test_warning.py", 99, "Line of code")
         self.assertEqual(idlemsg, s)
 
     def test_shell_show(self):
         with captured_stderr() as f:
-            shell.idle_showwarning(
-                "Test", UserWarning, "test_warning.py", 99, f, "Line of code"
-            )
+            shell.idle_showwarning("Test", UserWarning, "test_warning.py", 99, f, "Line of code")
             self.assertEqual(shellmsg.splitlines(), f.getvalue().splitlines())
 
 

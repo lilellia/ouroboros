@@ -1,9 +1,9 @@
 """Test result object"""
 
+from functools import wraps
 import io
 import sys
 import traceback
-from functools import wraps
 
 from . import util
 
@@ -178,8 +178,7 @@ class TestResult:
         # way this method works on objects that lack the attribute.
         # (where would such result instances come from? old stored pickles?)
         return (len(self.failures) == len(self.errors) == 0) and (
-            not hasattr(self, "unexpectedSuccesses")
-            or len(self.unexpectedSuccesses) == 0
+            not hasattr(self, "unexpectedSuccesses") or len(self.unexpectedSuccesses) == 0
         )
 
     def stop(self):

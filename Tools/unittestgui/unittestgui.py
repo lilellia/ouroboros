@@ -31,9 +31,9 @@ __author__ = "Steve Purcell (stephen_purcell@yahoo.com)"
 
 import sys
 import tkinter as tk
+from tkinter import filedialog, messagebox, simpledialog
 import traceback
 import unittest
-from tkinter import filedialog, messagebox, simpledialog
 
 ##############################################################################
 # GUI framework classes
@@ -216,9 +216,9 @@ class DiscoverSettingsDialog(simpledialog.Dialog):
         tk.Label(master, text="Top Level Directory").grid(row=0)
         self.e1 = tk.Entry(master, textvariable=self.dirVar)
         self.e1.grid(row=0, column=1)
-        tk.Button(
-            master, text="...", command=lambda: self.selectDirClicked(master)
-        ).grid(row=0, column=3)
+        tk.Button(master, text="...", command=lambda: self.selectDirClicked(master)).grid(
+            row=0, column=3
+        )
 
         tk.Label(master, text="Test File Pattern").grid(row=1)
         self.e2 = tk.Entry(master, textvariable=self.testPatternVar)
@@ -262,9 +262,7 @@ class TkTestRunner(BaseGUITestRunner):
         return filedialog.askdirectory()
 
     def settingsClicked(self):
-        d = DiscoverSettingsDialog(
-            self.top, self.top_level_dir, self.test_file_glob_pattern
-        )
+        d = DiscoverSettingsDialog(self.top, self.top_level_dir, self.test_file_glob_pattern)
         self.top_level_dir = d.top_level_dir
         self.test_file_glob_pattern = d.test_file_glob_pattern
 
@@ -276,9 +274,7 @@ class TkTestRunner(BaseGUITestRunner):
         self.remainingCountVar.set(discovered)
         self.progressBar.setProgressFraction(0.0)
         self.errorListbox.delete(0, tk.END)
-        self.statusVar.set(
-            f"Discovering tests from {self.directory_to_read}. Found: {discovered}"
-        )
+        self.statusVar.set(f"Discovering tests from {self.directory_to_read}. Found: {discovered}")
         self.stopGoButton["state"] = tk.NORMAL
 
     def createWidgets(self):
@@ -290,9 +286,7 @@ class TkTestRunner(BaseGUITestRunner):
         # Status bar
         statusFrame = tk.Frame(self.top, relief=tk.SUNKEN, borderwidth=2)
         statusFrame.pack(anchor=tk.SW, fill=tk.X, side=tk.BOTTOM)
-        tk.Label(statusFrame, width=1, textvariable=self.statusVar).pack(
-            side=tk.TOP, fill=tk.X
-        )
+        tk.Label(statusFrame, width=1, textvariable=self.statusVar).pack(side=tk.TOP, fill=tk.X)
 
         # Area to enter name of test to run
         leftFrame = tk.Frame(self.top, borderwidth=3)
@@ -311,18 +305,14 @@ class TkTestRunner(BaseGUITestRunner):
         buttonFrame = tk.Frame(self.top, borderwidth=3)
         buttonFrame.pack(side=tk.LEFT, anchor=tk.NW, fill=tk.Y)
 
-        tk.Button(
-            buttonFrame, text="Discover Tests", command=self.discoverClicked
-        ).pack(fill=tk.X)
+        tk.Button(buttonFrame, text="Discover Tests", command=self.discoverClicked).pack(fill=tk.X)
 
         self.stopGoButton = tk.Button(
             buttonFrame, text="Start", command=self.runClicked, state=tk.DISABLED
         )
         self.stopGoButton.pack(fill=tk.X)
 
-        tk.Button(buttonFrame, text="Close", command=self.top.quit).pack(
-            side=tk.BOTTOM, fill=tk.X
-        )
+        tk.Button(buttonFrame, text="Close", command=self.top.quit).pack(side=tk.BOTTOM, fill=tk.X)
         tk.Button(buttonFrame, text="Settings", command=self.settingsClicked).pack(
             side=tk.BOTTOM, fill=tk.X
         )
@@ -351,9 +341,7 @@ class TkTestRunner(BaseGUITestRunner):
         self.errorListbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=1, anchor=tk.NW)
         listScroll = tk.Scrollbar(listFrame, command=self.errorListbox.yview)
         listScroll.pack(side=tk.LEFT, fill=tk.Y, anchor=tk.N)
-        self.errorListbox.bind(
-            "<Double-1>", lambda e, self=self: self.showSelectedError()
-        )
+        self.errorListbox.bind("<Double-1>", lambda e, self=self: self.showSelectedError())
         self.errorListbox.configure(yscrollcommand=listScroll.set)
 
     def errorDialog(self, title, message):
@@ -417,9 +405,7 @@ class TkTestRunner(BaseGUITestRunner):
         window.title(txt)
         window.protocol("WM_DELETE_WINDOW", window.quit)
         test, error = self.errorInfo[selected]
-        tk.Label(window, text=str(test), foreground="red", justify=tk.LEFT).pack(
-            anchor=tk.W
-        )
+        tk.Label(window, text=str(test), foreground="red", justify=tk.LEFT).pack(anchor=tk.W)
         tracebackLines = traceback.format_exception(*error)
         tracebackText = "".join(tracebackLines)
         tk.Label(window, text=tracebackText, justify=tk.LEFT).pack()
@@ -435,9 +421,7 @@ class ProgressBar(tk.Frame):
 
     def __init__(self, *args, **kwargs):
         tk.Frame.__init__(self, *args, **kwargs)
-        self.canvas = tk.Canvas(
-            self, height="20", width="60", background="white", borderwidth=3
-        )
+        self.canvas = tk.Canvas(self, height="20", width="60", background="white", borderwidth=3)
         self.canvas.pack(fill=tk.X, expand=1)
         self.rect = self.text = None
         self.canvas.bind("<Configure>", self.paint)

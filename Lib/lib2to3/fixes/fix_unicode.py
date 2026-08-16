@@ -31,10 +31,7 @@ class FixUnicode(fixer_base.BaseFix):
             val = node.value
             if not self.unicode_literals and val[0] in "'\"" and "\\" in val:
                 val = r"\\".join(
-                    [
-                        v.replace("\\u", r"\\u").replace("\\U", r"\\U")
-                        for v in val.split(r"\\")
-                    ]
+                    [v.replace("\\u", r"\\u").replace("\\U", r"\\U") for v in val.split(r"\\")]
                 )
             if val[0] in "uU":
                 val = val[1:]

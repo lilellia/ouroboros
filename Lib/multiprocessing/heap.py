@@ -8,12 +8,12 @@
 #
 
 import bisect
+from collections import defaultdict
 import mmap
 import os
 import sys
 import tempfile
 import threading
-from collections import defaultdict
 
 from . import util
 from .context import assert_spawning, reduction
@@ -80,7 +80,8 @@ else:
                 # Arena is created anew (if fd != -1, it means we're coming
                 # from rebuild_arena() below)
                 self.fd, name = tempfile.mkstemp(
-                    prefix="pym-%d-" % os.getpid(), dir=self._choose_dir(size)  # noqa: UP031
+                    prefix="pym-%d-" % os.getpid(),  # noqa: UP031
+                    dir=self._choose_dir(size),
                 )
                 os.unlink(name)
                 util.Finalize(self, os.close, (self.fd,))
@@ -98,9 +99,7 @@ else:
 
     def reduce_arena(a):
         if a.fd == -1:
-            raise ValueError(
-                "Arena is unpicklable because forking was enabled when it was created"
-            )
+            raise ValueError("Arena is unpicklable because forking was enabled when it was created")
         return rebuild_arena, (a.size, reduction.DupFd(a.fd))
 
     def rebuild_arena(size, dupfd):
@@ -276,9 +275,7 @@ class Heap:
         # _free_pending_blocks() (appending and retrieving from a list is not
         # strictly thread-safe but under CPython it's atomic thanks to the GIL).
         if os.getpid() != self._lastpid:
-            raise ValueError(
-                f"My pid ({os.getpid():n}) is not last pid {self._lastpid:n}"
-            )
+            raise ValueError(f"My pid ({os.getpid():n}) is not last pid {self._lastpid:n}")
         if not self._lock.acquire(False):
             # can't acquire the lock right now, add the block to the list of
             # pending blocks to free

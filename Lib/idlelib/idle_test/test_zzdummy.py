@@ -1,8 +1,8 @@
 "Test zzdummy, coverage 100%."
 
-import unittest
 from idlelib import config, editor, format, zzdummy
 from tkinter import Text, Tk
+import unittest
 from unittest import mock
 
 from test.support import requires

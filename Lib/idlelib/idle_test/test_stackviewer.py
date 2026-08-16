@@ -1,9 +1,9 @@
 "Test stackviewer, coverage 63%."
 
-import unittest
 from idlelib import stackviewer
 from idlelib.tree import ScrolledCanvas, TreeNode
 from tkinter import Tk
+import unittest
 
 from test.support import requires
 

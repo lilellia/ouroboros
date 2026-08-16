@@ -1,7 +1,7 @@
 "Test help, coverage 94%."
 
-import unittest
 from idlelib import help
+import unittest
 
 from test.support import requires
 

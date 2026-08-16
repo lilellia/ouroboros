@@ -9,11 +9,11 @@ __version__ = "3.8"
 
 import argparse
 import os
+from pathlib import Path
 import shutil
 import sys
 import tempfile
 import zipfile
-from pathlib import Path
 
 if __name__ == "__main__":
     # Started directly, so enable relative imports
@@ -68,10 +68,7 @@ def copy_if_modified(src, dest):
         do_copy = True
     else:
         src_stat = os.stat(src)
-        do_copy = (
-            src_stat.st_mtime != dest_stat.st_mtime
-            or src_stat.st_size != dest_stat.st_size
-        )
+        do_copy = src_stat.st_mtime != dest_stat.st_mtime or src_stat.st_size != dest_stat.st_size
 
     if do_copy:
         shutil.copy2(src, dest)
@@ -326,9 +323,7 @@ def generate_source_files(ns):
         if zip_path.is_file():
             zip_path.unlink()
         elif zip_path.is_dir():
-            log_error(
-                "Cannot create zip file because a directory exists by the same name"
-            )
+            log_error("Cannot create zip file because a directory exists by the same name")
             return
         log_info("Generating {} in {}", zip_name, ns.temp)
         ns.temp.mkdir(parents=True, exist_ok=True)
@@ -534,9 +529,7 @@ def main():
         type=Path,
         default=None,
     )
-    parser.add_argument(
-        "-d", "--debug", help="Include debug build", action="store_true"
-    )
+    parser.add_argument("-d", "--debug", help="Include debug build", action="store_true")
     parser.add_argument(
         "-p",
         "--precompile",
@@ -546,9 +539,7 @@ def main():
     parser.add_argument(
         "-z", "--zip-lib", help="Include library in a ZIP file", action="store_true"
     )
-    parser.add_argument(
-        "--flat-dlls", help="Does not create a DLLs directory", action="store_true"
-    )
+    parser.add_argument("--flat-dlls", help="Does not create a DLLs directory", action="store_true")
     parser.add_argument(
         "-a",
         "--include-all",
@@ -620,9 +611,7 @@ Catalog: {ns.catalog}""",
     if ns.arch in ("arm32", "arm64"):
         for n in ("include_idle", "include_tcltk"):
             if getattr(ns, n):
-                log_warning(
-                    f"Disabling --{n.replace('_', '-')} on unsupported platform"
-                )
+                log_warning(f"Disabling --{n.replace('_', '-')} on unsupported platform")
                 setattr(ns, n, False)
 
     if ns.include_idle and not ns.include_tcltk:

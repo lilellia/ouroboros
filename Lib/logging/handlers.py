@@ -31,10 +31,10 @@ import pickle
 import queue
 import re
 import socket
+from stat import ST_DEV, ST_INO, ST_MTIME
 import struct
 import threading
 import time
-from stat import ST_DEV, ST_INO, ST_MTIME
 
 #
 # Some constants...
@@ -217,8 +217,7 @@ class RotatingFileHandler(BaseRotatingHandler):
             if pos + len(msg) >= self.maxBytes:
                 # See bpo-45401: Never rollover anything other than regular files
                 return not (
-                    os.path.exists(self.baseFilename)
-                    and not os.path.isfile(self.baseFilename)
+                    os.path.exists(self.baseFilename) and not os.path.isfile(self.baseFilename)
                 )
         return False
 
@@ -287,9 +286,7 @@ class TimedRotatingFileHandler(BaseRotatingHandler):
                     f"You must specify a day for weekly rollover from 0 to 6 (0 is Monday): {self.when}"
                 )
             if self.when[1] < "0" or self.when[1] > "6":
-                raise ValueError(
-                    f"Invalid day specified for weekly rollover: {self.when}"
-                )
+                raise ValueError(f"Invalid day specified for weekly rollover: {self.when}")
             self.dayOfWeek = int(self.when[1])
             self.suffix = "%Y-%m-%d"
             extMatch = r"(?<!\d)\d{4}-\d{2}-\d{2}(?!\d)"
@@ -339,9 +336,7 @@ class TimedRotatingFileHandler(BaseRotatingHandler):
             if self.atTime is None:
                 rotate_ts = _MIDNIGHT
             else:
-                rotate_ts = (
-                    self.atTime.hour * 60 + self.atTime.minute
-                ) * 60 + self.atTime.second
+                rotate_ts = (self.atTime.hour * 60 + self.atTime.minute) * 60 + self.atTime.second
 
             r = rotate_ts - ((currentHour * 60 + currentMinute) * 60 + currentSecond)
             if r <= 0:
@@ -381,7 +376,9 @@ class TimedRotatingFileHandler(BaseRotatingHandler):
                 dstNow = t[-1]
                 dstAtRollover = time.localtime(result)[-1]
                 if dstNow != dstAtRollover:
-                    if not dstNow:  # DST kicks in before next rollover, so we need to deduct an hour
+                    if (
+                        not dstNow
+                    ):  # DST kicks in before next rollover, so we need to deduct an hour
                         addend = -3600
                         if not time.localtime(result - 3600)[-1]:
                             addend = 0
@@ -400,9 +397,7 @@ class TimedRotatingFileHandler(BaseRotatingHandler):
         t = int(time.time())
         if t >= self.rolloverAt:
             # See #89564: Never rollover anything other than regular files
-            if os.path.exists(self.baseFilename) and not os.path.isfile(
-                self.baseFilename
-            ):
+            if os.path.exists(self.baseFilename) and not os.path.isfile(self.baseFilename):
                 # The file is not a regular file, so do not rollover, but do
                 # set the next rollover time to avoid repeated checks.
                 self.rolloverAt = self.computeRollover(t)
@@ -884,9 +879,7 @@ class SysLogHandler(logging.Handler):
         "CRITICAL": "critical",
     }
 
-    def __init__(
-        self, address=("localhost", SYSLOG_UDP_PORT), facility=LOG_USER, socktype=None
-    ):
+    def __init__(self, address=("localhost", SYSLOG_UDP_PORT), facility=LOG_USER, socktype=None):
         """
         Initialize a handler.
 
@@ -1123,9 +1116,9 @@ class SMTPHandler(logging.Handler):
         Format the record and send it to the specified addressees.
         """
         try:
+            from email.message import EmailMessage
             import email.utils
             import smtplib
-            from email.message import EmailMessage
 
             port = self.mailport
             if not port:
@@ -1151,9 +1144,7 @@ class SMTPHandler(logging.Handler):
                     except IndexError:
                         certfile = None
 
-                    context = ssl._create_stdlib_context(
-                        certfile=certfile, keyfile=keyfile
-                    )
+                    context = ssl._create_stdlib_context(certfile=certfile, keyfile=keyfile)
                     smtp.ehlo()
                     smtp.starttls(context=context)
                     smtp.ehlo()
@@ -1283,9 +1274,7 @@ class HTTPHandler(logging.Handler):
     POST semantics.
     """
 
-    def __init__(
-        self, host, url, method="GET", secure=False, credentials=None, context=None
-    ):
+    def __init__(self, host, url, method="GET", secure=False, credentials=None, context=None):
         """
         Initialize the instance with the host, the request URL, and the method
         ("GET" or "POST")
@@ -1437,9 +1426,7 @@ class MemoryHandler(BufferingHandler):
     is full, or when an event of a certain severity or greater is seen.
     """
 
-    def __init__(
-        self, capacity, flushLevel=logging.ERROR, target=None, flushOnClose=True
-    ):
+    def __init__(self, capacity, flushLevel=logging.ERROR, target=None, flushOnClose=True):
         """
         Initialize the handler with the buffer size, the level at which
         flushing should occur and an optional target.
@@ -1462,9 +1449,7 @@ class MemoryHandler(BufferingHandler):
         """
         Check for buffer full or a record at the flushLevel or higher.
         """
-        return (len(self.buffer) >= self.capacity) or (
-            record.levelno >= self.flushLevel
-        )
+        return (len(self.buffer) >= self.capacity) or (record.levelno >= self.flushLevel)
 
     def setTarget(self, target):
         """

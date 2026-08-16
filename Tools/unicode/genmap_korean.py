@@ -14,9 +14,7 @@ UHCL1_C1 = (0x81, 0xA0)
 UHCL1_C2 = (0x41, 0xFE)
 UHCL2_C1 = (0xA1, 0xFE)
 UHCL2_C2 = (0x41, 0xA0)
-MAPPINGS_CP949 = (
-    "http://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WINDOWS/CP949.TXT"
-)
+MAPPINGS_CP949 = "http://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WINDOWS/CP949.TXT"
 
 
 def main():

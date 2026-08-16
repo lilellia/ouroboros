@@ -9,6 +9,15 @@ import _thread as thread
 import contextlib
 import functools
 import idlelib  # testing
+from idlelib import (
+    autocomplete,  # AutoComplete, fetch_encodings
+    calltip,  # Calltip
+    debugger_r,  # start_debugger
+    debugobj_r,  # remote_object_tree_item
+    iomenu,  # encoding
+    rpc,  # multiple objects
+    stackviewer,  # StackTreeItem
+)
 import io
 import linecache
 import queue
@@ -19,15 +28,6 @@ import time
 import tkinter  # Use tcl and, if startup fails, messagebox.
 import traceback
 import warnings
-from idlelib import (
-    autocomplete,  # AutoComplete, fetch_encodings
-    calltip,  # Calltip
-    debugger_r,  # start_debugger
-    debugobj_r,  # remote_object_tree_item
-    iomenu,  # encoding
-    rpc,  # multiple objects
-    stackviewer,  # StackTreeItem
-)
 
 import __main__
 
@@ -273,19 +273,13 @@ def print_exception():
         if cause is not None and id(cause) not in seen:
             print_exc(type(cause), cause, cause.__traceback__)
             print(
-                "\nThe above exception was the direct cause "
-                "of the following exception:\n",
+                "\nThe above exception was the direct cause of the following exception:\n",
                 file=efile,
             )
-        elif (
-            context is not None
-            and not exc.__suppress_context__
-            and id(context) not in seen
-        ):
+        elif context is not None and not exc.__suppress_context__ and id(context) not in seen:
             print_exc(type(context), context, context.__traceback__)
             print(
-                "\nDuring handling of the above exception, "
-                "another exception occurred:\n",
+                "\nDuring handling of the above exception, another exception occurred:\n",
                 file=efile,
             )
         if tb:
@@ -392,9 +386,7 @@ def install_recursionlimit_wrappers():
         try:
             (limit,) = args
         except ValueError:
-            raise TypeError(
-                f"setrecursionlimit() takes exactly one argument ({len(args)} given)"
-            )
+            raise TypeError(f"setrecursionlimit() takes exactly one argument ({len(args)} given)")
         if not limit > 0:
             raise ValueError("recursion limit must be greater or equal than 1")
 
@@ -577,12 +569,8 @@ class MyHandler(rpc.RPCHandler):
         self.register("exec", executive)
         self.console = self.get_remote_proxy("console")
         sys.stdin = StdInputFile(self.console, "stdin", iomenu.encoding, iomenu.errors)
-        sys.stdout = StdOutputFile(
-            self.console, "stdout", iomenu.encoding, iomenu.errors
-        )
-        sys.stderr = StdOutputFile(
-            self.console, "stderr", iomenu.encoding, "backslashreplace"
-        )
+        sys.stdout = StdOutputFile(self.console, "stdout", iomenu.encoding, iomenu.errors)
+        sys.stderr = StdOutputFile(self.console, "stderr", iomenu.encoding, "backslashreplace")
 
         sys.displayhook = rpc.displayhook
         # page help() text to shell.

@@ -4,8 +4,11 @@ This module provides an implementation of the HeaderRegistry API.
 The implementation is designed to flexibly follow RFC5322 rules.
 """
 
-from email import _header_value_parser as parser
-from email import errors, utils
+from email import (
+    _header_value_parser as parser,
+    errors,
+    utils,
+)
 from types import MappingProxyType
 
 
@@ -37,9 +40,7 @@ class Address:
         # and domain.
         if addr_spec is not None:
             if username or domain:
-                raise TypeError(
-                    "addrspec specified when username and/or domain also specified"
-                )
+                raise TypeError("addrspec specified when username and/or domain also specified")
             a_s, rest = parser.get_addr_spec(addr_spec)
             if rest:
                 raise ValueError(
@@ -144,10 +145,7 @@ class Group:
     def __eq__(self, other):
         if not isinstance(other, Group):
             return NotImplemented
-        return (
-            self.display_name == other.display_name
-            and self.addresses == other.addresses
-        )
+        return self.display_name == other.display_name and self.addresses == other.addresses
 
 
 # Header Classes #
@@ -303,9 +301,7 @@ class DateHeader:
             try:
                 value = utils.parsedate_to_datetime(value)
             except ValueError:
-                kwds["defects"].append(
-                    errors.InvalidDateDefect("Invalid date value or format")
-                )
+                kwds["defects"].append(errors.InvalidDateDefect("Invalid date value or format"))
                 kwds["datetime"] = None
                 kwds["parse_tree"] = parser.TokenList()
                 return
@@ -362,8 +358,7 @@ class AddressHeader:
             if not hasattr(value, "__iter__"):
                 value = [value]
             groups = [
-                Group(None, [item]) if not hasattr(item, "addresses") else item
-                for item in value
+                Group(None, [item]) if not hasattr(item, "addresses") else item for item in value
             ]
             defects = []
         kwds["groups"] = groups
@@ -398,9 +393,7 @@ class SingleAddressHeader(AddressHeader):
     @property
     def address(self):
         if len(self.addresses) != 1:
-            raise ValueError(
-                f"value of single address header {self.name} is not a single address"
-            )
+            raise ValueError(f"value of single address header {self.name} is not a single address")
         return self.addresses[0]
 
 

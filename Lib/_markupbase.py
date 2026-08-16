@@ -126,9 +126,7 @@ class ParserBase:
                     # also in data attribute specifications of attlist declaration
                     # also link type declaration subsets in linktype declarations
                     # also link attribute specification lists in link declarations
-                    raise AssertionError(
-                        f"unsupported '[' char in {decltype} declaration"
-                    )
+                    raise AssertionError(f"unsupported '[' char in {decltype} declaration")
                 else:
                     raise AssertionError("unexpected '[' char in declaration")
             else:
@@ -152,9 +150,7 @@ class ParserBase:
             # look for MS Office ]> ending
             match = _msmarkedsectionclose.search(rawdata, i + 3)
         else:
-            raise AssertionError(
-                f"unknown status keyword {rawdata[i + 3 : j]!r} in marked section"
-            )
+            raise AssertionError(f"unknown status keyword {rawdata[i + 3 : j]!r} in marked section")
         if not match:
             return -1
         if report:
@@ -190,9 +186,7 @@ class ParserBase:
                     return -1
                 if s != "<!":
                     self.updatepos(declstartpos, j + 1)
-                    raise AssertionError(
-                        f"unexpected char in internal subset (in {s!r})"
-                    )
+                    raise AssertionError(f"unexpected char in internal subset (in {s!r})")
                 if (j + 2) == n:
                     # end of buffer; incomplete
                     return -1
@@ -209,9 +203,7 @@ class ParserBase:
                     return -1
                 if name not in {"attlist", "element", "entity", "notation"}:
                     self.updatepos(declstartpos, j + 2)
-                    raise AssertionError(
-                        f"unknown declaration {name!r} in internal subset"
-                    )
+                    raise AssertionError(f"unknown declaration {name!r} in internal subset")
                 # handle the individual names
                 meth = getattr(self, "_parse_doctype_" + name)
                 j = meth(j, declstartpos)

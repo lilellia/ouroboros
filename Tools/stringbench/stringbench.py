@@ -313,9 +313,7 @@ def rfind_test_slow_match_two_characters_bis(STR):
         s1_rfind(s2)
 
 
-@bench(
-    's="ABC"*33; ("E"+s+("D"+s)*500).rfind("E"+s)', "late match, 100 characters", 100
-)
+@bench('s="ABC"*33; ("E"+s+("D"+s)*500).rfind("E"+s)', "late match, 100 characters", 100)
 def rfind_test_slow_match_100_characters(STR):
     m = STR("ABC" * 33)
     d = STR("D")
@@ -327,9 +325,7 @@ def rfind_test_slow_match_100_characters(STR):
         s1_rfind(s2)
 
 
-@bench(
-    's="ABC"*33; (s+"E"+("D"+s)*500).rfind(s+"E")', "late match, 100 characters", 100
-)
+@bench('s="ABC"*33; (s+"E"+("D"+s)*500).rfind(s+"E")', "late match, 100 characters", 100)
 def rfind_test_slow_match_100_characters_bis(STR):
     m = STR("ABC" * 33)
     d = STR("D")
@@ -372,9 +368,7 @@ def index_test_slow_match_two_characters(STR):
         s1_index(s2)
 
 
-@bench(
-    's="ABC"*33; ((s+"D")*500+s+"E").index(s+"E")', "late match, 100 characters", 100
-)
+@bench('s="ABC"*33; ((s+"D")*500+s+"E").index(s+"E")', "late match, 100 characters", 100)
 def index_test_slow_match_100_characters(STR):
     m = STR("ABC" * 33)
     d = STR("D")
@@ -416,9 +410,7 @@ def rindex_test_slow_match_two_characters(STR):
         s1_rindex(s2)
 
 
-@bench(
-    's="ABC"*33; ("E"+s+("D"+s)*500).rindex("E"+s)', "late match, 100 characters", 100
-)
+@bench('s="ABC"*33; ("E"+s+("D"+s)*500).rindex("E"+s)', "late match, 100 characters", 100)
 def rindex_test_slow_match_100_characters(STR):
     m = STR("ABC" * 33)
     d = STR("D")
@@ -606,9 +598,7 @@ def split_test_slow_match_two_characters(STR):
         s1_split(s2, 1)
 
 
-@bench(
-    's="ABC"*33; ((s+"D")*500+s+"E").split(s+"E", 1)', "late match, 100 characters", 100
-)
+@bench('s="ABC"*33; ((s+"D")*500+s+"E").split(s+"E", 1)', "late match, 100 characters", 100)
 def split_test_slow_match_100_characters(STR):
     m = STR("ABC" * 33)
     d = STR("D")
@@ -800,9 +790,7 @@ def join_empty_5(STR):
         sep_join(s2)
 
 
-@bench(
-    '"A".join("ABC..Z")', "join string with 26 characters, with 1 character sep", 1000
-)
+@bench('"A".join("ABC..Z")', "join string with 26 characters, with 1 character sep", 1000)
 def join_alphabet_single(STR):
     sep = STR("A")
     s2 = get_bytes_yielding_seq(STR, "ABCDEFGHIJKLMnOPQRSTUVWXYZ")
@@ -824,9 +812,7 @@ def join_alphabet_5(STR):
         sep_join(s2)
 
 
-@bench(
-    '"A".join(list("ABC..Z"))', "join list of 26 characters, with 1 character sep", 1000
-)
+@bench('"A".join(list("ABC..Z"))', "join list of 26 characters, with 1 character sep", 1000)
 def join_alphabet_list_single(STR):
     sep = STR("A")
     s2 = [STR(x) for x in "ABCDEFGHIJKLMnOPQRSTUVWXYZ"]
@@ -857,9 +843,7 @@ def join_100_words_single(STR):
         sep_join(s2)
 
 
-@bench(
-    '"ABCDE".join(["Bob"]*100))', "join list of 100 words, with 5 character sep", 1000
-)
+@bench('"ABCDE".join(["Bob"]*100))', "join list of 100 words, with 5 character sep", 1000)
 def join_100_words_5(STR):
     sep = STR("ABCDE")
     s2 = [STR("Bob")] * 100
@@ -1514,12 +1498,8 @@ _format_dict = {
 }
 _format_bytes = bytes_from_str(_format)
 _format_unicode = unicode_from_str(_format)
-_format_dict_bytes = {
-    bytes_from_str(k): bytes_from_str(v) for (k, v) in _format_dict.items()
-}
-_format_dict_unicode = {
-    unicode_from_str(k): unicode_from_str(v) for (k, v) in _format_dict.items()
-}
+_format_dict_bytes = {bytes_from_str(k): bytes_from_str(v) for (k, v) in _format_dict.items()}
+_format_dict_unicode = {unicode_from_str(k): unicode_from_str(v) for (k, v) in _format_dict.items()}
 
 
 def _get_format(STR):

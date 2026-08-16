@@ -25,10 +25,10 @@ configuration problem notification and resolution.
 """
 # TODOs added Oct 2014, tjr
 
+from configparser import ConfigParser
 import idlelib
 import os
 import sys
-from configparser import ConfigParser
 from tkinter.font import Font
 
 
@@ -265,9 +265,7 @@ class IdleConf:
             _warn(warning, configType, section, option)
         try:
             if self.defaultCfg[configType].has_option(section, option):
-                return self.defaultCfg[configType].Get(
-                    section, option, type=type, raw=raw
-                )
+                return self.defaultCfg[configType].Get(section, option, type=type, raw=raw)
         except ValueError:
             pass
         # returning default, print warning
@@ -460,9 +458,7 @@ class IdleConf:
         if active_only:
             activeExtns = []
             for extn in extns:
-                if self.GetOption(
-                    "extensions", extn, "enable", default=True, type="bool"
-                ):
+                if self.GetOption("extensions", extn, "enable", default=True, type="bool"):
                     # the extension is enabled
                     if editor_only or shell_only:  # TODO both True contradict
                         if editor_only:
@@ -486,9 +482,7 @@ class IdleConf:
 
     def RemoveKeyBindNames(self, extnNameList):
         "Return extnNameList with keybinding section names removed."
-        return [
-            n for n in extnNameList if not n.endswith(("_bindings", "_cfgBindings"))
-        ]
+        return [n for n in extnNameList if not n.endswith(("_bindings", "_cfgBindings"))]
 
     def GetExtnNameForEvent(self, virtualEvent):
         """Return the name of the extension binding virtualEvent, or None.
@@ -534,9 +528,7 @@ class IdleConf:
         if self.defaultCfg["extensions"].has_section(keysName):
             eventNames = self.defaultCfg["extensions"].GetOptionList(keysName)
             for eventName in eventNames:
-                binding = self.GetOption(
-                    "extensions", keysName, eventName, default=""
-                ).split()
+                binding = self.GetOption("extensions", keysName, eventName, default="").split()
                 event = "<<" + eventName + ">>"
                 extKeys[event] = binding
         return extKeys
@@ -554,9 +546,7 @@ class IdleConf:
         if self.defaultCfg["extensions"].has_section(bindsName):
             eventNames = self.defaultCfg["extensions"].GetOptionList(bindsName)
             for eventName in eventNames:
-                binding = self.GetOption(
-                    "extensions", bindsName, eventName, default=""
-                ).split()
+                binding = self.GetOption("extensions", bindsName, eventName, default="").split()
                 event = "<<" + eventName + ">>"
                 extBinds[event] = binding
 
@@ -767,9 +757,9 @@ class IdleConf:
 
         Tuples in the list are those of GetExtraHelpSourceList.
         """
-        allHelpSources = self.GetExtraHelpSourceList(
-            "default"
-        ) + self.GetExtraHelpSourceList("user")
+        allHelpSources = self.GetExtraHelpSourceList("default") + self.GetExtraHelpSourceList(
+            "user"
+        )
         return allHelpSources
 
     def GetFont(self, root, configType, section):
@@ -784,9 +774,7 @@ class IdleConf:
         to tkinter.Font
         """
         family = self.GetOption(configType, section, "font", default="courier")
-        size = self.GetOption(
-            configType, section, "font-size", type="int", default="10"
-        )
+        size = self.GetOption(configType, section, "font-size", type="int", default="10")
         bold = self.GetOption(configType, section, "font-bold", default=0, type="bool")
         if family == "TkFixedFont":
             f = Font(name="TkFixedFont", exists=True, root=root)

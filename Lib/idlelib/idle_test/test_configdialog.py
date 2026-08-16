@@ -8,11 +8,11 @@ from idlelib import configdialog
 from test.support import requires
 
 requires("gui")
-import unittest
 from idlelib import config
 from idlelib.configdialog import changes, idleConf, tracers
 from idlelib.idle_test.mock_idle import Func
 from tkinter import DISABLED, NORMAL, BooleanVar, IntVar, StringVar, Tk
+import unittest
 from unittest import mock
 
 from test.support.testcase import ExtraAssertions
@@ -582,9 +582,7 @@ class HighPageTest(unittest.TestCase):
         d.fg_bg_toggle.set(True)
 
         d.color.set(color)
-        self.assertEqual(
-            d.style.lookup(d.frame_color_set["style"], "background"), color
-        )
+        self.assertEqual(d.style.lookup(d.frame_color_set["style"], "background"), color)
         self.assertEqual(d.highlight_sample.tag_cget("hilite", "foreground"), color)
         self.assertEqual(highpage, {"Python": {"hilite-foreground": color}})
 
@@ -1091,9 +1089,7 @@ class KeysPageTest(unittest.TestCase):
         self.assertNotIn(second_new, idleConf.userCfg)
         d.create_new_key_set(second_new)
         eq(idleConf.GetSectionList("user", "keys"), [first_new, second_new])
-        self.assertNotEqual(
-            idleConf.GetKeySet(first_new), idleConf.GetKeySet(second_new)
-        )
+        self.assertNotEqual(idleConf.GetKeySet(first_new), idleConf.GetKeySet(second_new))
         # Check that difference in keysets was in option `copy` from `changes`.
         idleConf.SetOption("keys", first_new, "copy", "<Key-F11>")
         eq(idleConf.GetKeySet(first_new), idleConf.GetKeySet(second_new))
@@ -1494,9 +1490,7 @@ class HelpSourceTest(unittest.TestCase):
         fr.user_helplist.append(("name2", "file2"))
 
         fr.update_help_changes()
-        self.assertEqual(
-            mainpage["HelpFiles"], {"1": "name1;file1", "2": "name2;file2"}
-        )
+        self.assertEqual(mainpage["HelpFiles"], {"1": "name1;file1", "2": "name2;file2"})
         fr.update_help_changes = Func()
 
 

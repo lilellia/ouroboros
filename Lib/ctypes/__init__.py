@@ -12,12 +12,12 @@ from _ctypes import (
     SIZEOF_TIME_T,
     ArgumentError,  # noqa: F401
     Array,  # noqa: F401
+    CFuncPtr as _CFuncPtr,
     Structure,  # noqa: F401
     Union,  # noqa: F401
+    __version__ as _ctypes_version,
     _Pointer,  # noqa: F401
 )
-from _ctypes import CFuncPtr as _CFuncPtr
-from _ctypes import __version__ as _ctypes_version
 from struct import calcsize as _calcsize
 
 if __version__ != _ctypes_version:
@@ -38,14 +38,8 @@ if _os.name == "posix" and _sys.platform == "darwin":
 
 from _ctypes import (
     FUNCFLAG_CDECL as _FUNCFLAG_CDECL,
-)
-from _ctypes import (
     FUNCFLAG_PYTHONAPI as _FUNCFLAG_PYTHONAPI,
-)
-from _ctypes import (
     FUNCFLAG_USE_ERRNO as _FUNCFLAG_USE_ERRNO,
-)
-from _ctypes import (
     FUNCFLAG_USE_LASTERROR as _FUNCFLAG_USE_LASTERROR,
 )
 
@@ -126,8 +120,10 @@ def CFUNCTYPE(restype, *argtypes, **kw):
 
 
 if _os.name == "nt":
-    from _ctypes import FUNCFLAG_STDCALL as _FUNCFLAG_STDCALL
-    from _ctypes import LoadLibrary as _dlopen
+    from _ctypes import (
+        FUNCFLAG_STDCALL as _FUNCFLAG_STDCALL,
+        LoadLibrary as _dlopen,
+    )
 
     _win_functype_cache = {}
 
@@ -653,9 +649,7 @@ if _os.name == "nt":  # COM stuff
 
     def DllGetClassObject(rclsid, riid, ppv):
         try:
-            ccom = __import__(
-                "comtypes.server.inprocserver", globals(), locals(), ["*"]
-            )
+            ccom = __import__("comtypes.server.inprocserver", globals(), locals(), ["*"])
         except ImportError:
             return -2147221231  # CLASS_E_CLASSNOTAVAILABLE
         else:
@@ -663,9 +657,7 @@ if _os.name == "nt":  # COM stuff
 
     def DllCanUnloadNow():
         try:
-            ccom = __import__(
-                "comtypes.server.inprocserver", globals(), locals(), ["*"]
-            )
+            ccom = __import__("comtypes.server.inprocserver", globals(), locals(), ["*"])
         except ImportError:
             return 0  # S_OK
         return ccom.DllCanUnloadNow()

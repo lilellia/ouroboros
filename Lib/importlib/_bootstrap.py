@@ -605,9 +605,7 @@ class ModuleSpec:
 
     """
 
-    def __init__(
-        self, name, loader, *, origin=None, loader_state=None, is_package=None
-    ):
+    def __init__(self, name, loader, *, origin=None, loader_state=None, is_package=None):
         self.name = name
         self.loader = loader
         self.origin = origin
@@ -684,9 +682,7 @@ def spec_from_loader(name, loader, *, origin=None, is_package=None):
         if is_package is None:
             return spec_from_file_location(name, loader=loader)
         search = [] if is_package else None
-        return spec_from_file_location(
-            name, loader=loader, submodule_search_locations=search
-        )
+        return spec_from_file_location(name, loader=loader, submodule_search_locations=search)
 
     if is_package is None:
         if hasattr(loader, "is_package"):
@@ -825,9 +821,7 @@ def module_from_spec(spec):
         # module creation should be used.
         module = spec.loader.create_module(spec)
     elif hasattr(spec.loader, "exec_module"):
-        raise ImportError(
-            "loaders that define exec_module() must also define create_module()"
-        )
+        raise ImportError("loaders that define exec_module() must also define create_module()")
     if module is None:
         module = _new_module(spec.name)
     _init_module_attrs(spec, module)
@@ -1430,10 +1424,7 @@ def _handle_fromlist(module, fromlist, import_, *, recursive=False):
                 # Backwards-compatibility dictates we ignore failed
                 # imports triggered by fromlist for modules that don't
                 # exist.
-                if (
-                    exc.name == from_name
-                    and sys.modules.get(from_name, _NEEDS_LOADING) is not None
-                ):
+                if exc.name == from_name and sys.modules.get(from_name, _NEEDS_LOADING) is not None:
                     continue
                 raise
     return module

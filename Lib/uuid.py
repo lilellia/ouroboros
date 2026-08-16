@@ -44,9 +44,9 @@ Typical usage:
     UUID('00010203-0405-0607-0809-0a0b0c0d0e0f')
 """
 
+from enum import Enum, _simple_enum
 import os
 import sys
-from enum import Enum, _simple_enum
 
 __author__ = "Ka-Ping Yee <ping@zesty.ca>"
 
@@ -180,8 +180,7 @@ class UUID:
 
         if [hex, bytes, bytes_le, fields, int].count(None) != 4:
             raise TypeError(
-                "one of the hex, bytes, bytes_le, fields, "
-                "or int arguments must be given"
+                "one of the hex, bytes, bytes_le, fields, or int arguments must be given"
             )
         if hex is not None:
             hex = hex.replace("urn:", "").replace("uuid:", "")
@@ -317,10 +316,7 @@ class UUID:
     def bytes_le(self):
         bytes = self.bytes
         return (
-            bytes[4 - 1 :: -1]
-            + bytes[6 - 1 : 4 - 1 : -1]
-            + bytes[8 - 1 : 6 - 1 : -1]
-            + bytes[8:]
+            bytes[4 - 1 :: -1] + bytes[6 - 1 : 4 - 1 : -1] + bytes[8 - 1 : 6 - 1 : -1] + bytes[8:]
         )
 
     @property
@@ -356,11 +352,7 @@ class UUID:
 
     @property
     def time(self):
-        return (
-            ((self.time_hi_version & 0x0FFF) << 48)
-            | (self.time_mid << 32)
-            | self.time_low
-        )
+        return ((self.time_hi_version & 0x0FFF) << 48) | (self.time_mid << 32) | self.time_low
 
     @property
     def clock_seq(self):
@@ -418,9 +410,7 @@ def _get_command_stdout(command, *args):
             command = (executable, *args)
         else:
             command = (executable,)
-        proc = subprocess.Popen(
-            command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, env=env
-        )
+        proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, env=env)
         if not proc:
             return None
         stdout, _stderr = proc.communicate()
@@ -593,9 +583,7 @@ def _arp_getnode():
         return mac
 
     # This works on Linux, FreeBSD and NetBSD
-    mac = _find_mac_near_keyword(
-        "arp", "-an", [os.fsencode(f"({ip_addr})")], lambda i: i + 2
-    )
+    mac = _find_mac_near_keyword("arp", "-an", [os.fsencode(f"({ip_addr})")], lambda i: i + 2)
     # Return None instead of 0.
     if mac:
         return mac
@@ -829,8 +817,7 @@ def main():
         "--uuid",
         choices=uuid_funcs.keys(),
         default="uuid4",
-        help="The function to use to generate the uuid. "
-        "By default uuid4 function is used.",
+        help="The function to use to generate the uuid. By default uuid4 function is used.",
     )
     parser.add_argument(
         "-n",
@@ -859,9 +846,7 @@ def main():
                 f"{args.uuid} requires a namespace and a name. "
                 "Run 'python -m uuid -h' for more information."
             )
-        namespace = (
-            namespaces[namespace] if namespace in namespaces else UUID(namespace)
-        )
+        namespace = namespaces[namespace] if namespace in namespaces else UUID(namespace)
         print(uuid_func(namespace, name))
     else:
         print(uuid_func())

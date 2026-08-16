@@ -138,13 +138,9 @@ FORMATS = {
 
 
 def add_output_cli(parser):
-    parser.add_argument(
-        "--format", dest="fmt", default="summary", choices=tuple(FORMATS)
-    )
+    parser.add_argument("--format", dest="fmt", default="summary", choices=tuple(FORMATS))
     parser.add_argument("--showfwd", action="store_true", default=None)
-    parser.add_argument(
-        "--no-showfwd", dest="showfwd", action="store_false", default=None
-    )
+    parser.add_argument("--no-showfwd", dest="showfwd", action="store_false", default=None)
 
     def process_args(args, *, argv=None):
         pass

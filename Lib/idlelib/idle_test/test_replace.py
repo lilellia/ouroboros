@@ -1,13 +1,13 @@
 "Test replace, coverage 78%."
 
-import unittest
 from idlelib.replace import ReplaceDialog
+import unittest
 
 from test.support import requires
 
 requires("gui")
-import idlelib.searchengine as se
 from idlelib.idle_test.mock_tk import Mbox
+import idlelib.searchengine as se
 from tkinter import Text, Tk
 from unittest.mock import Mock
 

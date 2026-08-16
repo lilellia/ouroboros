@@ -59,9 +59,7 @@ class ObjectTreeItem(TreeItem):
             item = make_objecttreeitem(
                 str(key) + " =",
                 value,
-                lambda value, key=key, object_=self.object: setattr(
-                    object_, key, value
-                ),
+                lambda value, key=key, object_=self.object: setattr(object_, key, value),
             )
             sublist.append(item)
         return sublist

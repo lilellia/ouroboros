@@ -85,12 +85,14 @@ __all__ = [
 ]
 
 
+from gettext import (
+    gettext as _,
+    ngettext,
+)
 import os as _os
 import re as _re
 import sys as _sys
 import warnings
-from gettext import gettext as _
-from gettext import ngettext
 
 SUPPRESS = "==SUPPRESS=="
 
@@ -173,9 +175,7 @@ class HelpFormatter:
 
         self._prog = prog
         self._indent_increment = indent_increment
-        self._max_help_position = min(
-            max_help_position, max(width - 20, indent_increment * 2)
-        )
+        self._max_help_position = min(max_help_position, max(width - 20, indent_increment * 2))
         self._width = width
 
         self._current_indent = 0
@@ -262,9 +262,7 @@ class HelpFormatter:
             get_invocation = self._format_action_invocation
             invocation_lengths = [len(get_invocation(action)) + self._current_indent]
             for subaction in self._iter_indented_subactions(action):
-                invocation_lengths.append(
-                    len(get_invocation(subaction)) + self._current_indent
-                )
+                invocation_lengths.append(len(get_invocation(subaction)) + self._current_indent)
 
             # update the maximum item length
             action_length = max(invocation_lengths)
@@ -408,9 +406,7 @@ class HelpFormatter:
                         if action.help is SUPPRESS:
                             suppressed_actions_count += 1
 
-                    exposed_actions_count = (
-                        group_action_count - suppressed_actions_count
-                    )
+                    exposed_actions_count = group_action_count - suppressed_actions_count
                     if not exposed_actions_count:
                         continue
 
@@ -656,9 +652,7 @@ class HelpFormatter:
         text = self._whitespace_matcher.sub(" ", text).strip()
         import textwrap
 
-        return textwrap.fill(
-            text, width, initial_indent=indent, subsequent_indent=indent
-        )
+        return textwrap.fill(text, width, initial_indent=indent, subsequent_indent=indent)
 
     def _get_help_string(self, action):
         return action.help
@@ -748,11 +742,7 @@ def _get_action_name(argument):
         metavar = argument.metavar
         if not isinstance(metavar, tuple):
             return metavar
-        if (
-            argument.nargs == ZERO_OR_MORE
-            and len(metavar) == 2
-            or argument.nargs == ONE_OR_MORE
-        ):
+        if argument.nargs == ZERO_OR_MORE and len(metavar) == 2 or argument.nargs == ONE_OR_MORE:
             return "{}[, {}]".format(*metavar)
         else:
             return ", ".join(metavar)
@@ -1146,9 +1136,7 @@ class _HelpAction(Action):
 
 
 class _VersionAction(Action):
-    def __init__(
-        self, option_strings, version=None, dest=SUPPRESS, default=SUPPRESS, help=None
-    ):
+    def __init__(self, option_strings, version=None, dest=SUPPRESS, default=SUPPRESS, help=None):
         if help is None:
             help = _("show program's version number and exit")
         super().__init__(
@@ -1481,8 +1469,7 @@ class _ActionsContainer:
 
         if type_func is FileType:
             raise ValueError(
-                f"{type_func!r} is a FileType class object, instance of it"
-                " must be passed"
+                f"{type_func!r} is a FileType class object, instance of it must be passed"
             )
 
         # raise an error if the metavar does not match the type
@@ -1595,8 +1582,7 @@ class _ActionsContainer:
             if not option_string[0] in self.prefix_chars:
                 args = {"option": option_string, "prefix_chars": self.prefix_chars}
                 msg = _(
-                    "invalid option string %(option)r: "
-                    "must start with a character %(prefix_chars)r"
+                    "invalid option string %(option)r: must start with a character %(prefix_chars)r"
                 )
                 raise ValueError(msg % args)
 
@@ -2023,10 +2009,7 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
             # if multiple actions match, the option string was ambiguous
             if len(option_tuples) > 1:
                 options = ", ".join(
-                    [
-                        option_string
-                        for action, option_string, sep, explicit_arg in option_tuples
-                    ]
+                    [option_string for action, option_string, sep, explicit_arg in option_tuples]
                 )
                 args = {"option": arg_strings[start_index], "matches": options}
                 msg = _("ambiguous option: %(option)s could match %(matches)s")
@@ -2054,11 +2037,7 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
                     # arguments, try to parse more single-dash options out
                     # of the tail of the option string
                     chars = self.prefix_chars
-                    if (
-                        arg_count == 0
-                        and option_string[1] not in chars
-                        and explicit_arg != ""
-                    ):
+                    if arg_count == 0 and option_string[1] not in chars and explicit_arg != "":
                         if sep or explicit_arg[0] in chars:
                             msg = _("ignored explicit argument %r")
                             raise ArgumentError(action, msg % explicit_arg)
@@ -2135,8 +2114,7 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
                         assert args[0] == "--"
                         args.remove("--")
                 elif action.nargs != REMAINDER and (
-                    arg_strings_pattern.find("-", start_index, start_index + arg_count)
-                    >= 0
+                    arg_strings_pattern.find("-", start_index, start_index + arg_count) >= 0
                 ):
                     args.remove("--")
                 start_index += arg_count
@@ -2177,9 +2155,7 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
             if start_index not in option_string_indices:
                 strings = arg_strings[start_index:next_option_string_index]
                 extras.extend(strings)
-                extras_pattern.extend(
-                    arg_strings_pattern[start_index:next_option_string_index]
-                )
+                extras_pattern.extend(arg_strings_pattern[start_index:next_option_string_index])
                 start_index = next_option_string_index
 
             # consume the next optional and any arguments for it
@@ -2236,8 +2212,7 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
         if required_actions:
             raise ArgumentError(
                 None,
-                _("the following arguments are required: %s")
-                % ", ".join(required_actions),
+                _("the following arguments are required: %s") % ", ".join(required_actions),
             )
 
         # make sure all required groups had one option present
@@ -2306,9 +2281,7 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
             msg = nargs_errors.get(action.nargs)
             if msg is None:
                 msg = (
-                    ngettext(
-                        "expected %s argument", "expected %s arguments", action.nargs
-                    )
+                    ngettext("expected %s argument", "expected %s arguments", action.nargs)
                     % action.nargs
                 )
             raise ArgumentError(action, msg)
@@ -2321,9 +2294,7 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
         # final actions until we find a match
         for i in range(len(actions), 0, -1):
             actions_slice = actions[:i]
-            pattern = "".join(
-                [self._get_nargs_pattern(action) for action in actions_slice]
-            )
+            pattern = "".join([self._get_nargs_pattern(action) for action in actions_slice])
             match = _re.match(pattern, arg_strings_pattern)
             if match is not None:
                 result = [len(string) for string in match.groups()]
@@ -2496,9 +2467,7 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
         positionals = self._get_positional_actions()
         a = [action for action in positionals if action.nargs in [PARSER, REMAINDER]]
         if a:
-            raise TypeError(
-                f"parse_intermixed_args: positional arg with nargs={a[0].nargs}"
-            )
+            raise TypeError(f"parse_intermixed_args: positional arg with nargs={a[0].nargs}")
 
         return self._parse_known_args2(args, namespace, intermixed=True)
 
@@ -2518,11 +2487,7 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
 
         # when nargs='*' on a positional, if there were no command-line
         # args, use the default if it is anything other than None
-        elif (
-            not arg_strings
-            and action.nargs == ZERO_OR_MORE
-            and not action.option_strings
-        ):
+        elif not arg_strings and action.nargs == ZERO_OR_MORE and not action.option_strings:
             if action.default is not None:
                 value = action.default
                 self._check_value(action, value)

@@ -1,13 +1,3 @@
-import importlib.abc
-import importlib.util
-import os
-import platform
-import re
-import string
-import sys
-import tokenize
-import traceback
-import webbrowser
 from idlelib import (
     configdialog,
     grep,
@@ -24,10 +14,20 @@ from idlelib.config import idleConf
 from idlelib.multicall import MultiCallCreator
 from idlelib.tree import wheel_event
 from idlelib.util import py_extensions
+import importlib.abc
+import importlib.util
+import os
+import platform
+import re
+import string
+import sys
 from tkinter import *
 from tkinter import messagebox, simpledialog
 from tkinter.font import Font
 from tkinter.ttk import Scrollbar
+import tokenize
+import traceback
+import webbrowser
 
 # The default tab setting for a Text widget, in average-width characters.
 TK_TABWIDTH_DEFAULT = 8
@@ -337,13 +337,9 @@ class EditorWindow:
         autocomplete = self.AutoComplete(self, self.user_input_insert_tags)
         text.bind("<<autocomplete>>", autocomplete.autocomplete_event)
         text.bind("<<try-open-completions>>", autocomplete.try_open_completions_event)
-        text.bind(
-            "<<force-open-completions>>", autocomplete.force_open_completions_event
-        )
+        text.bind("<<force-open-completions>>", autocomplete.force_open_completions_event)
         text.bind("<<expand-word>>", self.AutoExpand(self).expand_word_event)
-        text.bind(
-            "<<format-paragraph>>", self.FormatParagraph(self).format_paragraph_event
-        )
+        text.bind("<<format-paragraph>>", self.FormatParagraph(self).format_paragraph_event)
         parenmatch = self.ParenMatch(self)
         text.bind("<<flash-paren>>", parenmatch.flash_paren_event)
         text.bind("<<paren-closed>>", parenmatch.paren_closed_event)
@@ -360,16 +356,12 @@ class EditorWindow:
         text.bind("<<zoom-height>>", self.ZoomHeight(self).zoom_height_event)
         if self.allow_code_context:
             self.code_context = self.CodeContext(self)
-            text.bind(
-                "<<toggle-code-context>>", self.code_context.toggle_code_context_event
-            )
+            text.bind("<<toggle-code-context>>", self.code_context.toggle_code_context_event)
         else:
             self.update_menu_state("options", "*ode*ontext", "disabled")
         if self.allow_line_numbers:
             self.line_numbers = self.LineNumbers(self)
-            if idleConf.GetOption(
-                "main", "EditorWindow", "line-numbers-default", type="bool"
-            ):
+            if idleConf.GetOption("main", "EditorWindow", "line-numbers-default", type="bool"):
                 self.toggle_line_numbers_event()
             text.bind("<<toggle-line-numbers>>", self.toggle_line_numbers_event)
         else:
@@ -380,9 +372,7 @@ class EditorWindow:
 
     def set_width(self):
         text = self.text
-        inner_padding = sum(
-            map(text.tk.getint, [text.cget("border"), text.cget("padx")])
-        )
+        inner_padding = sum(map(text.tk.getint, [text.cget("border"), text.cget("padx")]))
         pixel_width = text.winfo_width() - 2 * inner_padding
 
         # Divide the width of the Text widget by the font width,
@@ -426,9 +416,7 @@ class EditorWindow:
                 # there was no previous selection
                 self.text.mark_set("my_anchor", "insert")
             else:
-                if self.text.compare(
-                    self.text.index("sel.first"), "<", self.text.index("insert")
-                ):
+                if self.text.compare(self.text.index("sel.first"), "<", self.text.index("insert")):
                     self.text.mark_set("my_anchor", "sel.first")  # extend back
                 else:
                     self.text.mark_set("my_anchor", "sel.last")  # extend forward
@@ -454,9 +442,7 @@ class EditorWindow:
         self.status_bar.pack(side=BOTTOM, fill=X)
         sep.pack(side=BOTTOM, fill=X)
         self.text.bind("<<set-line-and-column>>", self.set_line_and_column)
-        self.text.event_add(
-            "<<set-line-and-column>>", "<KeyRelease>", "<ButtonRelease>"
-        )
+        self.text.event_add("<<set-line-and-column>>", "<KeyRelease>", "<ButtonRelease>")
         self.text.after_idle(self.set_line_and_column)
 
     def set_line_and_column(self, event=None):
@@ -514,9 +500,7 @@ class EditorWindow:
         for name, label in self.menu_specs:
             underline, label = prepstr(label)
             postcommand = getattr(self, f"{name}_menu_postcommand", None)
-            menudict[name] = menu = Menu(
-                mbar, name=name, tearoff=0, postcommand=postcommand
-            )
+            menudict[name] = menu = Menu(mbar, name=name, tearoff=0, postcommand=postcommand)
             mbar.add_cascade(label=label, menu=menu, underline=underline)
         if macosx.isCarbonTk():
             # Insert the application menu
@@ -890,9 +874,7 @@ class EditorWindow:
 
     def update_cursor_blink(self):
         "Update the cursor blink configuration."
-        cursorblink = idleConf.GetOption(
-            "main", "EditorWindow", "cursor-blink", type="bool"
-        )
+        cursorblink = idleConf.GetOption("main", "EditorWindow", "cursor-blink", type="bool")
         if not cursorblink:
             self.text["insertofftime"] = 0
         else:
@@ -975,9 +957,7 @@ class EditorWindow:
         "Update the indentwidth if changed and not using tabs in this window"
         # Called from configdialog.py
         if not self.usetabs:
-            self.indentwidth = idleConf.GetOption(
-                "main", "Indent", "num-spaces", type="int"
-            )
+            self.indentwidth = idleConf.GetOption("main", "Indent", "num-spaces", type="int")
 
     def reset_help_menu_entries(self):
         """Update the additional help entries on the Help menu."""
@@ -1039,9 +1019,7 @@ class EditorWindow:
         rf_list = rf_list[0 : len(ulchars)]
         if file_path:
             try:
-                with open(
-                    file_path, "w", encoding="utf_8", errors="replace"
-                ) as rf_file:
+                with open(file_path, "w", encoding="utf_8", errors="replace") as rf_file:
                     rf_file.writelines(rf_list)
             except OSError as err:
                 if not getattr(self.root, "recentfiles_message", False):
@@ -1060,9 +1038,7 @@ class EditorWindow:
             for i, file_name in enumerate(rf_list):
                 file_name = file_name.rstrip()  # zap \n
                 callback = instance.__recent_file_callback(file_name)
-                menu.add_command(
-                    label=ulchars[i] + " " + file_name, command=callback, underline=0
-                )
+                menu.add_command(label=ulchars[i] + " " + file_name, command=callback, underline=0)
 
     def __recent_file_callback(self, file_name):
         def open_recent_file(fn_closure=file_name):
@@ -1333,9 +1309,9 @@ class EditorWindow:
         if self.color:
             # Return true iff colorizer hasn't (re)gotten this far
             # yet, or the character is tagged as being in a string
-            return self.text.tag_prevrange(
-                "TODO", text_index
-            ) or "STRING" in self.text.tag_names(text_index)
+            return self.text.tag_prevrange("TODO", text_index) or "STRING" in self.text.tag_names(
+                text_index
+            )
         else:
             # The colorizer is missing: assume the worst
             return 1
@@ -1515,9 +1491,7 @@ class EditorWindow:
                     startatindex = repr(startat) + ".0"
                     rawtext = text.get(startatindex, "insert")
                     y.set_code(rawtext)
-                    bod = y.find_good_parse_start(
-                        self._build_char_in_string_func(startatindex)
-                    )
+                    bod = y.find_good_parse_start(self._build_char_in_string_func(startatindex))
                     if bod is not None or startat == 1:
                         break
                 y.set_lo(bod or 0)
@@ -1612,9 +1586,7 @@ class EditorWindow:
         if text.compare("insert linestart", "!=", "insert"):
             text.delete("insert linestart", "insert")
         if column:
-            text.insert(
-                "insert", self._make_blanks(column), self.user_input_insert_tags
-            )
+            text.insert("insert", self._make_blanks(column), self.user_input_insert_tags)
         text.undo_block_stop()
 
     # Guess indentwidth from text content.

@@ -89,9 +89,7 @@ class Function(_Object):
 class Class(_Object):
     "Information about a Python class."
 
-    def __init__(
-        self, module, name, super_, file, lineno, parent=None, *, end_lineno=None
-    ):
+    def __init__(self, module, name, super_, file, lineno, parent=None, *, end_lineno=None):
         super().__init__(module, name, file, lineno, end_lineno, parent)
         self.super = super_ or []
         self.methods = {}
@@ -114,9 +112,7 @@ def _nest_function(ob, func_name, lineno, end_lineno, is_async=False):
 
 def _nest_class(ob, class_name, lineno, end_lineno, super=None):
     "Return a Class after nesting within ob."
-    return Class(
-        ob.module, class_name, super, ob.file, lineno, parent=ob, end_lineno=end_lineno
-    )
+    return Class(ob.module, class_name, super, ob.file, lineno, parent=ob, end_lineno=end_lineno)
 
 
 def readmodule(module, path=None):
@@ -341,11 +337,7 @@ def _main():
                 ob.indent = obj.indent + indent_level
             objs.extend(new_objs)
         if isinstance(obj, Class):
-            print(
-                "{}class {} {} {}".format(
-                    " " * obj.indent, obj.name, obj.super, obj.lineno
-                )
-            )
+            print("{}class {} {} {}".format(" " * obj.indent, obj.name, obj.super, obj.lineno))
         elif isinstance(obj, Function):
             print("{}def {} {}".format(" " * obj.indent, obj.name, obj.lineno))
 

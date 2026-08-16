@@ -234,9 +234,7 @@ class Timer:
             i *= 10
 
 
-def timeit(
-    stmt="pass", setup="pass", timer=default_timer, number=default_number, globals=None
-):
+def timeit(stmt="pass", setup="pass", timer=default_timer, number=default_number, globals=None):
     """Convenience function to create Timer object and call timeit method."""
     return Timer(stmt, setup, timer, globals).timeit(number)
 

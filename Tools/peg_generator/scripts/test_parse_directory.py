@@ -2,12 +2,12 @@
 
 import argparse
 import ast
+from glob import escape, glob
 import os
+from pathlib import PurePath
 import sys
 import time
 import tokenize
-from glob import escape, glob
-from pathlib import PurePath
 from typing import Any
 
 sys.path.insert(0, os.getcwd())
@@ -25,9 +25,7 @@ argparser = argparse.ArgumentParser(
     prog="test_parse_directory",
     description="Helper program to test directories or files for pegen",
 )
-argparser.add_argument(
-    "-d", "--directory", help="Directory path containing files to test"
-)
+argparser.add_argument("-d", "--directory", help="Directory path containing files to test")
 argparser.add_argument(
     "-e",
     "--exclude",
@@ -108,18 +106,14 @@ def generate_time_stats(files, total_seconds) -> None:
         )
 
 
-def parse_directory(
-    directory: str, verbose: bool, excluded_files: list[str], short: bool
-) -> int:
+def parse_directory(directory: str, verbose: bool, excluded_files: list[str], short: bool) -> int:
     # For a given directory, traverse files and attempt to parse each one
     # - Output success/failure for each file
     errors = 0
     files = []
     total_seconds = 0
 
-    for file in sorted(
-        glob(os.path.join(escape(directory), "**/*.py"), recursive=True)
-    ):
+    for file in sorted(glob(os.path.join(escape(directory), "**/*.py"), recursive=True)):
         # Only attempt to parse Python files and files that are not excluded
         if any(PurePath(file).match(pattern) for pattern in excluded_files):
             continue
@@ -132,9 +126,7 @@ def parse_directory(
             total_seconds += dt
             report_status(succeeded=True, file=file, verbose=verbose, short=short)
         except SyntaxError as error:
-            report_status(
-                succeeded=False, file=file, verbose=verbose, error=error, short=short
-            )
+            report_status(succeeded=False, file=file, verbose=verbose, error=error, short=short)
             errors += 1
         files.append(file)
 

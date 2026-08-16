@@ -50,12 +50,12 @@ the setsockopt() and getsockopt() methods.
 """
 
 import _socket
+from _socket import *
+from enum import IntEnum, IntFlag
 import io
 import os
 import selectors
 import sys
-from _socket import *
-from enum import IntEnum, IntFlag
 
 try:
     import errno
@@ -82,19 +82,13 @@ __all__.extend(os._get_exports_list(_socket))
 # in this module understands the enums and translates them back from integers
 # where needed (e.g. .family property of a socket object).
 
-IntEnum._convert_(
-    "AddressFamily", __name__, lambda C: C.isupper() and C.startswith("AF_")
-)
+IntEnum._convert_("AddressFamily", __name__, lambda C: C.isupper() and C.startswith("AF_"))
 
-IntEnum._convert_(
-    "SocketKind", __name__, lambda C: C.isupper() and C.startswith("SOCK_")
-)
+IntEnum._convert_("SocketKind", __name__, lambda C: C.isupper() and C.startswith("SOCK_"))
 
 IntFlag._convert_("MsgFlag", __name__, lambda C: C.isupper() and C.startswith("MSG_"))
 
-IntFlag._convert_(
-    "AddressInfo", __name__, lambda C: C.isupper() and C.startswith("AI_")
-)
+IntFlag._convert_("AddressInfo", __name__, lambda C: C.isupper() and C.startswith("AI_"))
 
 _LOCALHOST = "127.0.0.1"
 _LOCALHOST_V6 = "::1"
@@ -305,9 +299,7 @@ class socket(_socket.socket):
             sock.setblocking(True)
         return sock, addr
 
-    def makefile(
-        self, mode="r", buffering=None, *, encoding=None, errors=None, newline=None
-    ):
+    def makefile(self, mode="r", buffering=None, *, encoding=None, errors=None, newline=None):
         """makefile(...) -> an I/O stream connected to the socket
 
         The arguments are as for io.open() after the filename, except the only
@@ -582,14 +574,10 @@ if hasattr(_socket.socket, "recvmsg"):
         """
         # Array of ints
         fds = array.array("i")
-        msg, ancdata, flags, addr = sock.recvmsg(
-            bufsize, _socket.CMSG_LEN(maxfds * fds.itemsize)
-        )
+        msg, ancdata, flags, addr = sock.recvmsg(bufsize, _socket.CMSG_LEN(maxfds * fds.itemsize))
         for cmsg_level, cmsg_type, cmsg_data in ancdata:
             if cmsg_level == _socket.SOL_SOCKET and cmsg_type == _socket.SCM_RIGHTS:
-                fds.frombytes(
-                    cmsg_data[: len(cmsg_data) - (len(cmsg_data) % fds.itemsize)]
-                )
+                fds.frombytes(cmsg_data[: len(cmsg_data) - (len(cmsg_data) % fds.itemsize)])
 
         return msg, list(fds), flags, addr
 
@@ -617,9 +605,7 @@ def _fallback_socketpair(family=AF_INET, type=SOCK_STREAM, proto=0):
     elif family == AF_INET6:
         host = _LOCALHOST_V6
     else:
-        raise ValueError(
-            "Only AF_INET and AF_INET6 socket address families are supported"
-        )
+        raise ValueError("Only AF_INET and AF_INET6 socket address families are supported")
     if type != SOCK_STREAM:
         raise ValueError("Only SOCK_STREAM socket type is supported")
     if proto != 0:
@@ -652,10 +638,7 @@ def _fallback_socketpair(family=AF_INET, type=SOCK_STREAM, proto=0):
     # able to connect to {host}:{port} instead of us.
     # We expect only AF_INET and AF_INET6 families.
     try:
-        if (
-            ssock.getsockname() != csock.getpeername()
-            or csock.getsockname() != ssock.getpeername()
-        ):
+        if ssock.getsockname() != csock.getpeername() or csock.getsockname() != ssock.getpeername():
             raise ConnectionError("Unexpected peer connection")
     except:
         # getsockname() and getpeername() can fail
@@ -892,11 +875,7 @@ def has_dualstack_ipv6():
     """Return True if the platform supports creating a SOCK_STREAM socket
     which can handle both AF_INET and AF_INET6 (IPv4 / IPv6) connections.
     """
-    if (
-        not has_ipv6
-        or not hasattr(_socket, "IPPROTO_IPV6")
-        or not hasattr(_socket, "IPV6_V6ONLY")
-    ):
+    if not has_ipv6 or not hasattr(_socket, "IPPROTO_IPV6") or not hasattr(_socket, "IPV6_V6ONLY"):
         return False
     try:
         with socket(AF_INET6, SOCK_STREAM) as sock:
@@ -906,9 +885,7 @@ def has_dualstack_ipv6():
         return False
 
 
-def create_server(
-    address, *, family=AF_INET, backlog=None, reuse_port=False, dualstack_ipv6=False
-):
+def create_server(address, *, family=AF_INET, backlog=None, reuse_port=False, dualstack_ipv6=False):
     """Convenience function which creates a SOCK_STREAM type socket
     bound to *address* (a 2-tuple (host, port)) and return the socket
     object.

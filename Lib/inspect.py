@@ -143,22 +143,22 @@ __all__ = [
 import abc
 import ast
 import builtins
+from collections import OrderedDict, namedtuple
 import collections.abc
 import dis
 import enum
 import functools
 import importlib.machinery
 import itertools
+from keyword import iskeyword
 import linecache
+from operator import attrgetter
 import os
 import re
 import sys
 import token
 import tokenize
 import types
-from collections import OrderedDict, namedtuple
-from keyword import iskeyword
-from operator import attrgetter
 from weakref import ref as make_weakref
 
 # Create constants for the compiler flags in Include/code.h
@@ -1001,9 +1001,7 @@ def getsourcefile(object):
     all_bytecode_suffixes = importlib.machinery.DEBUG_BYTECODE_SUFFIXES[:]
     all_bytecode_suffixes += importlib.machinery.OPTIMIZED_BYTECODE_SUFFIXES[:]
     if any(filename.endswith(s) for s in all_bytecode_suffixes):
-        filename = (
-            os.path.splitext(filename)[0] + importlib.machinery.SOURCE_SUFFIXES[0]
-        )
+        filename = os.path.splitext(filename)[0] + importlib.machinery.SOURCE_SUFFIXES[0]
     elif any(filename.endswith(s) for s in importlib.machinery.EXTENSION_SUFFIXES):
         return None
     # return a filename found in the linecache even if it doesn't exist on disk
@@ -1170,9 +1168,7 @@ def findsource(object):
         if not hasattr(object, "co_firstlineno"):
             raise OSError("could not find function definition")
         lnum = object.co_firstlineno - 1
-        pat = re.compile(
-            r"^(\s*def\s)|(\s*async\s+def\s)|(.*(?<!\w)lambda(:|\s))|^(\s*@)"
-        )
+        pat = re.compile(r"^(\s*def\s)|(\s*async\s+def\s)|(.*(?<!\w)lambda(:|\s))|^(\s*@)")
         while lnum > 0:
             try:
                 line = lines[lnum]
@@ -1214,11 +1210,7 @@ def getcomments(object):
     elif lnum > 0:
         indent = indentsize(lines[lnum])
         end = lnum - 1
-        if (
-            end >= 0
-            and lines[end].lstrip()[:1] == "#"
-            and indentsize(lines[end]) == indent
-        ):
+        if end >= 0 and lines[end].lstrip()[:1] == "#" and indentsize(lines[end]) == indent:
             comments = [lines[end].expandtabs().lstrip()]
             if end > 0:
                 end = end - 1
@@ -1734,8 +1726,7 @@ def getclosurevars(func):
         nonlocal_vars = {}
     else:
         nonlocal_vars = {
-            var: cell.cell_contents
-            for var, cell in zip(code.co_freevars, func.__closure__)
+            var: cell.cell_contents for var, cell in zip(code.co_freevars, func.__closure__)
         }
 
     # Global and builtin references are named in co_names and resolved
@@ -1773,9 +1764,7 @@ _Traceback = namedtuple("_Traceback", "filename lineno function code_context ind
 
 
 class Traceback(_Traceback):
-    def __new__(
-        cls, filename, lineno, function, code_context, index, *, positions=None
-    ):
+    def __new__(cls, filename, lineno, function, code_context, index, *, positions=None):
         instance = super().__new__(cls, filename, lineno, function, code_context, index)
         instance.positions = positions
         return instance
@@ -1860,12 +1849,8 @@ _FrameInfo = namedtuple("_FrameInfo", ("frame",) + Traceback._fields)
 
 
 class FrameInfo(_FrameInfo):
-    def __new__(
-        cls, frame, filename, lineno, function, code_context, index, *, positions=None
-    ):
-        instance = super().__new__(
-            cls, frame, filename, lineno, function, code_context, index
-        )
+    def __new__(cls, frame, filename, lineno, function, code_context, index, *, positions=None):
+        instance = super().__new__(cls, frame, filename, lineno, function, code_context, index)
         instance.positions = positions
         return instance
 
@@ -2449,9 +2434,7 @@ def _signature_fromstr(cls, obj, s, skip_bound_arg=True):
             # commonly used to define default values in text signatures
             left = self.visit(node.left)
             right = self.visit(node.right)
-            if not isinstance(left, ast.Constant) or not isinstance(
-                right, ast.Constant
-            ):
+            if not isinstance(left, ast.Constant) or not isinstance(right, ast.Constant):
                 raise ValueError  # noqa: TRY004
             if isinstance(node.op, ast.Add):
                 return ast.Constant(left.value + right.value)
@@ -2474,9 +2457,7 @@ def _signature_fromstr(cls, obj, s, skip_bound_arg=True):
     # non-keyword-only parameters
     total_non_kw_args = len(f.args.posonlyargs) + len(f.args.args)
     required_non_kw_args = total_non_kw_args - len(f.args.defaults)
-    defaults = itertools.chain(
-        itertools.repeat(None, required_non_kw_args), f.args.defaults
-    )
+    defaults = itertools.chain(itertools.repeat(None, required_non_kw_args), f.args.defaults)
 
     kind = Parameter.POSITIONAL_ONLY
     for name, default in zip(f.args.posonlyargs, defaults):
@@ -2564,9 +2545,7 @@ def _signature_from_function(
     positional = arg_names[:pos_count]
     keyword_only_count = func_code.co_kwonlyargcount
     keyword_only = arg_names[pos_count : pos_count + keyword_only_count]
-    annotations = get_annotations(
-        func, globals=globals, locals=locals, eval_str=eval_str
-    )
+    annotations = get_annotations(func, globals=globals, locals=locals, eval_str=eval_str)
     defaults = func.__defaults__
     kwdefaults = func.__kwdefaults__
 
@@ -2685,9 +2664,7 @@ def _signature_from_callable(
         # handled explicitly below).
         obj = unwrap(
             obj,
-            stop=(
-                lambda f: hasattr(f, "__signature__") or isinstance(f, types.MethodType)
-            ),
+            stop=(lambda f: hasattr(f, "__signature__") or isinstance(f, types.MethodType)),
         )
         if isinstance(obj, types.MethodType):
             # If the unwrapped object is a *method*, we might want to
@@ -2710,9 +2687,7 @@ def _signature_from_callable(
             if isinstance(sig, str):
                 sig = _signature_fromstr(sigcls, obj, sig)
             if not isinstance(sig, Signature):
-                raise TypeError(
-                    f"unexpected object {o_sig!r} in __signature__ attribute"
-                )
+                raise TypeError(f"unexpected object {o_sig!r} in __signature__ attribute")
             return sig
 
     try:
@@ -2920,10 +2895,7 @@ class Parameter:
             # their name as "implicitN" and treat them as positional-only.
             # See issue 19611.
             if self._kind != _POSITIONAL_OR_KEYWORD:
-                msg = (
-                    "implicit arguments must be passed as "
-                    "positional or keyword arguments, not {}"
-                )
+                msg = "implicit arguments must be passed as positional or keyword arguments, not {}"
                 msg = msg.format(self._kind.description)
                 raise ValueError(msg)
             self._kind = _POSITIONAL_ONLY
@@ -3180,9 +3152,7 @@ class Signature:
 
     empty = _empty
 
-    def __init__(
-        self, parameters=None, *, return_annotation=_empty, __validate_parameters__=True
-    ):
+    def __init__(self, parameters=None, *, return_annotation=_empty, __validate_parameters__=True):
         """Constructs Signature from the given list of Parameter
         objects and 'return_annotation'.  All arguments are optional.
         """
@@ -3229,9 +3199,7 @@ class Signature:
         self._return_annotation = return_annotation
 
     @classmethod
-    def from_callable(
-        cls, obj, *, follow_wrapped=True, globals=None, locals=None, eval_str=False
-    ):
+    def from_callable(cls, obj, *, follow_wrapped=True, globals=None, locals=None, eval_str=False):
         """Constructs Signature for the given callable object."""
         return _signature_from_callable(
             obj,
@@ -3265,14 +3233,10 @@ class Signature:
         return type(self)(parameters, return_annotation=return_annotation)
 
     def _hash_basis(self):
-        params = tuple(
-            param for param in self.parameters.values() if param.kind != _KEYWORD_ONLY
-        )
+        params = tuple(param for param in self.parameters.values() if param.kind != _KEYWORD_ONLY)
 
         kwo_params = {
-            param.name: param
-            for param in self.parameters.values()
-            if param.kind == _KEYWORD_ONLY
+            param.name: param for param in self.parameters.values() if param.kind == _KEYWORD_ONLY
         }
 
         return params, kwo_params, self.return_annotation
@@ -3371,9 +3335,7 @@ class Signature:
                         break
 
                     if param.name in kwargs and param.kind != _POSITIONAL_ONLY:
-                        raise TypeError(
-                            f"multiple values for argument {param.name!r}"
-                        ) from None
+                        raise TypeError(f"multiple values for argument {param.name!r}") from None
 
                     arguments[param.name] = arg_val
 
@@ -3400,14 +3362,8 @@ class Signature:
                 # if it has a default value, or it is an '*args'-like
                 # parameter, left alone by the processing of positional
                 # arguments.
-                if (
-                    not partial
-                    and param.kind != _VAR_POSITIONAL
-                    and param.default is _empty
-                ):
-                    raise TypeError(
-                        f"missing a required argument: {param_name!r}"
-                    ) from None
+                if not partial and param.kind != _VAR_POSITIONAL and param.default is _empty:
+                    raise TypeError(f"missing a required argument: {param_name!r}") from None
 
             else:
                 arguments[param_name] = arg_val
@@ -3424,9 +3380,7 @@ class Signature:
                     ),
                 )
             else:
-                raise TypeError(
-                    f"got an unexpected keyword argument {next(iter(kwargs))!r}"
-                )
+                raise TypeError(f"got an unexpected keyword argument {next(iter(kwargs))!r}")
 
         return self._bound_arguments_cls(self, arguments)
 

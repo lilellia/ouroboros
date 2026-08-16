@@ -94,8 +94,10 @@ __all__ = [
 
 import __future__
 
+from collections import namedtuple
 import difflib
 import inspect
+from io import IncrementalNewlineDecoder, StringIO
 import linecache
 import os
 import pdb  # noqa: T100
@@ -103,8 +105,6 @@ import re
 import sys
 import traceback
 import unittest
-from collections import namedtuple
-from io import IncrementalNewlineDecoder, StringIO
 
 TestResults = namedtuple("TestResults", "failed attempted")
 
@@ -159,9 +159,7 @@ REPORT_NDIFF = register_optionflag("REPORT_NDIFF")
 REPORT_ONLY_FIRST_FAILURE = register_optionflag("REPORT_ONLY_FIRST_FAILURE")
 FAIL_FAST = register_optionflag("FAIL_FAST")
 
-REPORTING_FLAGS = (
-    REPORT_UDIFF | REPORT_CDIFF | REPORT_NDIFF | REPORT_ONLY_FIRST_FAILURE | FAIL_FAST
-)
+REPORTING_FLAGS = REPORT_UDIFF | REPORT_CDIFF | REPORT_NDIFF | REPORT_ONLY_FIRST_FAILURE | FAIL_FAST
 
 # Special string markers for use in `want` strings:
 BLANKLINE_MARKER = "<BLANKLINE>"
@@ -439,8 +437,7 @@ def _module_relative_path(module, test_path):
 
         # A module w/o __file__ (this includes builtins)
         raise ValueError(
-            "Can't resolve paths relative to the module "
-            f"{module.__name__!r} (it has no __file__)"
+            f"Can't resolve paths relative to the module {module.__name__!r} (it has no __file__)"
         )
 
     # Combine the base directory and the test path.
@@ -723,9 +720,7 @@ class DocTestParser:
         the new `DocTest` object.  See the documentation for `DocTest`
         for more information.
         """
-        return DocTest(
-            self.get_examples(string, name), globs, name, filename, lineno, string
-        )
+        return DocTest(self.get_examples(string, name), globs, name, filename, lineno, string)
 
     def get_examples(self, string, name="<string>"):
         """
@@ -873,7 +868,11 @@ class DocTestFinder:
     """
 
     def __init__(
-        self, verbose=False, parser=DocTestParser(), recurse=True, exclude_empty=True  # noqa: B008
+        self,
+        verbose=False,
+        parser=DocTestParser(),  # noqa: B008
+        recurse=True,
+        exclude_empty=True,
     ):
         """
         Create a new doctest finder.
@@ -1060,9 +1059,9 @@ class DocTestFinder:
                 valname = f"{name}.{valname}"
 
                 # Recurse to functions & classes.
-                if (
-                    self._is_routine(val) or inspect.isclass(val)
-                ) and self._from_module(module, val):
+                if (self._is_routine(val) or inspect.isclass(val)) and self._from_module(
+                    module, val
+                ):
                     self._find(tests, val, valname, module, source_lines, globs, seen)
 
         # Look for tests in a module's __test__ dictionary.
@@ -1070,8 +1069,7 @@ class DocTestFinder:
             for valname, val in getattr(obj, "__test__", {}).items():
                 if not isinstance(valname, str):
                     raise ValueError(  # noqa: TRY004
-                        "DocTestFinder.find: __test__ keys "
-                        f"must be strings: {type(valname)!r}"
+                        f"DocTestFinder.find: __test__ keys must be strings: {type(valname)!r}"
                     )
                 if not (
                     inspect.isroutine(val)
@@ -1096,9 +1094,7 @@ class DocTestFinder:
 
                 # Recurse to methods, properties, and nested classes.
                 if (
-                    inspect.isroutine(val)
-                    or inspect.isclass(val)
-                    or isinstance(val, property)
+                    inspect.isroutine(val) or inspect.isclass(val) or isinstance(val, property)
                 ) and self._from_module(module, val):
                     valname = f"{name}.{valname}"
                     self._find(tests, val, valname, module, source_lines, globs, seen)
@@ -1159,9 +1155,7 @@ class DocTestFinder:
         if inspect.isclass(obj) and docstring is not None:
             if source_lines is None:
                 return None
-            pat = re.compile(
-                r"^\s*class\s*{}\b".format(re.escape(getattr(obj, "__name__", "-")))
-            )
+            pat = re.compile(r"^\s*class\s*{}\b".format(re.escape(getattr(obj, "__name__", "-"))))
             for i, line in enumerate(source_lines):
                 if pat.match(line):
                     lineno = i
@@ -1315,12 +1309,7 @@ class DocTestRunner:
         """
         if self._verbose:
             if example.want:
-                out(
-                    "Trying:\n"
-                    + _indent(example.source)
-                    + "Expecting:\n"
-                    + _indent(example.want)
-                )
+                out("Trying:\n" + _indent(example.source) + "Expecting:\n" + _indent(example.want))
             else:
                 out("Trying:\n" + _indent(example.source) + "Expecting nothing\n")
 
@@ -2192,9 +2181,7 @@ def testfile(
         raise ValueError("Package may only be specified for module-relative paths.")
 
     # Relativize the path
-    text, filename = _load_testfile(
-        filename, package, module_relative, encoding or "utf-8"
-    )
+    text, filename = _load_testfile(filename, package, module_relative, encoding or "utf-8")
 
     # If no name was given, then use the file's name.
     if name is None:
@@ -2336,9 +2323,7 @@ class DocTestCase(unittest.TestCase):
             # so add the default reporting flags
             optionflags |= _unittest_reportflags
 
-        runner = DocTestRunner(
-            optionflags=optionflags, checker=self._dt_checker, verbose=False
-        )
+        runner = DocTestRunner(optionflags=optionflags, checker=self._dt_checker, verbose=False)
 
         try:
             runner.DIVIDER = "-" * 70
@@ -2447,9 +2432,7 @@ class DocTestCase(unittest.TestCase):
         )
 
     def __hash__(self):
-        return hash(
-            (self._dt_optionflags, self._dt_setUp, self._dt_tearDown, self._dt_checker)
-        )
+        return hash((self._dt_optionflags, self._dt_setUp, self._dt_tearDown, self._dt_checker))
 
     def __repr__(self):
         name = self._dt_test.name.split(".")

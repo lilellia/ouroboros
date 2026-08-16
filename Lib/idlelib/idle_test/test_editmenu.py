@@ -6,10 +6,10 @@ Edit modules have their own test files
 from test.support import requires
 
 requires("gui")
-import tkinter as tk
-import unittest
 from idlelib import pyshell
+import tkinter as tk
 from tkinter import ttk
+import unittest
 
 
 class PasteTest(unittest.TestCase):

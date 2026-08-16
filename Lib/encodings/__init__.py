@@ -86,9 +86,7 @@ def search_function(encoding):
     # try in the encodings package, then at top-level.
     #
     norm_encoding = normalize_encoding(encoding)
-    aliased_encoding = _aliases.get(norm_encoding) or _aliases.get(
-        norm_encoding.replace(".", "_")
-    )
+    aliased_encoding = _aliases.get(norm_encoding) or _aliases.get(norm_encoding.replace(".", "_"))
     if aliased_encoding is not None:
         modnames = [aliased_encoding, norm_encoding]
     else:
@@ -124,9 +122,7 @@ def search_function(encoding):
     entry = getregentry()
     if not isinstance(entry, codecs.CodecInfo):
         if not 4 <= len(entry) <= 7:
-            raise CodecRegistryError(
-                f'module "{mod.__name__}" ({mod.__file__}) failed to register'
-            )
+            raise CodecRegistryError(f'module "{mod.__name__}" ({mod.__file__}) failed to register')
         if (
             not callable(entry[0])
             or not callable(entry[1])

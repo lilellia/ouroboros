@@ -67,14 +67,17 @@ It is returned in place of lists of (ctext/quoted-pair) and
 XXX: provide complete list of token types.
 """
 
+from email import (
+    _encoded_words as _ew,
+    errors,
+    utils,
+)
 import functools
+from operator import iadd, itemgetter
 import re
+from string import hexdigits
 import sys
 import urllib  # For urllib.parse.unquote
-from email import _encoded_words as _ew
-from email import errors, utils
-from operator import iadd, itemgetter
-from string import hexdigits
 
 #
 # Useful constants and functions
@@ -310,9 +313,7 @@ class AddressList(TokenList):
 
     @property
     def mailboxes(self):
-        return functools.reduce(
-            iadd, (x.mailboxes for x in self if x.token_type == "address"), []
-        )
+        return functools.reduce(iadd, (x.mailboxes for x in self if x.token_type == "address"), [])
 
     @property
     def all_mailboxes(self):
@@ -711,9 +712,7 @@ class Value(TokenList):
         token = self[0]
         if token.token_type == "cfws":
             token = self[1]
-        if token.token_type.endswith(
-            ("quoted-string", "attribute", "extended-attribute")
-        ):
+        if token.token_type.endswith(("quoted-string", "attribute", "extended-attribute")):
             return token.stripped_value
         return self.value
 
@@ -749,9 +748,7 @@ class MimeParameters(TokenList):
             if not first_param.extended and len(parts) > 1:  # noqa: SIM102
                 if parts[1][0] == 0:
                     parts[1][1].defects.append(
-                        errors.InvalidHeaderDefect(
-                            "duplicate parameter name; duplicate(s) ignored"
-                        )
+                        errors.InvalidHeaderDefect("duplicate parameter name; duplicate(s) ignored")
                     )
                     parts = parts[:1]
                 # Else assume the *0* was missing...note that this is different
@@ -772,9 +769,7 @@ class MimeParameters(TokenList):
                         continue
                     else:
                         param.defects.append(
-                            errors.InvalidHeaderDefect(
-                                "inconsistent RFC2231 parameter numbering"
-                            )
+                            errors.InvalidHeaderDefect("inconsistent RFC2231 parameter numbering")
                         )
                 i += 1
                 value = param.param_value
@@ -981,16 +976,10 @@ RouteComponentMarker = ValueTerminal("@", "route-component-marker")
 # characters left in the string after the phrase is removed.
 
 _wsp_splitter = re.compile(r"([{}]+)".format("".join(WSP))).split
-_non_atom_end_matcher = re.compile(
-    r"[^{}]+".format(re.escape("".join(ATOM_ENDS)))
-).match
+_non_atom_end_matcher = re.compile(r"[^{}]+".format(re.escape("".join(ATOM_ENDS)))).match
 _non_printable_finder = re.compile(r"[\x00-\x20\x7F]").findall
-_non_token_end_matcher = re.compile(
-    r"[^{}]+".format(re.escape("".join(TOKEN_ENDS)))
-).match
-_non_attribute_end_matcher = re.compile(
-    r"[^{}]+".format(re.escape("".join(ATTRIBUTE_ENDS)))
-).match
+_non_token_end_matcher = re.compile(r"[^{}]+".format(re.escape("".join(TOKEN_ENDS)))).match
+_non_attribute_end_matcher = re.compile(r"[^{}]+".format(re.escape("".join(ATTRIBUTE_ENDS)))).match
 _non_extended_attribute_end_matcher = re.compile(
     r"[^{}]+".format(re.escape("".join(EXTENDED_ATTRIBUTE_ENDS)))
 ).match
@@ -1061,12 +1050,7 @@ def get_encoded_word(value, terminal_type="vtext"):
     if tok == value[2:]:
         raise errors.HeaderParseError(f"expected encoded word but found {value}")
     remstr = "".join(remainder)
-    if (
-        len(remstr) > 1
-        and remstr[0] in hexdigits
-        and remstr[1] in hexdigits
-        and tok.count("?") < 2
-    ):
+    if len(remstr) > 1 and remstr[0] in hexdigits and remstr[1] in hexdigits and tok.count("?") < 2:
         # The ? after the CTE was followed by an encoded word escape (=XX).
         rest, *remainder = remstr.split("?=", 1)
         tok = tok + "?=" + rest
@@ -1143,9 +1127,7 @@ def get_unstructured(value):
                 if len(unstructured) > 0:  # noqa: SIM102
                     if unstructured[-1].token_type != "fws":
                         unstructured.defects.append(
-                            errors.InvalidHeaderDefect(
-                                "missing whitespace before encoded word"
-                            )
+                            errors.InvalidHeaderDefect("missing whitespace before encoded word")
                         )
                         have_ws = False
                 if have_ws and len(unstructured) > 1:  # noqa: SIM102
@@ -1256,9 +1238,7 @@ def get_bare_quoted_string(value):
                     and bare_quoted_string[-2].token_type == "encoded-word"
                 )
             ):
-                bare_quoted_string[-1] = EWWhiteSpaceTerminal(
-                    bare_quoted_string[-1], "fws"
-                )
+                bare_quoted_string[-1] = EWWhiteSpaceTerminal(bare_quoted_string[-1], "fws")
         else:
             token, value = get_qcontent(value)
         bare_quoted_string.append(token)
@@ -1289,9 +1269,7 @@ def get_comment(value):
             token, value = get_qp_ctext(value)
         comment.append(token)
     if not value:
-        comment.defects.append(
-            errors.InvalidHeaderDefect("end of header inside comment")
-        )
+        comment.defects.append(errors.InvalidHeaderDefect("end of header inside comment"))
         return comment, value
     return comment, value[1:]
 
@@ -1421,15 +1399,11 @@ def get_word(value):
     else:
         leader = None
     if not value:
-        raise errors.HeaderParseError(
-            "Expected 'atom' or 'quoted-string' but found nothing."
-        )
+        raise errors.HeaderParseError("Expected 'atom' or 'quoted-string' but found nothing.")
     if value[0] == '"':
         token, value = get_quoted_string(value)
     elif value[0] in SPECIALS:
-        raise errors.HeaderParseError(
-            f"Expected 'atom' or 'quoted-string' but found '{value}'"
-        )
+        raise errors.HeaderParseError(f"Expected 'atom' or 'quoted-string' but found '{value}'")
     else:
         token, value = get_atom(value)
     if leader is not None:
@@ -1454,9 +1428,7 @@ def get_phrase(value):
         token, value = get_word(value)
         phrase.append(token)
     except errors.HeaderParseError:
-        phrase.defects.append(
-            errors.InvalidHeaderDefect("phrase does not start with word")
-        )
+        phrase.defects.append(errors.InvalidHeaderDefect("phrase does not start with word"))
     while value and value[0] not in PHRASE_ENDS:
         if value[0] == ".":
             phrase.append(DOT)
@@ -1468,9 +1440,7 @@ def get_phrase(value):
             except errors.HeaderParseError:
                 if value[0] in CFWS_LEADER:
                     token, value = get_cfws(value)
-                    phrase.defects.append(
-                        errors.ObsoleteHeaderDefect("comment found without atom")
-                    )
+                    phrase.defects.append(errors.ObsoleteHeaderDefect("comment found without atom"))
                 else:
                     raise
             phrase.append(token)
@@ -1507,9 +1477,7 @@ def get_local_part(value):
             )
         else:
             local_part.defects.append(
-                errors.ObsoleteHeaderDefect(
-                    "local-part is not a dot-atom (contains CFWS)"
-                )
+                errors.ObsoleteHeaderDefect("local-part is not a dot-atom (contains CFWS)")
             )
         local_part[0] = obs_local_part
     try:
@@ -1528,9 +1496,7 @@ def get_obs_local_part(value):
     while value and (value[0] == "\\" or value[0] not in PHRASE_ENDS):
         if value[0] == ".":
             if last_non_ws_was_dot:
-                obs_local_part.defects.append(
-                    errors.InvalidHeaderDefect("invalid repeated '.'")
-                )
+                obs_local_part.defects.append(errors.InvalidHeaderDefect("invalid repeated '.'"))
             obs_local_part.append(DOT)
             last_non_ws_was_dot = True
             value = value[1:]
@@ -1539,16 +1505,12 @@ def get_obs_local_part(value):
             obs_local_part.append(ValueTerminal(value[0], "misplaced-special"))
             value = value[1:]
             obs_local_part.defects.append(
-                errors.InvalidHeaderDefect(
-                    "'\\' character outside of quoted-string/ccontent"
-                )
+                errors.InvalidHeaderDefect("'\\' character outside of quoted-string/ccontent")
             )
             last_non_ws_was_dot = False
             continue
         if obs_local_part and obs_local_part[-1].token_type != "dot":
-            obs_local_part.defects.append(
-                errors.InvalidHeaderDefect("missing '.' between words")
-            )
+            obs_local_part.defects.append(errors.InvalidHeaderDefect("missing '.' between words"))
         try:
             token, value = get_word(value)
             last_non_ws_was_dot = False
@@ -1607,9 +1569,7 @@ def get_dtext(value):
 def _check_for_early_dl_end(value, domain_literal):
     if value:
         return False
-    domain_literal.append(
-        errors.InvalidHeaderDefect("end of input inside domain-literal")
-    )
+    domain_literal.append(errors.InvalidHeaderDefect("end of input inside domain-literal"))
     domain_literal.append(ValueTerminal("]", "domain-literal-end"))
     return True
 
@@ -1643,9 +1603,7 @@ def get_domain_literal(value):
     if _check_for_early_dl_end(value, domain_literal):
         return domain_literal, value
     if value[0] != "]":
-        raise errors.HeaderParseError(
-            f"expected ']' at end of domain-literal but found '{value}'"
-        )
+        raise errors.HeaderParseError(f"expected ']' at end of domain-literal but found '{value}'")
     domain_literal.append(ValueTerminal("]", "domain-literal-end"))
     value = value[1:]
     if value and value[0] in CFWS_LEADER:
@@ -1699,9 +1657,7 @@ def get_addr_spec(value):
     token, value = get_local_part(value)
     addr_spec.append(token)
     if not value or value[0] != "@":
-        addr_spec.defects.append(
-            errors.InvalidHeaderDefect("addr-spec local part with no domain")
-        )
+        addr_spec.defects.append(errors.InvalidHeaderDefect("addr-spec local part with no domain"))
         return addr_spec, value
     addr_spec.append(ValueTerminal("@", "address-at-symbol"))
     token, value = get_domain(value[1:])
@@ -1746,9 +1702,7 @@ def get_obs_route(value):
     if not value:
         raise errors.HeaderParseError("end of header while parsing obs-route")
     if value[0] != ":":
-        raise errors.HeaderParseError(
-            f"expected ':' marking end of obs-route but found '{value}'"
-        )
+        raise errors.HeaderParseError(f"expected ':' marking end of obs-route but found '{value}'")
     obs_route.append(ValueTerminal(":", "end-of-obs-route-marker"))
     return obs_route, value[1:]
 
@@ -1770,9 +1724,7 @@ def get_angle_addr(value):
     # circumstances.
     if value and value[0] == ">":
         angle_addr.append(ValueTerminal(">", "angle-addr-end"))
-        angle_addr.defects.append(
-            errors.InvalidHeaderDefect("null addr-spec in angle-addr")
-        )
+        angle_addr.defects.append(errors.InvalidHeaderDefect("null addr-spec in angle-addr"))
         value = value[1:]
         return angle_addr, value
     try:
@@ -1781,23 +1733,17 @@ def get_angle_addr(value):
         try:
             token, value = get_obs_route(value)
             angle_addr.defects.append(
-                errors.ObsoleteHeaderDefect(
-                    "obsolete route specification in angle-addr"
-                )
+                errors.ObsoleteHeaderDefect("obsolete route specification in angle-addr")
             )
         except errors.HeaderParseError:
-            raise errors.HeaderParseError(
-                f"expected addr-spec or obs-route but found '{value}'"
-            )
+            raise errors.HeaderParseError(f"expected addr-spec or obs-route but found '{value}'")
         angle_addr.append(token)
         token, value = get_addr_spec(value)
     angle_addr.append(token)
     if value and value[0] == ">":
         value = value[1:]
     else:
-        angle_addr.defects.append(
-            errors.InvalidHeaderDefect("missing trailing '>' on angle-addr")
-        )
+        angle_addr.defects.append(errors.InvalidHeaderDefect("missing trailing '>' on angle-addr"))
     angle_addr.append(ValueTerminal(">", "angle-addr-end"))
     if value and value[0] in CFWS_LEADER:
         token, value = get_cfws(value)
@@ -1956,9 +1902,7 @@ def get_group_list(value):
     """
     group_list = GroupList()
     if not value:
-        group_list.defects.append(
-            errors.InvalidHeaderDefect("end of header before group-list")
-        )
+        group_list.defects.append(errors.InvalidHeaderDefect("end of header before group-list"))
         return group_list, value
     leader = None
     if value and value[0] in CFWS_LEADER:
@@ -1967,9 +1911,7 @@ def get_group_list(value):
             # This should never happen in email parsing, since CFWS-only is a
             # legal alternative to group-list in a group, which is the only
             # place group-list appears.
-            group_list.defects.append(
-                errors.InvalidHeaderDefect("end of header in group-list")
-            )
+            group_list.defects.append(errors.InvalidHeaderDefect("end of header in group-list"))
             group_list.append(leader)
             return group_list, value
         if value[0] == ";":
@@ -1980,9 +1922,7 @@ def get_group_list(value):
         if leader is not None:
             group_list.append(leader)
         group_list.extend(token)
-        group_list.defects.append(
-            errors.ObsoleteHeaderDefect("group-list with empty entries")
-        )
+        group_list.defects.append(errors.ObsoleteHeaderDefect("group-list with empty entries"))
         return group_list, value
     if leader is not None:
         token[:0] = [leader]
@@ -2069,9 +2009,7 @@ def get_address_list(value):
                 if not value or value[0] == ",":
                     address_list.append(leader)
                     address_list.defects.append(
-                        errors.ObsoleteHeaderDefect(
-                            "address-list entry with no content"
-                        )
+                        errors.ObsoleteHeaderDefect("address-list entry with no content")
                     )
                 else:
                     token, value = get_invalid_mailbox(value, ",")
@@ -2151,9 +2089,7 @@ def get_msg_id(value):
         try:
             # obs-id-left is same as local-part of add-spec.
             token, value = get_obs_local_part(value)
-            msg_id.defects.append(
-                errors.ObsoleteHeaderDefect("obsolete id-left in msg-id")
-            )
+            msg_id.defects.append(errors.ObsoleteHeaderDefect("obsolete id-left in msg-id"))
         except errors.HeaderParseError:
             raise errors.HeaderParseError(
                 f"expected dot-atom-text or obs-id-left but found '{value}'"
@@ -2179,21 +2115,16 @@ def get_msg_id(value):
         except errors.HeaderParseError:
             try:
                 token, value = get_domain(value)
-                msg_id.defects.append(
-                    errors.ObsoleteHeaderDefect("obsolete id-right in msg-id")
-                )
+                msg_id.defects.append(errors.ObsoleteHeaderDefect("obsolete id-right in msg-id"))
             except errors.HeaderParseError:
                 raise errors.HeaderParseError(
-                    "expected dot-atom-text, no-fold-literal or obs-id-right"
-                    f" but found '{value}'"
+                    f"expected dot-atom-text, no-fold-literal or obs-id-right but found '{value}'"
                 )
     msg_id.append(token)
     if value and value[0] == ">":
         value = value[1:]
     else:
-        msg_id.defects.append(
-            errors.InvalidHeaderDefect("missing trailing '>' on msg-id")
-        )
+        msg_id.defects.append(errors.InvalidHeaderDefect("missing trailing '>' on msg-id"))
     msg_id.append(ValueTerminal(">", "msg-id-end"))
     if value and value[0] in CFWS_LEADER:
         token, value = get_cfws(value)
@@ -2214,9 +2145,7 @@ def parse_message_id(value):
     else:
         # Value after parsing a valid msg_id should be None.
         if value:
-            message_id.defects.append(
-                errors.InvalidHeaderDefect(f"Unexpected {value!r}")
-            )
+            message_id.defects.append(errors.InvalidHeaderDefect(f"Unexpected {value!r}"))
 
     return message_id
 
@@ -2255,9 +2184,7 @@ def parse_mime_version(value):
         value = value[1:]
     if not digits.isdigit():
         mime_version.defects.append(
-            errors.InvalidHeaderDefect(
-                f"Expected MIME major version number but found {digits!r}"
-            )
+            errors.InvalidHeaderDefect(f"Expected MIME major version number but found {digits!r}")
         )
         mime_version.append(ValueTerminal(digits, "xtext"))
     else:
@@ -2269,9 +2196,7 @@ def parse_mime_version(value):
     if not value or value[0] != ".":
         if mime_version.major is not None:
             mime_version.defects.append(
-                errors.InvalidHeaderDefect(
-                    "Incomplete MIME version; found only major number"
-                )
+                errors.InvalidHeaderDefect("Incomplete MIME version; found only major number")
             )
         if value:
             mime_version.append(ValueTerminal(value, "xtext"))
@@ -2284,9 +2209,7 @@ def parse_mime_version(value):
     if not value:
         if mime_version.major is not None:
             mime_version.defects.append(
-                errors.InvalidHeaderDefect(
-                    "Incomplete MIME version; found only major number"
-                )
+                errors.InvalidHeaderDefect("Incomplete MIME version; found only major number")
             )
         return mime_version
     digits = ""
@@ -2295,9 +2218,7 @@ def parse_mime_version(value):
         value = value[1:]
     if not digits.isdigit():
         mime_version.defects.append(
-            errors.InvalidHeaderDefect(
-                f"Expected MIME minor version number but found {digits!r}"
-            )
+            errors.InvalidHeaderDefect(f"Expected MIME minor version number but found {digits!r}")
         )
         mime_version.append(ValueTerminal(digits, "xtext"))
     else:
@@ -2521,9 +2442,7 @@ def get_parameter(value):
     param.append(token)
     if not value or value[0] == ";":
         param.defects.append(
-            errors.InvalidHeaderDefect(
-                f"Parameter contains name ({token}) but no value"
-            )
+            errors.InvalidHeaderDefect(f"Parameter contains name ({token}) but no value")
         )
         return param, value
     if value[0] == "*":
@@ -2572,9 +2491,7 @@ def get_parameter(value):
                     semi_valid = True
         if semi_valid:
             param.defects.append(
-                errors.InvalidHeaderDefect(
-                    "Quoted string value for extended parameter is invalid"
-                )
+                errors.InvalidHeaderDefect("Quoted string value for extended parameter is invalid")
             )
             param.append(qstring)
             for t in qstring:
@@ -2610,9 +2527,7 @@ def get_parameter(value):
         )
     if not value:
         # Assume the charset/lang is missing and the token is the value.
-        param.defects.append(
-            errors.InvalidHeaderDefect("Missing required charset/lang delimiters")
-        )
+        param.defects.append(errors.InvalidHeaderDefect("Missing required charset/lang delimiters"))
         appendto.append(token)
         if remainder is None:
             return param, value
@@ -2709,9 +2624,7 @@ def parse_mime_parameters(value):
             token, value = get_invalid_parameter(value)
             param.extend(token)
             mime_parameters.defects.append(
-                errors.InvalidHeaderDefect(
-                    f"parameter with invalid trailing text {token!r}"
-                )
+                errors.InvalidHeaderDefect(f"parameter with invalid trailing text {token!r}")
             )
         if value:
             # Must be a ';' at this point.
@@ -2800,17 +2713,13 @@ def parse_content_disposition_header(value):
     """disposition-type *( ";" parameter )"""
     disp_header = ContentDisposition()
     if not value:
-        disp_header.defects.append(
-            errors.HeaderMissingRequiredValue("Missing content disposition")
-        )
+        disp_header.defects.append(errors.HeaderMissingRequiredValue("Missing content disposition"))
         return disp_header
     try:
         token, value = get_token(value)
     except errors.HeaderParseError:
         disp_header.defects.append(
-            errors.InvalidHeaderDefect(
-                f"Expected content disposition but found {value!r}"
-            )
+            errors.InvalidHeaderDefect(f"Expected content disposition but found {value!r}")
         )
         _find_mime_parameters(disp_header, value)
         return disp_header
@@ -2821,8 +2730,7 @@ def parse_content_disposition_header(value):
     if value[0] != ";":
         disp_header.defects.append(
             errors.InvalidHeaderDefect(
-                "Only parameters are valid after content disposition, but "
-                f"found {value!r}"
+                f"Only parameters are valid after content disposition, but found {value!r}"
             )
         )
         _find_mime_parameters(disp_header, value)
@@ -2845,9 +2753,7 @@ def parse_content_transfer_encoding_header(value):
         token, value = get_token(value)
     except errors.HeaderParseError:
         cte_header.defects.append(
-            errors.InvalidHeaderDefect(
-                f"Expected content transfer encoding but found {value!r}"
-            )
+            errors.InvalidHeaderDefect(f"Expected content transfer encoding but found {value!r}")
         )
     else:
         cte_header.append(token)
@@ -2924,9 +2830,7 @@ def _refold_parse_tree(parse_tree, *, policy):
             tstr.encode(encoding)
             charset = encoding
         except UnicodeEncodeError:
-            if any(
-                isinstance(x, errors.UndecodableBytesDefect) for x in part.all_defects
-            ):
+            if any(isinstance(x, errors.UndecodableBytesDefect) for x in part.all_defects):
                 charset = "unknown-8bit"
             else:
                 # If policy.utf8 is false this should really be taken from a
@@ -3068,9 +2972,7 @@ def _refold_parse_tree(parse_tree, *, policy):
     return policy.linesep.join(lines) + policy.linesep
 
 
-def _fold_as_ew(
-    to_encode, lines, maxlen, last_ew, ew_combine_allowed, charset, leading_whitespace
-):
+def _fold_as_ew(to_encode, lines, maxlen, last_ew, ew_combine_allowed, charset, leading_whitespace):
     """Fold string to_encode into lines as encoded word, combining if allowed.
     Return the new value for last_ew, or None if ew_combine_allowed is False.
 
@@ -3107,9 +3009,7 @@ def _fold_as_ew(
     chrome_len = len(encode_as) + 7
 
     if (chrome_len + 1) >= maxlen:
-        raise errors.HeaderParseError(
-            "max_line_length is too small to fit an encoded word"
-        )
+        raise errors.HeaderParseError("max_line_length is too small to fit an encoded word")
 
     while to_encode:
         remaining_space = maxlen - len(lines[-1])
@@ -3208,9 +3108,7 @@ def _fold_mime_parameters(part, lines, maxlen, encoding):
             splitpoint = maxchars = maxlen - chrome_len - 2
             while True:
                 partial = value[:splitpoint]
-                encoded_value = urllib.parse.quote(
-                    partial, safe="", errors=error_handler
-                )
+                encoded_value = urllib.parse.quote(partial, safe="", errors=error_handler)
                 if len(encoded_value) <= maxchars:
                     break
                 splitpoint -= 1

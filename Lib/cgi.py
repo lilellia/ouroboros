@@ -36,17 +36,17 @@ __version__ = "2.6"
 # Imports
 # =======
 
+from collections.abc import Mapping
+from email.message import Message
+from email.parser import FeedParser
 import html
+from io import BytesIO, StringIO, TextIOWrapper
 import locale
 import os
 import sys
 import tempfile
 import urllib.parse
 import warnings
-from collections.abc import Mapping
-from email.message import Message
-from email.parser import FeedParser
-from io import BytesIO, StringIO, TextIOWrapper
 
 __all__ = [
     "FieldStorage",
@@ -144,9 +144,7 @@ log = initlog  # The current logging function
 maxlen = 0
 
 
-def parse(
-    fp=None, environ=os.environ, keep_blank_values=0, strict_parsing=0, separator="&"
-):
+def parse(fp=None, environ=os.environ, keep_blank_values=0, strict_parsing=0, separator="&"):
     """Parse a query in the environment or from a file (default stdin)
 
     Arguments, all optional:
@@ -446,9 +444,7 @@ class FieldStorage:
                 headers["content-length"] = environ["CONTENT_LENGTH"]
         else:
             if not (isinstance(headers, (Mapping, Message))):
-                raise TypeError(
-                    "headers must be mapping or an instance of email.message.Message"
-                )
+                raise TypeError("headers must be mapping or an instance of email.message.Message")
         self.headers = headers
         if fp is None:
             self.fp = sys.stdin.buffer
@@ -464,9 +460,7 @@ class FieldStorage:
         self.errors = errors
 
         if not isinstance(outerboundary, bytes):
-            raise TypeError(
-                f"outerboundary must be bytes, not {type(outerboundary).__name__}"
-            )
+            raise TypeError(f"outerboundary must be bytes, not {type(outerboundary).__name__}")
         self.outerboundary = outerboundary
 
         self.bytes_read = 0

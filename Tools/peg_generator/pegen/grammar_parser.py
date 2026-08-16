@@ -123,9 +123,7 @@ class GeneratedParser(Parser):
             and (more_alts := self.more_alts())
             and (_dedent := self.expect("DEDENT"))
         ):
-            return Rule(
-                rulename[0], rulename[1], Rhs(alts.alts + more_alts.alts), memo=opt
-            )
+            return Rule(rulename[0], rulename[1], Rhs(alts.alts + more_alts.alts), memo=opt)
         self._reset(mark)
         if (
             (rulename := self.rulename())
@@ -215,11 +213,7 @@ class GeneratedParser(Parser):
     def alt(self) -> Alt | None:
         # alt: items '$' action | items '$' | items action | items
         mark = self._mark()
-        if (
-            (items := self.items())
-            and (literal := self.expect("$"))
-            and (action := self.action())
-        ):
+        if (items := self.items()) and (literal := self.expect("$")) and (action := self.action()):
             return Alt(items + [NamedItem(None, NameLeaf("ENDMARKER"))], action=action)
         self._reset(mark)
         if (items := self.items()) and (literal := self.expect("$")):  # noqa: F841
@@ -419,9 +413,7 @@ class GeneratedParser(Parser):
     def target_atoms(self) -> str | None:
         # target_atoms: target_atom target_atoms | target_atom
         mark = self._mark()
-        if (target_atom := self.target_atom()) and (
-            target_atoms := self.target_atoms()
-        ):
+        if (target_atom := self.target_atom()) and (target_atoms := self.target_atoms()):
             return target_atom + " " + target_atoms
         self._reset(mark)
         if target_atom := self.target_atom():

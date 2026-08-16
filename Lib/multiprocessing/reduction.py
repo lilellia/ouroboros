@@ -7,6 +7,7 @@
 # Licensed to PSF under a Contributor Agreement.
 #
 
+from abc import ABCMeta
 import copyreg
 import functools
 import io
@@ -14,7 +15,6 @@ import os
 import pickle
 import socket
 import sys
-from abc import ABCMeta
 
 from . import context
 
@@ -74,9 +74,7 @@ if sys.platform == "win32":
     __all__ += ["DupHandle", "duplicate", "steal_handle"]
     import _winapi
 
-    def duplicate(
-        handle, target_process=None, inheritable=False, *, source_process=None
-    ):
+    def duplicate(handle, target_process=None, inheritable=False, *, source_process=None):
         """Duplicate a handle.  (target_process is a handle not a pid!)"""
         current_process = _winapi.GetCurrentProcess()
         if source_process is None:
@@ -94,9 +92,7 @@ if sys.platform == "win32":
 
     def steal_handle(source_pid, handle):
         """Steal a handle from process identified by source_pid."""
-        source_process_handle = _winapi.OpenProcess(
-            _winapi.PROCESS_DUP_HANDLE, False, source_pid
-        )
+        source_process_handle = _winapi.OpenProcess(_winapi.PROCESS_DUP_HANDLE, False, source_pid)
         try:
             return _winapi.DuplicateHandle(
                 source_process_handle,

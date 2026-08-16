@@ -1,11 +1,11 @@
 """Extract, format and print information about Python stack traces."""
 
 import collections.abc
+from contextlib import suppress
 import itertools
 import linecache
 import sys
 import textwrap
-from contextlib import suppress
 
 __all__ = [
     "FrameSummary",
@@ -101,13 +101,9 @@ def extract_tb(tb, limit=None):
 # Exception formatting and output.
 #
 
-_cause_message = (
-    "\nThe above exception was the direct cause of the following exception:\n\n"
-)
+_cause_message = "\nThe above exception was the direct cause of the following exception:\n\n"
 
-_context_message = (
-    "\nDuring handling of the above exception, another exception occurred:\n\n"
-)
+_context_message = "\nDuring handling of the above exception, another exception occurred:\n\n"
 
 
 class _Sentinel:
@@ -132,9 +128,7 @@ def _parse_value_tb(exc, value, tb):
     return value, tb
 
 
-def print_exception(
-    exc, /, value=_sentinel, tb=_sentinel, limit=None, file=None, chain=True
-):
+def print_exception(exc, /, value=_sentinel, tb=_sentinel, limit=None, file=None, chain=True):
     """Print exception up to 'limit' stack trace entries from 'tb' to 'file'.
 
     This differs from print_tb() in the following ways: (1) if
@@ -336,9 +330,7 @@ class FrameSummary:
         if lookup_line:
             self.line  # noqa: B018
         self.locals = (
-            {k: _safe_string(v, "local", func=repr) for k, v in locals.items()}
-            if locals
-            else None
+            {k: _safe_string(v, "local", func=repr) for k, v in locals.items()} if locals else None
         )
         self.end_lineno = end_lineno
         self.colno = colno
@@ -435,9 +427,7 @@ class StackSummary(list):
     """A list of FrameSummary objects, representing a stack of frames."""
 
     @classmethod
-    def extract(
-        klass, frame_gen, *, limit=None, lookup_lines=True, capture_locals=False
-    ):
+    def extract(klass, frame_gen, *, limit=None, lookup_lines=True, capture_locals=False):
         """Create a StackSummary from a traceback or stack object.
 
         :param frame_gen: A generator that yields (frame, lineno) tuples
@@ -551,12 +541,8 @@ class StackSummary(list):
             frame_line_len = len(frame_summary.line.lstrip())
             stripped_characters = orig_line_len - frame_line_len
             if frame_summary.colno is not None and frame_summary.end_colno is not None:
-                start_offset = _byte_offset_to_character_offset(
-                    line, frame_summary.colno
-                )
-                end_offset = _byte_offset_to_character_offset(
-                    line, frame_summary.end_colno
-                )
+                start_offset = _byte_offset_to_character_offset(line, frame_summary.colno)
+                end_offset = _byte_offset_to_character_offset(line, frame_summary.end_colno)
                 code_segment = line[start_offset:end_offset]
 
                 anchors = None
@@ -582,16 +568,13 @@ class StackSummary(list):
                     row.append(" " * (dp_start_offset - stripped_characters))
 
                     if anchors:
-                        dp_left_end_offset = _display_width(
-                            code_segment, anchors.left_end_offset
-                        )
+                        dp_left_end_offset = _display_width(code_segment, anchors.left_end_offset)
                         dp_right_start_offset = _display_width(
                             code_segment, anchors.right_start_offset
                         )
                         row.append(anchors.primary_char * dp_left_end_offset)
                         row.append(
-                            anchors.secondary_char
-                            * (dp_right_start_offset - dp_left_end_offset)
+                            anchors.secondary_char * (dp_right_start_offset - dp_left_end_offset)
                         )
                         row.append(
                             anchors.primary_char
@@ -640,8 +623,7 @@ class StackSummary(list):
                 if count > _RECURSIVE_CUTOFF:
                     count -= _RECURSIVE_CUTOFF
                     result.append(
-                        f"  [Previous line repeated {count} more "
-                        f"time{'s' if count > 1 else ''}]\n"
+                        f"  [Previous line repeated {count} more time{'s' if count > 1 else ''}]\n"
                     )
                 last_file = frame_summary.filename
                 last_line = frame_summary.lineno
@@ -655,8 +637,7 @@ class StackSummary(list):
         if count > _RECURSIVE_CUTOFF:
             count -= _RECURSIVE_CUTOFF
             result.append(
-                f"  [Previous line repeated {count} more "
-                f"time{'s' if count > 1 else ''}]\n"
+                f"  [Previous line repeated {count} more time{'s' if count > 1 else ''}]\n"
             )
         return result
 
@@ -921,9 +902,7 @@ class TracebackException:
                     cause = None
 
                 if compact:
-                    need_context = (
-                        cause is None and e is not None and not e.__suppress_context__
-                    )
+                    need_context = cause is None and e is not None and not e.__suppress_context__
                 else:
                     need_context = True
                 if (
@@ -946,7 +925,7 @@ class TracebackException:
                 else:
                     context = None
 
-                if e and isinstance(e, BaseExceptionGroup):  # noqa: F821
+                if e and isinstance(e, BaseExceptionGroup):
                     exceptions = []
                     for exc in e.exceptions:
                         texc = TracebackException(
@@ -1035,9 +1014,7 @@ class TracebackException:
         # Show exactly where the problem was found.
         filename_suffix = ""
         if self.lineno is not None:
-            yield '  File "{}", line {}\n'.format(
-                self.filename or "<string>", self.lineno
-            )
+            yield '  File "{}", line {}\n'.format(self.filename or "<string>", self.lineno)
         elif self.filename is not None:
             filename_suffix = f" ({self.filename})"
 
@@ -1053,9 +1030,7 @@ class TracebackException:
 
             if self.offset is not None:
                 offset = self.offset
-                end_offset = (
-                    self.end_offset if self.end_offset not in {None, 0} else offset
-                )
+                end_offset = self.end_offset if self.end_offset not in {None, 0} else offset
                 if offset == end_offset or end_offset == -1:
                     end_offset = offset + 1
 
@@ -1065,9 +1040,7 @@ class TracebackException:
                 if colno >= 0:
                     # non-space whitespace (likes tabs) must be kept for alignment
                     caretspace = ((c if c.isspace() else " ") for c in ltext[:colno])
-                    yield "    {}{}".format(
-                        "".join(caretspace), ("^" * (end_colno - colno) + "\n")
-                    )
+                    yield "    {}{}".format("".join(caretspace), ("^" * (end_colno - colno) + "\n"))
         msg = self.msg or "<no detail available>"
         yield f"{stype}: {msg}{filename_suffix}\n"
 
@@ -1116,9 +1089,7 @@ class TracebackException:
                 yield from _ctx.emit(exc.format_exception_only())
             elif _ctx.exception_group_depth > self.max_group_depth:
                 # exception group, but depth exceeds limit
-                yield from _ctx.emit(
-                    f"... (max_group_depth is {self.max_group_depth})\n"
-                )
+                yield from _ctx.emit(f"... (max_group_depth is {self.max_group_depth})\n")
             else:
                 # format exception group
                 is_toplevel = _ctx.exception_group_depth == 0
@@ -1161,14 +1132,10 @@ class TracebackException:
                     else:
                         remaining = num_excs - self.max_group_width
                         plural = "s" if remaining > 1 else ""
-                        yield from _ctx.emit(
-                            f"and {remaining} more exception{plural}\n"
-                        )
+                        yield from _ctx.emit(f"and {remaining} more exception{plural}\n")
 
                     if last_exc and _ctx.need_close:
-                        yield (
-                            _ctx.indent() + "+------------------------------------\n"
-                        )
+                        yield (_ctx.indent() + "+------------------------------------\n")
                         _ctx.need_close = False
                     _ctx.exception_group_depth -= 1
 
@@ -1247,9 +1214,7 @@ def _compute_suggestion_error(exc_value, tb, wrong_name):
         max_distance = (len(possible_name) + wrong_name_len + 3) * _MOVE_COST // 6
         # Don't take matches we've already beaten.
         max_distance = min(max_distance, best_distance - 1)
-        current_distance = _levenshtein_distance(
-            wrong_name, possible_name, max_distance
-        )
+        current_distance = _levenshtein_distance(wrong_name, possible_name, max_distance)
         if current_distance > max_distance:
             continue
         if not suggestion or current_distance < best_distance:

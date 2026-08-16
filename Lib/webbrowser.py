@@ -33,9 +33,7 @@ def register(name, klass, instance=None, *, preferred=False):
         # Preferred browsers go to the front of the list.
         # Need to match to the default browser returned by xdg-settings, which
         # may be of the form e.g. "firefox.desktop".
-        if preferred or (
-            _os_preferred_browser and f"{name}.desktop" == _os_preferred_browser
-        ):
+        if preferred or (_os_preferred_browser and f"{name}.desktop" == _os_preferred_browser):
             _tryorder.insert(0, name)
         else:
             _tryorder.append(name)
@@ -290,16 +288,11 @@ class UnixBrowser(BaseBrowser):
             else:
                 action = self.remote_action_newtab
         else:
-            raise Error(
-                "Bad 'new' parameter to open(); " + f"expected 0, 1, or 2, got {new}"
-            )
+            raise Error("Bad 'new' parameter to open(); " + f"expected 0, 1, or 2, got {new}")
 
         self._check_url(url.replace("%action", action))
 
-        args = [
-            arg.replace("%action", action).replace("%s", url)
-            for arg in self.remote_args
-        ]
+        args = [arg.replace("%action", action).replace("%s", url) for arg in self.remote_args]
         args = [arg for arg in args if arg]
         success = self._invoke(args, True, autoraise, url)
         if not success:
@@ -638,8 +631,7 @@ if sys.platform == "darwin":
 
         def __init__(self, name):
             warnings.warn(
-                f"{self.__class__.__name__} is deprecated in 3.11"
-                " use MacOSXOSAScript instead.",
+                f"{self.__class__.__name__} is deprecated in 3.11 use MacOSXOSAScript instead.",
                 DeprecationWarning,
                 stacklevel=2,
             )

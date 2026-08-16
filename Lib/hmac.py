@@ -50,9 +50,7 @@ class HMAC:
         """
 
         if not isinstance(key, (bytes, bytearray)):
-            raise TypeError(
-                f"key: expected bytes or bytearray, but got {type(key).__name__!r}"
-            )
+            raise TypeError(f"key: expected bytes or bytearray, but got {type(key).__name__!r}")
 
         if not digestmod:
             raise TypeError("Missing required argument 'digestmod'.")

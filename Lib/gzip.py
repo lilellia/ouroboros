@@ -473,9 +473,7 @@ def _read_exact(fp, n):
     while len(data) < n:
         b = fp.read(n - len(data))
         if not b:
-            raise EOFError(
-                "Compressed file ended before the end-of-stream marker was reached"
-            )
+            raise EOFError("Compressed file ended before the end-of-stream marker was reached")
         data += b
     return data
 
@@ -579,9 +577,7 @@ class _GzipReader(_compression.DecompressReader):
             if uncompress != b"":
                 break
             if buf == b"":
-                raise EOFError(
-                    "Compressed file ended before the end-of-stream marker was reached"
-                )
+                raise EOFError("Compressed file ended before the end-of-stream marker was reached")
 
         self._crc = zlib.crc32(uncompress, self._crc)
         self._stream_size += len(uncompress)
@@ -664,9 +660,7 @@ def decompress(data):
         # Read all the data except the header
         decompressed = do.decompress(data[fp.tell() :])
         if not do.eof or len(do.unused_data) < 8:
-            raise EOFError(
-                "Compressed file ended before the end-of-stream marker was reached"
-            )
+            raise EOFError("Compressed file ended before the end-of-stream marker was reached")
         crc, length = struct.unpack("<II", do.unused_data[:8])
         if crc != zlib.crc32(decompressed):
             raise BadGzipFile("CRC check failed")

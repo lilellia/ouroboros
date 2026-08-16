@@ -1,9 +1,9 @@
 "Test redirector, coverage 100%."
 
-import unittest
 from idlelib.idle_test.mock_idle import Func
 from idlelib.redirector import WidgetRedirector
 from tkinter import TclError, Text, Tk
+import unittest
 
 from test.support import requires
 from test.support.testcase import ExtraAssertions

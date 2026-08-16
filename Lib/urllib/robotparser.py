@@ -146,9 +146,7 @@ class RobotFileParser:
                             and numbers[0].strip().isdigit()
                             and numbers[1].strip().isdigit()
                         ):
-                            entry.req_rate = RequestRate(
-                                int(numbers[0]), int(numbers[1])
-                            )
+                            entry.req_rate = RequestRate(int(numbers[0]), int(numbers[1]))
                         state = 2
                 elif line[0] == "sitemap":
                     # According to http://www.sitemaps.org/protocol.html

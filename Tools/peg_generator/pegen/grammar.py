@@ -62,9 +62,7 @@ SIMPLE_STR = True
 
 
 class Rule:
-    def __init__(
-        self, name: str, type: str | None, rhs: Rhs, memo: object | None = None
-    ):
+    def __init__(self, name: str, type: str | None, rhs: Rhs, memo: object | None = None):
         self.name = name
         self.type = type
         self.rhs = rhs
@@ -162,9 +160,7 @@ class Rhs:
 
 
 class Alt:
-    def __init__(
-        self, items: list[NamedItem], *, icut: int = -1, action: str | None = None
-    ):
+    def __init__(self, items: list[NamedItem], *, icut: int = -1, action: str | None = None):
         self.items = items
         self.icut = icut
         self.action = action

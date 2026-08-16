@@ -10,10 +10,10 @@ For example usage, see the 'if __name__=="__main__"' block at the end of the
 module.  See also the BaseHTTPServer module docs for other API information.
 """
 
-import sys
-import urllib.parse
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from platform import python_implementation
+import sys
+import urllib.parse
 from wsgiref.handlers import SimpleHandler
 
 __version__ = "0.2"
@@ -30,9 +30,7 @@ class ServerHandler(SimpleHandler):
 
     def close(self):
         try:
-            self.request_handler.log_request(
-                self.status.split(" ", 1)[0], self.bytes_sent
-            )
+            self.request_handler.log_request(self.status.split(" ", 1)[0], self.bytes_sent)
         finally:
             SimpleHandler.close(self)
 
@@ -146,9 +144,7 @@ def demo_app(environ, start_response):
     return [stdout.getvalue().encode("utf-8")]
 
 
-def make_server(
-    host, port, app, server_class=WSGIServer, handler_class=WSGIRequestHandler
-):
+def make_server(host, port, app, server_class=WSGIServer, handler_class=WSGIRequestHandler):
     """Create a new WSGI server listening on `host` and `port` for `app`"""
     server = server_class((host, port), handler_class)
     server.set_app(app)

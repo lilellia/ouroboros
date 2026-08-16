@@ -9,8 +9,7 @@ def _reset_tzpath(to=None, stacklevel=4):
     if tzpaths is not None:
         if isinstance(tzpaths, (str, bytes)):
             raise TypeError(
-                "tzpaths must be a list or tuple, "
-                + f"not {type(tzpaths)}: {tzpaths!r}"
+                "tzpaths must be a list or tuple, " + f"not {type(tzpaths)}: {tzpaths!r}"
             )
 
         if not all(map(os.path.isabs, tzpaths)):
@@ -61,10 +60,7 @@ def _get_invalid_paths_message(tzpaths):
     prefix = "\n    "
     indented_str = prefix + prefix.join(invalid_paths)
 
-    return (
-        "Paths should be absolute but found the following relative paths:"
-        + indented_str
-    )
+    return "Paths should be absolute but found the following relative paths:" + indented_str
 
 
 def find_tzfile(key):
@@ -91,15 +87,11 @@ def _validate_tzfile_path(path, _base=_TEST_PATH):
     # the length.
     new_path = os.path.normpath(path)
     if len(new_path) != len(path):
-        raise ValueError(
-            f"ZoneInfo keys must be normalized relative paths, got: {path}"
-        )
+        raise ValueError(f"ZoneInfo keys must be normalized relative paths, got: {path}")
 
     resolved = os.path.normpath(os.path.join(_base, new_path))
     if not resolved.startswith(_base):
-        raise ValueError(
-            f"ZoneInfo keys must refer to subdirectories of TZPATH, got: {path}"
-        )
+        raise ValueError(f"ZoneInfo keys must refer to subdirectories of TZPATH, got: {path}")
 
 
 del _TEST_PATH

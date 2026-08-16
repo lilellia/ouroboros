@@ -177,9 +177,7 @@ if os_name == "posix" or os_name == "darwin":  # noqa: F821
     DEFAULT_PROGRAM_NAME = f"python{VERSION_MAJOR}"  # noqa: F821
     STDLIB_SUBDIR = f"{platlibdir}/python{VERSION_MAJOR}.{VERSION_MINOR}"  # noqa: F821
     STDLIB_LANDMARKS = [f"{STDLIB_SUBDIR}/os.py", f"{STDLIB_SUBDIR}/os.pyc"]
-    PLATSTDLIB_LANDMARK = (
-        f"{platlibdir}/python{VERSION_MAJOR}.{VERSION_MINOR}/lib-dynload"  # noqa: F821
-    )
+    PLATSTDLIB_LANDMARK = f"{platlibdir}/python{VERSION_MAJOR}.{VERSION_MINOR}/lib-dynload"  # noqa: F821
     BUILDSTDLIB_LANDMARKS = ["Lib/os.py"]
     VENV_LANDMARK = "pyvenv.cfg"
     ZIP_LANDMARK = f"{platlibdir}/python{VERSION_MAJOR}{VERSION_MINOR}.zip"  # noqa: F821
@@ -313,9 +311,7 @@ if ENV_PYTHONEXECUTABLE or ENV___PYVENV_LAUNCHER__:  # noqa: F821
         # a stub executable that execs the real interpreter in an
         # embedded app bundle. That bundle is an implementation detail
         # and should not affect base_executable.
-        base_executable = (
-            f"{dirname(library)}/bin/python{VERSION_MAJOR}.{VERSION_MINOR}"  # noqa: F821
-        )
+        base_executable = f"{dirname(library)}/bin/python{VERSION_MAJOR}.{VERSION_MINOR}"  # noqa: F821
     else:
         base_executable = executable
 

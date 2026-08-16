@@ -8,12 +8,12 @@ __all__ = ["ShareableList", "SharedMemory"]
 
 
 import errno
+from functools import partial
 import mmap
 import os
 import secrets
 import struct
 import types
-from functools import partial
 
 if os.name == "nt":
     import _winapi
@@ -90,9 +90,7 @@ class SharedMemory:
                 while True:
                     name = _make_filename()
                     try:
-                        self._fd = _posixshmem.shm_open(
-                            name, self._flags, mode=self._mode
-                        )
+                        self._fd = _posixshmem.shm_open(name, self._flags, mode=self._mode)
                     except FileExistsError:
                         continue
                     self._name = name
@@ -299,9 +297,7 @@ class ShareableList:
             for fmt in _formats:
                 offset += self._alignment if fmt[-1] != "s" else int(fmt[:-1])
                 self._allocated_offsets.append(offset)
-            _recreation_codes = [
-                self._extract_recreation_code(item) for item in sequence
-            ]
+            _recreation_codes = [self._extract_recreation_code(item) for item in sequence]
             requested_size = struct.calcsize(
                 "q"
                 + self._format_size_metainfo
@@ -354,9 +350,7 @@ class ShareableList:
         if (position >= self._list_len) or (self._list_len < 0):
             raise IndexError("Requested position out of range.")
 
-        v = struct.unpack_from(
-            "8s", self.shm.buf, self._offset_packing_formats + position * 8
-        )[0]
+        v = struct.unpack_from("8s", self.shm.buf, self._offset_packing_formats + position * 8)[0]
         fmt = v.rstrip(b"\x00")
         fmt_as_str = fmt.decode(_encoding)
 
@@ -401,9 +395,7 @@ class ShareableList:
         position = position if position >= 0 else position + self._list_len
         try:
             offset = self._offset_data_start + self._allocated_offsets[position]
-            (v,) = struct.unpack_from(
-                self._get_packing_format(position), self.shm.buf, offset
-            )
+            (v,) = struct.unpack_from(self._get_packing_format(position), self.shm.buf, offset)
         except IndexError:
             raise IndexError("index out of range")
 

@@ -57,8 +57,7 @@ def _bytes_from_decode_data(s):
         return memoryview(s).tobytes()
     except TypeError:
         raise TypeError(
-            "argument should be a bytes-like object or ASCII "
-            f"string, not {s.__class__.__name__!r}"
+            f"argument should be a bytes-like object or ASCII string, not {s.__class__.__name__!r}"
         ) from None
 
 
@@ -421,9 +420,7 @@ def a85decode(b, *, foldspaces=False, adobe=False, ignorechars=b" \t\n\r\v"):
     b = _bytes_from_decode_data(b)
     if adobe:
         if not b.endswith(_A85END):
-            raise ValueError(
-                f"Ascii85 encoded byte sequences must end with {_A85END!r}"
-            )
+            raise ValueError(f"Ascii85 encoded byte sequences must end with {_A85END!r}")
         if b.startswith(_A85START):
             b = b[2:-2]  # Strip off start/end markers
         else:
@@ -475,8 +472,7 @@ def a85decode(b, *, foldspaces=False, adobe=False, ignorechars=b" \t\n\r\v"):
 # The following code is originally taken (with permission) from Mercurial
 
 _b85alphabet = (
-    b"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    b"abcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{|}~"
+    b"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{|}~"
 )
 _b85chars = None
 _b85chars2 = None

@@ -55,9 +55,7 @@ def tree(tlist, size, level, widthfactor, branchlists, angledist=10, sizedist=5)
                 lst.append(t.clone())
                 brs.append(randomize(branchlist, angledist, sizedist))
                 t.right(angle)
-        for x in tree(
-            lst, size * sizefactor, level - 1, widthfactor, brs, angledist, sizedist
-        ):
+        for x in tree(lst, size * sizefactor, level - 1, widthfactor, brs, angledist, sizedist):
             yield None
 
 

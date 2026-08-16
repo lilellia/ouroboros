@@ -76,9 +76,7 @@ class FixMap(fixer_base.ConditionalFix):
             new.prefix = ""
             new = Call(Name("list"), [new])
         elif "map_lambda" in results:
-            new = ListComp(
-                results["xp"].clone(), results["fp"].clone(), results["it"].clone()
-            )
+            new = ListComp(results["xp"].clone(), results["fp"].clone(), results["it"].clone())
             new = Node(syms.power, [new] + trailers, prefix="")
 
         else:

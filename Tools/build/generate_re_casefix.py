@@ -54,10 +54,7 @@ def main(outfile="Lib/re/_casefix.py"):
 
     # List of codes of lowercased characters which have the same uppercase.
     equivalent_lower_codes = [
-        sorted(t)
-        for s in equivalent_chars
-        for t in [{ord(c.lower()) for c in s}]
-        if len(t) > 1
+        sorted(t) for s in equivalent_chars for t in [{ord(c.lower()) for c in s}] if len(t) > 1
     ]
 
     bad_codes = []
@@ -79,9 +76,7 @@ def main(outfile="Lib/re/_casefix.py"):
             print(f"  '{alpha(i)}' (U+{i:04x}, {uname(i)})", file=sys.stderr)
         sys.exit(1)
 
-    mapping = {
-        i: tuple(j for j in t if i != j) for t in equivalent_lower_codes for i in t
-    }
+    mapping = {i: tuple(j for j in t if i != j) for t in equivalent_lower_codes for i in t}
 
     items = []
     for i, t in sorted(mapping.items()):

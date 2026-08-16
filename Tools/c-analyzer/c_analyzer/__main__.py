@@ -23,11 +23,7 @@ from c_parser.info import KIND
 
 from . import (
     analyze as _analyze,
-)
-from . import (
     check_all as _check_all,
-)
-from . import (
     datafiles as _datafiles,
 )
 from .match import filter_forward
@@ -143,9 +139,7 @@ def add_checks_cli(parser, checks=None, *, add_flags=None):
     process_checks = add_sepval_cli(parser, "--check", "checks", checks)
     if add_flags:
         for check in checks:
-            parser.add_argument(
-                f"--{check}", dest="checks", action="append_const", const=check
-            )
+            parser.add_argument(f"--{check}", dest="checks", action="append_const", const=check)
     return [
         process_checks,
     ]
@@ -292,9 +286,7 @@ def _cli_check(parser, checks=None, **kwargs):
         process_checks = None
     elif checks is None:
         process_checks = add_checks_cli(parser)
-    elif (
-        len(checks) == 1 and type(checks) is not dict and re.match(r"^<.*>$", checks[0])
-    ):
+    elif len(checks) == 1 and type(checks) is not dict and re.match(r"^<.*>$", checks[0]):
         check = checks[0][1:-1]
 
         def process_checks(args, *, argv=None):

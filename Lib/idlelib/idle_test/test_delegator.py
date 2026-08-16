@@ -1,7 +1,7 @@
 "Test delegator, coverage 100%."
 
-import unittest
 from idlelib.delegator import Delegator
+import unittest
 
 
 class DelegatorTest(unittest.TestCase):

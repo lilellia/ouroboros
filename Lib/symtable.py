@@ -1,7 +1,6 @@
 """Interface to the compiler's internal symbol tables"""
 
 import _symtable
-import weakref
 from _symtable import (
     CELL,
     DEF_ANNOT,
@@ -17,6 +16,7 @@ from _symtable import (
     SCOPE_MASK,
     SCOPE_OFF,
 )
+import weakref
 
 __all__ = ["Class", "Function", "Symbol", "SymbolTable", "symtable"]
 
@@ -140,9 +140,7 @@ class SymbolTable:
             flags = self._table.symbols[name]
             namespaces = self.__check_children(name)
             module_scope = self._table.name == "top"
-            sym = self._symbols[name] = Symbol(
-                name, flags, namespaces, module_scope=module_scope
-            )
+            sym = self._symbols[name] = Symbol(name, flags, namespaces, module_scope=module_scope)
         return sym
 
     def get_symbols(self):
@@ -153,9 +151,7 @@ class SymbolTable:
 
     def __check_children(self, name):
         return [
-            _newSymbolTable(st, self._filename)
-            for st in self._table.children
-            if st.name == name
+            _newSymbolTable(st, self._filename) for st in self._table.children if st.name == name
         ]
 
     def get_children(self):
@@ -173,9 +169,7 @@ class Function(SymbolTable):
 
     def __idents_matching(self, test_func):
         return tuple(
-            ident
-            for ident in self.get_identifiers()
-            if test_func(self._table.symbols[ident])
+            ident for ident in self.get_identifiers() if test_func(self._table.symbols[ident])
         )
 
     def get_parameters(self):
@@ -242,20 +236,14 @@ class Class(SymbolTable):
                             # scope 'st' with the same identifier, if any.
                             scope_name = st.name
                             for c in st.children:
-                                if (
-                                    c.name == scope_name
-                                    and c.type == _symtable.TYPE_FUNCTION
-                                ):
+                                if c.name == scope_name and c.type == _symtable.TYPE_FUNCTION:
                                     # A generic generator of type TYPE_FUNCTION
                                     # cannot be a direct child of 'st' (but it
                                     # can be a descendant), e.g.:
                                     #
                                     # class A:
                                     #   type genexpr[genexpr] = (x for x in [])
-                                    assert (
-                                        scope_name != "genexpr"
-                                        or ".0" not in c.varnames
-                                    )
+                                    assert scope_name != "genexpr" or ".0" not in c.varnames
                                     d[scope_name] = 1
                                     break
             self.__methods = tuple(d)
@@ -306,8 +294,7 @@ class Symbol:
     def is_local(self):
         """Return *True* if the symbol is local."""
         return bool(
-            self.__scope in (LOCAL, CELL)
-            or (self.__module_scope and self.__flags & DEF_BOUND)
+            self.__scope in (LOCAL, CELL) or (self.__module_scope and self.__flags & DEF_BOUND)
         )
 
     def is_annotated(self):

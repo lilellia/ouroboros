@@ -7,8 +7,6 @@ from ._common import (
 )
 from ._regexes import (
     ENUM_MEMBER_DECL as _ENUM_MEMBER_DECL,
-)
-from ._regexes import (
     STRUCT_MEMBER_DECL as _STRUCT_MEMBER_DECL,
 )
 

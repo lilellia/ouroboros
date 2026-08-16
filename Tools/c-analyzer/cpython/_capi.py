@@ -1,9 +1,9 @@
+from collections import namedtuple
 import logging
 import os
 import os.path
 import re
 import textwrap
-from collections import namedtuple
 
 from c_common.tables import build_table, resolve_columns
 from c_parser.parser._regexes import _ind

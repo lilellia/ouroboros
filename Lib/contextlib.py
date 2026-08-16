@@ -2,10 +2,10 @@
 
 import _collections_abc
 import abc
-import os
-import sys
 from collections import deque
 from functools import wraps
+import os
+import sys
 from types import GenericAlias, MethodType
 
 __all__ = [
@@ -474,7 +474,7 @@ class suppress(AbstractContextManager):
             return
         if issubclass(exctype, self._exceptions):
             return True
-        if issubclass(exctype, BaseExceptionGroup):  # noqa: F821
+        if issubclass(exctype, BaseExceptionGroup):
             _match, rest = excinst.split(self._exceptions)
             if rest is None:
                 return True

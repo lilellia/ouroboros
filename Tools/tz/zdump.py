@@ -1,9 +1,9 @@
-import os
-import struct
-import sys
 from array import array
 from collections import namedtuple
 from datetime import datetime
+import os
+import struct
+import sys
 
 ttinfo = namedtuple("ttinfo", ["tt_gmtoff", "tt_isdst", "tt_abbrind"])
 

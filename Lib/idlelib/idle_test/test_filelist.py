@@ -1,8 +1,8 @@
 "Test filelist, coverage 19%."
 
-import unittest
 from idlelib import filelist
 from tkinter import Tk
+import unittest
 
 from test.support import requires
 

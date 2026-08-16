@@ -6,6 +6,7 @@ for the Distutils compiler abstraction model."""
 import os
 import re
 import sys
+
 from distutils.errors import (
     DistutilsModuleError,
     DistutilsPlatformError,
@@ -147,9 +148,7 @@ class CCompiler:
 
         for key in kwargs:  # noqa: PLC0206
             if key not in self.executables:
-                raise ValueError(
-                    f"unknown executable '{key}' for class {self.__class__.__name__}"
-                )
+                raise ValueError(f"unknown executable '{key}' for class {self.__class__.__name__}")
             self.set_executable(key, kwargs[key])
 
     def set_executable(self, key, value):
@@ -174,10 +173,7 @@ class CCompiler:
         for defn in definitions:
             if not (
                 isinstance(defn, tuple)
-                and (
-                    len(defn) in (1, 2)
-                    and (isinstance(defn[1], str) or defn[1] is None)
-                )
+                and (len(defn) in (1, 2) and (isinstance(defn[1], str) or defn[1] is None))
                 and isinstance(defn[0], str)
             ):
                 raise TypeError(
@@ -365,10 +361,7 @@ def get_default_compiler(osname=None, platform=None):
     if platform is None:
         platform = sys.platform
     for pattern, compiler in _default_compilers:
-        if (
-            re.match(pattern, platform) is not None
-            or re.match(pattern, osname) is not None
-        ):
+        if re.match(pattern, platform) is not None or re.match(pattern, osname) is not None:
             return compiler
     # Default to Unix compiler
     return "unix"

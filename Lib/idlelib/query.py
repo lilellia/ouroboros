@@ -86,14 +86,9 @@ class Query(Toplevel):
         self.geometry(  # Center dialog over parent (or below htest box).
             "+%d+%d"  # noqa: UP031
             % (
-                parent.winfo_rootx()
-                + (parent.winfo_width() / 2 - self.winfo_reqwidth() / 2),
+                parent.winfo_rootx() + (parent.winfo_width() / 2 - self.winfo_reqwidth() / 2),
                 parent.winfo_rooty()
-                + (
-                    (parent.winfo_height() / 2 - self.winfo_reqheight() / 2)
-                    if not _htest
-                    else 150
-                ),
+                + ((parent.winfo_height() / 2 - self.winfo_reqheight() / 2) if not _htest else 150),
             )
         )
         self.resizable(height=False, width=False)
@@ -118,14 +113,10 @@ class Query(Toplevel):
         self.entryvar = StringVar(self, self.text0)
         self.entry = Entry(frame, width=30, textvariable=self.entryvar)
         self.error_font = Font(name="TkCaptionFont", exists=True, root=self.parent)
-        self.entry_error = Label(
-            frame, text=" ", foreground="red", font=self.error_font
-        )
+        self.entry_error = Label(frame, text=" ", foreground="red", font=self.error_font)
         # Display or blank error by setting ['text'] =.
         entrylabel.grid(column=0, row=0, columnspan=3, padx=5, sticky=W)
-        self.entry.grid(
-            column=0, row=1, columnspan=3, padx=5, sticky=W + E, pady=[10, 0]
-        )
+        self.entry.grid(column=0, row=1, columnspan=3, padx=5, sticky=W + E, pady=[10, 0])
         self.entry_error.grid(column=0, row=2, columnspan=3, padx=5, sticky=W + E)
 
         self.create_extra()
@@ -180,9 +171,7 @@ class SectionName(Query):
 
     # Used in ConfigDialog.GetNewKeysName, .GetNewThemeName (837)
 
-    def __init__(
-        self, parent, title, message, used_names, *, _htest=False, _utest=False
-    ):
+    def __init__(self, parent, title, message, used_names, *, _htest=False, _utest=False):
         super().__init__(
             parent, title, message, used_names=used_names, _htest=_htest, _utest=_utest
         )
@@ -208,9 +197,7 @@ class ModuleName(Query):
     # Used in open_module (editor.EditorWindow until move to iobinding).
 
     def __init__(self, parent, title, message, text0, *, _htest=False, _utest=False):
-        super().__init__(
-            parent, title, message, text0=text0, _htest=_htest, _utest=_utest
-        )
+        super().__init__(parent, title, message, text0=text0, _htest=_htest, _utest=_utest)
 
     def entry_ok(self):
         "Return entered module name as file path or None."
@@ -312,9 +299,7 @@ class HelpSource(Query):
         self.path_error = Label(frame, text=" ", foreground="red", font=self.error_font)
 
         pathlabel.grid(column=0, row=10, columnspan=3, padx=5, pady=[10, 0], sticky=W)
-        self.path.grid(
-            column=0, row=11, columnspan=2, padx=5, sticky=W + E, pady=[10, 0]
-        )
+        self.path.grid(column=0, row=11, columnspan=2, padx=5, sticky=W + E, pady=[10, 0])
         browse.grid(column=2, row=11, padx=5, sticky=W + S)
         self.path_error.grid(column=0, row=12, columnspan=3, padx=5, sticky=W + E)
 
@@ -393,9 +378,7 @@ class CustomRun(Query):
         if cli_args is None:
             cli_args = []
         message = "Command Line Arguments for sys.argv:"
-        super().__init__(
-            parent, title, message, text0=cli_args, _htest=_htest, _utest=_utest
-        )
+        super().__init__(parent, title, message, text0=cli_args, _htest=_htest, _utest=_utest)
 
     def create_extra(self):
         "Add run mode on rows 10-12."

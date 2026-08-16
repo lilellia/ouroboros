@@ -6,11 +6,11 @@ Otherwise, tests are mostly independent.
 Currently only test grep_it, coverage 51%.
 """
 
+from idlelib import grep
+from idlelib.idle_test.mock_tk import Var
 import os
 import re
 import unittest
-from idlelib import grep
-from idlelib.idle_test.mock_tk import Var
 
 from test.support import captured_stdout
 from test.support.testcase import ExtraAssertions

@@ -129,14 +129,14 @@ Exported functions:
 """
 
 import base64
+from datetime import datetime
+from decimal import Decimal
 import errno
 import http.client
+from io import BytesIO
 import sys
 import time
 import urllib.parse
-from datetime import datetime
-from decimal import Decimal
-from io import BytesIO
 from xml.parsers import expat
 
 try:
@@ -219,9 +219,7 @@ class ProtocolError(Error):
         self.headers = headers
 
     def __repr__(self):
-        return (
-            f"<{self.__class__.__name__} for {self.url}: {self.errcode} {self.errmsg}>"
-        )
+        return f"<{self.__class__.__name__} for {self.url}: {self.errcode} {self.errmsg}>"
 
 
 ##
@@ -428,9 +426,7 @@ class Binary:
             data = b""
         else:
             if not isinstance(data, (bytes, bytearray)):
-                raise TypeError(
-                    f"expected bytes or bytearray, not {data.__class__.__name__}"
-                )
+                raise TypeError(f"expected bytes or bytearray, not {data.__class__.__name__}")
             data = bytes(data)  # Make a copy of the bytes!
         self.data = data
 
@@ -992,9 +988,7 @@ def getparser(use_datetime=False, use_builtin_types=False):
         target = FastUnmarshaller(True, False, mkbytes, mkdatetime, Fault)
         parser = FastParser(target)
     else:
-        target = Unmarshaller(
-            use_datetime=use_datetime, use_builtin_types=use_builtin_types
-        )
+        target = Unmarshaller(use_datetime=use_datetime, use_builtin_types=use_builtin_types)
         if FastParser:
             parser = FastParser(target)
         else:
@@ -1016,9 +1010,7 @@ def getparser(use_datetime=False, use_builtin_types=False):
 # @return A string containing marshalled data.
 
 
-def dumps(
-    params, methodname=None, methodresponse=None, encoding=None, allow_none=False
-):
+def dumps(params, methodname=None, methodresponse=None, encoding=None, allow_none=False):
     """data [,options] -> marshalled data
 
     Convert an argument tuple or a Fault instance to an XML-RPC
@@ -1040,9 +1032,7 @@ def dumps(
     where necessary.
     """
 
-    assert isinstance(params, (tuple, Fault)), (
-        "argument must be tuple or Fault instance"
-    )
+    assert isinstance(params, (tuple, Fault)), "argument must be tuple or Fault instance"
     if isinstance(params, Fault):
         methodresponse = 1
     elif methodresponse and isinstance(params, tuple):
@@ -1283,9 +1273,7 @@ class Transport:
         # Discard any response data and raise exception
         if resp.getheader("content-length", ""):
             resp.read()
-        raise ProtocolError(
-            host + handler, resp.status, resp.reason, dict(resp.getheaders())
-        )
+        raise ProtocolError(host + handler, resp.status, resp.reason, dict(resp.getheaders()))
 
     ##
     # Create parser.
@@ -1294,9 +1282,7 @@ class Transport:
 
     def getparser(self):
         # get parser and unmarshaller
-        return getparser(
-            use_datetime=self._use_datetime, use_builtin_types=self._use_builtin_types
-        )
+        return getparser(use_datetime=self._use_datetime, use_builtin_types=self._use_builtin_types)
 
     ##
     # Get authorization info from host parameter
@@ -1397,11 +1383,7 @@ class Transport:
 
     def send_content(self, connection, request_body):
         # optionally encode the request
-        if (
-            self.encode_threshold is not None
-            and self.encode_threshold < len(request_body)
-            and gzip
-        ):
+        if self.encode_threshold is not None and self.encode_threshold < len(request_body) and gzip:
             connection.putheader("Content-Encoding", "gzip")
             request_body = gzip_encode(request_body)
 
@@ -1446,9 +1428,7 @@ class Transport:
 class SafeTransport(Transport):
     """Handles an HTTPS transaction to an XML-RPC server."""
 
-    def __init__(
-        self, use_datetime=False, use_builtin_types=False, *, headers=(), context=None
-    ):
+    def __init__(self, use_datetime=False, use_builtin_types=False, *, headers=(), context=None):
         super().__init__(
             use_datetime=use_datetime,
             use_builtin_types=use_builtin_types,
@@ -1463,17 +1443,13 @@ class SafeTransport(Transport):
             return self._connection[1]
 
         if not hasattr(http.client, "HTTPSConnection"):
-            raise NotImplementedError(
-                "your version of http.client doesn't support HTTPS"
-            )
+            raise NotImplementedError("your version of http.client doesn't support HTTPS")
         # create a HTTPS connection object from a host descriptor
         # host may be a string, or a (host, x509-dict) tuple
         chost, self._extra_headers, x509 = self.get_host_info(host)
         self._connection = (
             host,
-            http.client.HTTPSConnection(
-                chost, None, context=self.context, **(x509 or {})
-            ),
+            http.client.HTTPSConnection(chost, None, context=self.context, **(x509 or {})),
         )
         return self._connection[1]
 

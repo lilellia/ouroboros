@@ -25,9 +25,9 @@
 
 import os
 import tkinter
-import warnings
 from tkinter import *
 from tkinter import _cnfmerge
+import warnings
 
 warnings.warn(
     "The Tix Tk extension is unmaintained, and the tkinter.tix wrapper module"
@@ -200,9 +200,7 @@ class tixCommand:
         tix_resetoptions command must be used.
         """
         if newScmPrio is not None:
-            return self.tk.call(
-                "tix", "resetoptions", newScheme, newFontSet, newScmPrio
-            )
+            return self.tk.call("tix", "resetoptions", newScheme, newFontSet, newScmPrio)
         else:
             return self.tk.call("tix", "resetoptions", newScheme, newFontSet)
 
@@ -295,9 +293,7 @@ class TixWidget(tkinter.Widget):
     Both options are for use by subclasses only.
     """
 
-    def __init__(
-        self, master=None, widgetName=None, static_options=None, cnf=None, kw=None
-    ):
+    def __init__(self, master=None, widgetName=None, static_options=None, cnf=None, kw=None):
         # Merge keywords and dictionary arguments
         if kw is None:
             kw = {}
@@ -512,9 +508,7 @@ class DisplayStyle:
             else:
                 master = tkinter._get_default_root("create display style")
         self.tk = master.tk
-        self.stylename = self.tk.call(
-            "tixDisplayStyle", itemtype, *self._options(cnf, kw)
-        )
+        self.stylename = self.tk.call("tixDisplayStyle", itemtype, *self._options(cnf, kw))
 
     def __str__(self):
         return self.stylename
@@ -565,9 +559,7 @@ class Balloon(TixWidget):
         static = ["options", "installcolormap", "initwait", "statusbar", "cursor"]
         TixWidget.__init__(self, master, "tixBalloon", static, cnf, kw)
         self.subwidget_list["label"] = _dummyLabel(self, "label", destroy_physically=0)
-        self.subwidget_list["message"] = _dummyLabel(
-            self, "message", destroy_physically=0
-        )
+        self.subwidget_list["message"] = _dummyLabel(self, "message", destroy_physically=0)
 
     def bind_widget(self, widget, cnf=None, **kw):
         """Bind balloon widget to another.
@@ -588,9 +580,7 @@ class ButtonBox(TixWidget):
     def __init__(self, master=None, cnf=None, **kw):
         if cnf is None:
             cnf = {}
-        TixWidget.__init__(
-            self, master, "tixButtonBox", ["orientation", "options"], cnf, kw
-        )
+        TixWidget.__init__(self, master, "tixButtonBox", ["orientation", "options"], cnf, kw)
 
     def add(self, name, cnf=None, **kw):
         """Add a button with given name to box."""
@@ -916,9 +906,7 @@ class FileEntry(TixWidget):
     def __init__(self, master, cnf=None, **kw):
         if cnf is None:
             cnf = {}
-        TixWidget.__init__(
-            self, master, "tixFileEntry", ["dialogtype", "options"], cnf, kw
-        )
+        TixWidget.__init__(self, master, "tixFileEntry", ["dialogtype", "options"], cnf, kw)
         self.subwidget_list["button"] = _dummyButton(self, "button")
         self.subwidget_list["entry"] = _dummyEntry(self, "entry")
 
@@ -1161,9 +1149,7 @@ class LabelEntry(TixWidget):
     def __init__(self, master=None, cnf=None, **kw):
         if cnf is None:
             cnf = {}
-        TixWidget.__init__(
-            self, master, "tixLabelEntry", ["labelside", "options"], cnf, kw
-        )
+        TixWidget.__init__(self, master, "tixLabelEntry", ["labelside", "options"], cnf, kw)
         self.subwidget_list["label"] = _dummyLabel(self, "label")
         self.subwidget_list["entry"] = _dummyEntry(self, "entry")
 
@@ -1182,9 +1168,7 @@ class LabelFrame(TixWidget):
     def __init__(self, master=None, cnf=None, **kw):
         if cnf is None:
             cnf = {}
-        TixWidget.__init__(
-            self, master, "tixLabelFrame", ["labelside", "options"], cnf, kw
-        )
+        TixWidget.__init__(self, master, "tixLabelFrame", ["labelside", "options"], cnf, kw)
         self.subwidget_list["label"] = _dummyLabel(self, "label")
         self.subwidget_list["frame"] = _dummyFrame(self, "frame")
 
@@ -1202,9 +1186,7 @@ class ListNoteBook(TixWidget):
             cnf = {}
         TixWidget.__init__(self, master, "tixListNoteBook", ["options"], cnf, kw)
         # Is this necessary? It's not an exposed subwidget in Tix.
-        self.subwidget_list["pane"] = _dummyPanedWindow(
-            self, "pane", destroy_physically=0
-        )
+        self.subwidget_list["pane"] = _dummyPanedWindow(self, "pane", destroy_physically=0)
         self.subwidget_list["hlist"] = _dummyHList(self, "hlist")
         self.subwidget_list["shlist"] = _dummyScrolledHList(self, "shlist")
 
@@ -1253,9 +1235,7 @@ class NoteBook(TixWidget):
         if cnf is None:
             cnf = {}
         TixWidget.__init__(self, master, "tixNoteBook", ["options"], cnf, kw)
-        self.subwidget_list["nbframe"] = TixSubWidget(
-            self, "nbframe", destroy_physically=0
-        )
+        self.subwidget_list["nbframe"] = TixSubWidget(self, "nbframe", destroy_physically=0)
 
     def add(self, name, cnf=None, **kw):
         if cnf is None:
@@ -1341,9 +1321,7 @@ class PanedWindow(TixWidget):
     def __init__(self, master, cnf=None, **kw):
         if cnf is None:
             cnf = {}
-        TixWidget.__init__(
-            self, master, "tixPanedWindow", ["orientation", "options"], cnf, kw
-        )
+        TixWidget.__init__(self, master, "tixPanedWindow", ["orientation", "options"], cnf, kw)
 
     # add delete forget panecget paneconfigure panes setsize
     def add(self, name, cnf=None, **kw):
@@ -1592,9 +1570,7 @@ class StdButtonBox(TixWidget):
     def __init__(self, master=None, cnf=None, **kw):
         if cnf is None:
             cnf = {}
-        TixWidget.__init__(
-            self, master, "tixStdButtonBox", ["orientation", "options"], cnf, kw
-        )
+        TixWidget.__init__(self, master, "tixStdButtonBox", ["orientation", "options"], cnf, kw)
         self.subwidget_list["ok"] = _dummyButton(self, "ok")
         self.subwidget_list["apply"] = _dummyButton(self, "apply")
         self.subwidget_list["cancel"] = _dummyButton(self, "cancel")
@@ -2157,9 +2133,7 @@ class Grid(TixWidget, XView, YView):
                      or a real number following by the word chars
                      (e.g. 3.4chars) that sets the height of the row to the
                      given number of characters."""
-        return self.tk.splitlist(
-            self.tk.call(self, "size", "row", index, *self._options({}, kw))
-        )
+        return self.tk.splitlist(self.tk.call(self, "size", "row", index, *self._options({}, kw)))
 
     def unset(self, x, y):
         """Clears the cell at (x, y) by removing its display item."""

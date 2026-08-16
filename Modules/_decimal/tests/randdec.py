@@ -240,9 +240,7 @@ def close_to_emax_less(prec, emax, emin):
 
 def close_to_emax_greater(prec, emax, emin):
     rprec = 10**prec
-    return "".join(
-        ("1.", "0" * randrange(prec), str(randrange(rprec)), "E", str(emax + 1))
-    )
+    return "".join(("1.", "0" * randrange(prec), str(randrange(rprec)), "E", str(emax + 1)))
 
 
 # Close to emin:
@@ -253,42 +251,32 @@ def close_to_emin_greater(prec, emax, emin):
 
 def close_to_emin_less(prec, emax, emin):
     rprec = 10**prec
-    return "".join(
-        ("9.", "9" * randrange(prec), str(randrange(rprec)), "E", str(emin - 1))
-    )
+    return "".join(("9.", "9" * randrange(prec), str(randrange(rprec)), "E", str(emin - 1)))
 
 
 # Close to etiny:
 def close_to_etiny_greater(prec, emax, emin):
     rprec = 10**prec
     etiny = emin - (prec - 1)
-    return "".join(
-        ("1.", "0" * randrange(prec), str(randrange(rprec)), "E", str(etiny))
-    )
+    return "".join(("1.", "0" * randrange(prec), str(randrange(rprec)), "E", str(etiny)))
 
 
 def close_to_etiny_less(prec, emax, emin):
     rprec = 10**prec
     etiny = emin - (prec - 1)
-    return "".join(
-        ("9.", "9" * randrange(prec), str(randrange(rprec)), "E", str(etiny - 1))
-    )
+    return "".join(("9.", "9" * randrange(prec), str(randrange(rprec)), "E", str(etiny - 1)))
 
 
 def close_to_min_etiny_greater(prec, max_prec, min_emin):
     rprec = 10**prec
     etiny = min_emin - (max_prec - 1)
-    return "".join(
-        ("1.", "0" * randrange(prec), str(randrange(rprec)), "E", str(etiny))
-    )
+    return "".join(("1.", "0" * randrange(prec), str(randrange(rprec)), "E", str(etiny)))
 
 
 def close_to_min_etiny_less(prec, max_prec, min_emin):
     rprec = 10**prec
     etiny = min_emin - (max_prec - 1)
-    return "".join(
-        ("9.", "9" * randrange(prec), str(randrange(rprec)), "E", str(etiny - 1))
-    )
+    return "".join(("9.", "9" * randrange(prec), str(randrange(rprec)), "E", str(etiny - 1)))
 
 
 close_funcs = [

@@ -21,9 +21,7 @@ def resolve_name(name, package):
     if not name.startswith("."):
         return name
     elif not package:
-        raise ImportError(
-            f"no package specified for {name!r} (required for relative module names)"
-        )
+        raise ImportError(f"no package specified for {name!r} (required for relative module names)")
     level = 0
     for character in name:
         if character != ".":

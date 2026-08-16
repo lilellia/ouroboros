@@ -1,20 +1,20 @@
 """Test sidebar, coverage 85%"""
 
-import idlelib.pyshell
-import idlelib.sidebar
-import sys
-import tkinter as tk
-import unittest
-import unittest.mock
 from idlelib.delegator import Delegator
 from idlelib.editor import fixwordbreaks
 from idlelib.idle_test.tkinter_testing_utils import run_in_tk_mainloop
 from idlelib.percolator import Percolator
+import idlelib.pyshell
 from idlelib.pyshell import PyShell, PyShellFileList, fix_x11_paste
 from idlelib.run import fix_scaling
+import idlelib.sidebar
 from idlelib.sidebar import get_end_linenumber, get_lineno
 from itertools import chain
+import sys
 from textwrap import dedent
+import tkinter as tk
+import unittest
+import unittest.mock
 
 from test.support import adjust_int_max_str_digits, requires, swap_attr
 from test.support.testcase import ExtraAssertions
@@ -296,9 +296,7 @@ class LineNumbersTest(unittest.TestCase):
             self.linenumber.sidebar_text.event_generate("<B1-Motion>", x=x, y=y)
             self.root.update()
 
-        self.linenumber.sidebar_text.event_generate(
-            "<ButtonRelease-1>", x=end_x, y=end_y
-        )
+        self.linenumber.sidebar_text.event_generate("<ButtonRelease-1>", x=end_x, y=end_y)
         self.root.update()
 
     @unittest.skip("test disabled")
@@ -458,9 +456,7 @@ class ShellSidebarTest(unittest.TestCase, ExtraAssertions):
     def get_sidebar_lines(self):
         canvas = self.shell.shell_sidebar.canvas
         texts = list(canvas.find(tk.ALL))
-        texts_by_y_coords = {
-            canvas.bbox(text)[1]: canvas.itemcget(text, "text") for text in texts
-        }
+        texts_by_y_coords = {canvas.bbox(text)[1]: canvas.itemcget(text, "text") for text in texts}
         line_y_coords = self.get_shell_line_y_coords()
         return [texts_by_y_coords.get(y, None) for y in line_y_coords]
 

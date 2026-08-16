@@ -35,6 +35,7 @@ __credits__ = "Gustavo Niemeyer, Niels Gust\u00e4bel, Richard Townsend."
 # ---------
 # Imports
 # ---------
+from builtins import open as bltn_open
 import copy
 import io
 import os
@@ -45,7 +46,6 @@ import struct
 import sys
 import time
 import warnings
-from builtins import open as bltn_open
 
 try:
     import pwd
@@ -803,8 +803,7 @@ class LinkOutsideDestinationError(FilterError):
         self.tarinfo = tarinfo
         self._path = path
         super().__init__(
-            f"{tarinfo.name!r} would link to {path!r}, "
-            + "which is outside the destination"
+            f"{tarinfo.name!r} would link to {path!r}, " + "which is outside the destination"
         )
 
 
@@ -837,9 +836,7 @@ def _get_filtered_attrs(member, dest_path, for_data=True):
         # For example, 'C:/foo' on Windows.
         raise AbsolutePathError(member)
     # Ensure we stay in the destination
-    target_path = os.path.realpath(
-        os.path.join(dest_path, name), strict=os.path.ALLOW_MISSING
-    )
+    target_path = os.path.realpath(os.path.join(dest_path, name), strict=os.path.ALLOW_MISSING)
     if os.path.commonpath([target_path, dest_path]) != dest_path:
         raise OutsideDestinationError(member, target_path)
     # Limit permissions (no high bits, and go-w)
@@ -966,8 +963,7 @@ class TarInfo:
         "offset": "The tar header starts here.",
         "offset_data": "The file's data starts here.",
         "pax_headers": (
-            "A dictionary containing key-value pairs of an "
-            "associated pax extended header."
+            "A dictionary containing key-value pairs of an associated pax extended header."
         ),
         "sparse": "Sparse member information.",
         "tarfile": None,
@@ -1108,9 +1104,7 @@ class TarInfo:
             raise ValueError("linkname is too long")
 
         if len(info["name"].encode(encoding, errors)) > LENGTH_NAME:
-            info["prefix"], info["name"] = self._posix_split_name(
-                info["name"], encoding, errors
-            )
+            info["prefix"], info["name"] = self._posix_split_name(info["name"], encoding, errors)
 
         return self._create_header(info, USTAR_FORMAT, encoding, errors)
 
@@ -1125,9 +1119,7 @@ class TarInfo:
             )
 
         if len(info["name"].encode(encoding, errors)) > LENGTH_NAME:
-            buf += self._create_gnu_long_header(
-                info["name"], GNUTYPE_LONGNAME, encoding, errors
-            )
+            buf += self._create_gnu_long_header(info["name"], GNUTYPE_LONGNAME, encoding, errors)
 
         return buf + self._create_header(info, GNU_FORMAT, encoding, errors)
 
@@ -1280,9 +1272,7 @@ class TarInfo:
         info["magic"] = GNU_MAGIC
 
         # create extended header + name blocks.
-        return cls._create_header(
-            info, USTAR_FORMAT, encoding, errors
-        ) + cls._create_payload(name)
+        return cls._create_header(info, USTAR_FORMAT, encoding, errors) + cls._create_payload(name)
 
     @classmethod
     def _create_pax_generic_header(cls, pax_headers, type, encoding):
@@ -1332,9 +1322,9 @@ class TarInfo:
         info["magic"] = POSIX_MAGIC
 
         # Create pax header + record blocks.
-        return cls._create_header(
-            info, USTAR_FORMAT, "ascii", "replace"
-        ) + cls._create_payload(records)
+        return cls._create_header(info, USTAR_FORMAT, "ascii", "replace") + cls._create_payload(
+            records
+        )
 
     @classmethod
     def frombuf(cls, buf, encoding, errors):
@@ -1566,18 +1556,12 @@ class TarInfo:
             if pos + length > len(buf):
                 raise InvalidHeaderError("invalid header")
 
-            header_value_end_offset = (
-                match.start(1) + length - 1
-            )  # Last byte of the header
+            header_value_end_offset = match.start(1) + length - 1  # Last byte of the header
             keyword_and_value = buf[match.end(1) + 1 : header_value_end_offset]
             raw_keyword, equals, raw_value = keyword_and_value.partition(b"=")
 
             # Check the framing of the header. The last character must be '\n' (0x0A)
-            if (
-                not raw_keyword
-                or equals != b"="
-                or buf[header_value_end_offset] != 0x0A
-            ):
+            if not raw_keyword or equals != b"=" or buf[header_value_end_offset] != 0x0A:
                 raise InvalidHeaderError("invalid header")
             raw_headers.append((length, raw_keyword, raw_value))
 
@@ -1611,17 +1595,13 @@ class TarInfo:
             # hdrcharset=BINARY header).
             # We first try the strict standard encoding, and if that fails we
             # fall back on the user's encoding and error handler.
-            keyword = self._decode_pax_field(
-                raw_keyword, "utf-8", "utf-8", tarfile.errors
-            )
+            keyword = self._decode_pax_field(raw_keyword, "utf-8", "utf-8", tarfile.errors)
             if keyword in PAX_NAME_FIELDS:
                 value = self._decode_pax_field(
                     raw_value, encoding, tarfile.encoding, tarfile.errors
                 )
             else:
-                value = self._decode_pax_field(
-                    raw_value, "utf-8", "utf-8", tarfile.errors
-                )
+                value = self._decode_pax_field(raw_value, "utf-8", "utf-8", tarfile.errors)
 
             pax_headers[keyword] = value
 
@@ -1850,11 +1830,7 @@ class TarFile:
             fileobj = bltn_open(name, self._mode)  # noqa: SIM115
             self._extfileobj = False
         else:
-            if (
-                name is None
-                and hasattr(fileobj, "name")
-                and isinstance(fileobj.name, (str, bytes))
-            ):
+            if name is None and hasattr(fileobj, "name") and isinstance(fileobj.name, (str, bytes)):
                 name = fileobj.name
             if hasattr(fileobj, "mode"):
                 self._mode = fileobj.mode
@@ -1996,9 +1972,7 @@ class TarFile:
                         fileobj.seek(saved_pos)
                     continue
             error_msgs_summary = "\n".join(error_msgs)
-            raise ReadError(
-                f"file could not be opened successfully:\n{error_msgs_summary}"
-            )
+            raise ReadError(f"file could not be opened successfully:\n{error_msgs_summary}")
 
         elif ":" in mode:
             filemode, comptype = mode.split(":", 1)
@@ -2310,9 +2284,7 @@ class TarFile:
                     _safe_print("??????????")
                 else:
                     _safe_print(stat.filemode(tarinfo.mode))
-                _safe_print(
-                    f"{tarinfo.uname or tarinfo.uid}/{tarinfo.gname or tarinfo.gid}"
-                )
+                _safe_print(f"{tarinfo.uname or tarinfo.uid}/{tarinfo.gname or tarinfo.gid}")
                 if tarinfo.ischr() or tarinfo.isblk():
                     _safe_print(
                         "%10s" % ("%d,%d" % (tarinfo.devmajor, tarinfo.devminor))  # noqa: UP031
@@ -2462,9 +2434,7 @@ class TarFile:
             members = self
 
         for member in members:
-            tarinfo, unfiltered = self._get_extract_tarinfo(
-                member, filter_function, path
-            )
+            tarinfo, unfiltered = self._get_extract_tarinfo(member, filter_function, path)
             if tarinfo is None:
                 continue
             if tarinfo.isdir():
@@ -2516,9 +2486,7 @@ class TarFile:
     def _log_no_directory_fixup(self, member, reason):
         self._dbg(2, f"tarfile: Not fixing up directory {member.name!r} ({reason})")
 
-    def extract(
-        self, member, path="", set_attrs=True, *, numeric_owner=False, filter=None
-    ):
+    def extract(self, member, path="", set_attrs=True, *, numeric_owner=False, filter=None):
         """Extract a member from the archive to the current working directory,
         using its full name. Its file information is extracted as accurately
         as possible. `member' may be a filename or a TarInfo object. You can
@@ -2568,9 +2536,7 @@ class TarFile:
             filtered._link_target = os.path.join(path, filtered.linkname)
         return filtered, unfiltered
 
-    def _extract_one(
-        self, tarinfo, path, set_attrs, numeric_owner, filter_function=None
-    ):
+    def _extract_one(self, tarinfo, path, set_attrs, numeric_owner, filter_function=None):
         """Extract from filtered tarinfo to disk.
 
         filter_function is only used when extracting a *different*
@@ -2773,9 +2739,7 @@ class TarFile:
     def makelink(self, tarinfo, targetpath):
         return self.makelink_with_filter(tarinfo, targetpath, None, None)
 
-    def makelink_with_filter(
-        self, tarinfo, targetpath, filter_function, extraction_root
-    ):
+    def makelink_with_filter(self, tarinfo, targetpath, filter_function, extraction_root):
         """Make a (symbolic) link called targetpath. If it cannot be created
         (platform limitation), we try to make a copy of the referenced file
         instead of a link.
@@ -2816,9 +2780,7 @@ class TarFile:
                     + "extraction_root must also not be None"
                 )
             try:
-                filter_function(
-                    unfiltered.replace(name=tarinfo.name, deep=False), extraction_root
-                )
+                filter_function(unfiltered.replace(name=tarinfo.name, deep=False), extraction_root)
                 filtered = filter_function(unfiltered, extraction_root)
             except _FILTER_ERRORS as cause:
                 raise LinkFallbackError(tarinfo, unfiltered.name) from cause
@@ -3014,9 +2976,7 @@ class TarFile:
         """
         if tarinfo.issym():
             # Always search the entire archive.
-            linkname = "/".join(
-                filter(None, (os.path.dirname(tarinfo.name), tarinfo.linkname))
-            )
+            linkname = "/".join(filter(None, (os.path.dirname(tarinfo.name), tarinfo.linkname)))
             limit = None
         else:
             # Search the archive before the link, because a hard link is
@@ -3122,9 +3082,7 @@ def main():
     )
 
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument(
-        "-l", "--list", metavar="<tarfile>", help="Show listing of a tarfile"
-    )
+    group.add_argument("-l", "--list", metavar="<tarfile>", help="Show listing of a tarfile")
     group.add_argument(
         "-e",
         "--extract",
@@ -3139,9 +3097,7 @@ def main():
         metavar=("<name>", "<file>"),
         help="Create tarfile from sources",
     )
-    group.add_argument(
-        "-t", "--test", metavar="<tarfile>", help="Test if a tarfile is valid"
-    )
+    group.add_argument("-t", "--test", metavar="<tarfile>", help="Test if a tarfile is valid")
 
     args = parser.parse_args()
 

@@ -153,7 +153,7 @@ class TaskGroup:
 
         if self._errors:
             try:
-                raise BaseExceptionGroup(  # noqa: F821
+                raise BaseExceptionGroup(
                     "unhandled errors in a TaskGroup",
                     self._errors,
                 ) from None

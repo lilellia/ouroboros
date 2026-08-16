@@ -420,9 +420,7 @@ class _IPAddressBase:
         address_len = len(address)
         if address_len != expected_len:
             msg = "%r (len %d != %d) is not permitted as an IPv%d address"
-            raise AddressValueError(
-                msg % (address, address_len, expected_len, self._version)
-            )
+            raise AddressValueError(msg % (address, address_len, expected_len, self._version))
 
     @classmethod
     def _ip_int_from_prefix(cls, prefixlen):
@@ -856,9 +854,7 @@ class _BaseNetwork(_IPAddressBase):
             yield s1
         else:
             # If we got here, there's a bug somewhere.
-            raise AssertionError(
-                f"Error performing exclusion: s1: {s1} s2: {s2} other: {other}"
-            )
+            raise AssertionError(f"Error performing exclusion: s1: {s1} s2: {s2} other: {other}")
 
     def compare_networks(self, other):
         """Compare two IP objects.
@@ -1066,9 +1062,7 @@ class _BaseNetwork(_IPAddressBase):
             A boolean, True if the address is reserved per RFC 4291.
 
         """
-        return (
-            self.network_address.is_link_local and self.broadcast_address.is_link_local
-        )
+        return self.network_address.is_link_local and self.broadcast_address.is_link_local
 
     @property
     def is_private(self):
@@ -1080,12 +1074,10 @@ class _BaseNetwork(_IPAddressBase):
 
         """
         return any(
-            self.network_address in priv_network
-            and self.broadcast_address in priv_network
+            self.network_address in priv_network and self.broadcast_address in priv_network
             for priv_network in self._constants._private_networks
         ) and all(
-            self.network_address not in network
-            and self.broadcast_address not in network
+            self.network_address not in network and self.broadcast_address not in network
             for network in self._constants._private_networks_exceptions
         )
 
@@ -1109,10 +1101,7 @@ class _BaseNetwork(_IPAddressBase):
             RFC 2373 2.5.2.
 
         """
-        return (
-            self.network_address.is_unspecified
-            and self.broadcast_address.is_unspecified
-        )
+        return self.network_address.is_unspecified and self.broadcast_address.is_unspecified
 
     @property
     def is_loopback(self):
@@ -1443,11 +1432,7 @@ class IPv4Interface(IPv4Address):
         if address_less is NotImplemented:
             return NotImplemented
         try:
-            return (
-                self.network < other.network
-                or self.network == other.network
-                and address_less
-            )
+            return self.network < other.network or self.network == other.network and address_less
         except AttributeError:
             # We *do* allow addresses and interfaces to be sorted. The
             # unassociated address is considered less than all interfaces.
@@ -1660,9 +1645,7 @@ class _BaseV6:
         if len(ip_str) > 45:
             shorten = ip_str
             if len(shorten) > 100:
-                shorten = (
-                    f"{ip_str[:45]}({len(ip_str) - 90} chars elided){ip_str[-45:]}"
-                )
+                shorten = f"{ip_str[:45]}({len(ip_str) - 90} chars elided){ip_str[-45:]}"
             raise AddressValueError(f"At most 45 characters expected in {shorten!r}")
 
         # We want to allow more parts than the max to be 'split'
@@ -1991,9 +1974,7 @@ class IPv6Address(_BaseV6, _BaseAddress):
         """
         ipv4_mapped = self.ipv4_mapped
         if ipv4_mapped is None:
-            raise AddressValueError(
-                f"Can not apply to non-IPv4-mapped IPv6 address {self!s}"
-            )
+            raise AddressValueError(f"Can not apply to non-IPv4-mapped IPv6 address {self!s}")
         high_order_bits = self._ip >> 32
         return f"{self._string_from_ip_int(high_order_bits)}:{ipv4_mapped!s}"
 
@@ -2240,11 +2221,7 @@ class IPv6Interface(IPv6Address):
         if address_less is NotImplemented:
             return address_less
         try:
-            return (
-                self.network < other.network
-                or self.network == other.network
-                and address_less
-            )
+            return self.network < other.network or self.network == other.network and address_less
         except AttributeError:
             # We *do* allow addresses and interfaces to be sorted. The
             # unassociated address is considered less than all interfaces.
@@ -2366,9 +2343,7 @@ class IPv6Network(_BaseV6, _BaseNetwork):
             A boolean, True if the address is reserved per RFC 3513 2.5.6.
 
         """
-        return (
-            self.network_address.is_site_local and self.broadcast_address.is_site_local
-        )
+        return self.network_address.is_site_local and self.broadcast_address.is_site_local
 
 
 class _IPv6Constants:

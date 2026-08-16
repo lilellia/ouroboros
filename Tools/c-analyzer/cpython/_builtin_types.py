@@ -1,7 +1,7 @@
+from collections import namedtuple
 import os.path
 import re
 import textwrap
-from collections import namedtuple
 
 from c_common import tables
 
@@ -131,12 +131,7 @@ class BuiltinTypeDecl(namedtuple("BuiltinTypeDecl", "file lno name kind")):
         if kind not in cls.KINDS:
             raise ValueError(f"unsupported kind {kind!r}")
         self = cls(filename, lno, name, kind)
-        if (
-            self.kind not in ("extern", "capi")
-            and self.api
-            or self.kind == "capi"
-            and not self.api
-        ):
+        if self.kind not in ("extern", "capi") and self.api or self.kind == "capi" and not self.api:
             raise NotImplementedError(self)
         return self
 

@@ -4,8 +4,8 @@ It uses the function MultiByteToWideChar to generate a decoding table.
 """
 
 import ctypes
-import unicodedata
 from ctypes import wintypes
+import unicodedata
 
 from gencodec import codegen
 

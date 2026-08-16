@@ -24,15 +24,15 @@ __all__ = (
 
 
 import asyncio
+from asyncio import iscoroutinefunction
 import builtins
 import contextlib
+from functools import partial, wraps
 import inspect
 import io
 import pkgutil
 import pprint
 import sys
-from asyncio import iscoroutinefunction
-from functools import partial, wraps
 from threading import RLock
 from types import CodeType, MethodType, ModuleType
 from unittest.util import safe_repr
@@ -74,9 +74,7 @@ def _is_instance_mock(obj):
 
 def _is_exception(obj):
     return (
-        isinstance(obj, BaseException)
-        or isinstance(obj, type)
-        and issubclass(obj, BaseException)
+        isinstance(obj, BaseException) or isinstance(obj, type) and issubclass(obj, BaseException)
     )
 
 
@@ -636,9 +634,7 @@ class NonCallableMock(Base):
 
     side_effect = property(__get_side_effect, __set_side_effect)
 
-    def reset_mock(
-        self, visited=None, *, return_value: bool = False, side_effect: bool = False
-    ):
+    def reset_mock(self, visited=None, *, return_value: bool = False, side_effect: bool = False):
         "Restore the mock object to its initial state."
         if visited is None:
             visited = []
@@ -661,9 +657,7 @@ class NonCallableMock(Base):
         for child in self._mock_children.values():
             if isinstance(child, _SpecState) or child is _deleted:
                 continue
-            child.reset_mock(
-                visited, return_value=return_value, side_effect=side_effect
-            )
+            child.reset_mock(visited, return_value=return_value, side_effect=side_effect)
 
         ret = self._mock_return_value
         if _is_instance_mock(ret) and ret is not self:
@@ -803,9 +797,7 @@ class NonCallableMock(Base):
         from_type = dir(type(self))
         from_dict = list(self.__dict__)
         from_child_mocks = [
-            m_name
-            for m_name, m_value in self._mock_children.items()
-            if m_value is not _deleted
+            m_name for m_name, m_value in self._mock_children.items() if m_value is not _deleted
         ]
 
         from_type = [e for e in from_type if not e.startswith("_")]
@@ -977,9 +969,7 @@ class NonCallableMock(Base):
         if self.call_args is None:
             expected = self._format_mock_call_signature(args, kwargs)
             actual = "not called."
-            error_message = (
-                f"expected call not found.\nExpected: {expected}\n  Actual: {actual}"
-            )
+            error_message = f"expected call not found.\nExpected: {expected}\n  Actual: {actual}"
             raise AssertionError(error_message)
 
         def _error_message():
@@ -1040,8 +1030,7 @@ class NonCallableMock(Base):
                 not_found.append(kall)
         if not_found:
             raise AssertionError(
-                "{!r} does not contain all of {!r} in its call list, "
-                "found {!r} instead".format(
+                "{!r} does not contain all of {!r} in its call list, found {!r} instead".format(
                     self._mock_name or "mock", tuple(not_found), all_calls
                 )
             ) from cause
@@ -1114,11 +1103,7 @@ class NonCallableMock(Base):
 
 # Denylist for forbidden attribute names in safe mode
 _ATTRIB_DENY_LIST = frozenset(
-    {
-        name.removeprefix("assert_")
-        for name in dir(NonCallableMock)
-        if name.startswith("assert_")
-    }
+    {name.removeprefix("assert_") for name in dir(NonCallableMock) if name.startswith("assert_")}
 )
 
 
@@ -1335,9 +1320,7 @@ def _check_spec_arg_typos(kwargs_to_check):
     typos = ("autospect", "auto_spec", "set_spec")
     for typo in typos:
         if typo in kwargs_to_check:
-            raise RuntimeError(
-                f"{typo!r} might be a typo; use unsafe=True if this is intended"
-            )
+            raise RuntimeError(f"{typo!r} might be a typo; use unsafe=True if this is intended")
 
 
 class _patch:
@@ -1570,11 +1553,7 @@ class _patch:
                 _kwargs["spec_set"] = spec_set
 
             # add a name to mocks
-            if (
-                isinstance(Klass, type)
-                and issubclass(Klass, NonCallableMock)
-                and self.attribute
-            ):
+            if isinstance(Klass, type) and issubclass(Klass, NonCallableMock) and self.attribute:
                 _kwargs["name"] = self.attribute
 
             _kwargs.update(kwargs)
@@ -1619,9 +1598,7 @@ class _patch:
                     f"[target={self.target!r}, attr={autospec!r}]"
                 )
 
-            new = create_autospec(
-                autospec, spec_set=spec_set, _name=self.attribute, **kwargs
-            )
+            new = create_autospec(autospec, spec_set=spec_set, _name=self.attribute, **kwargs)
         elif kwargs:
             # can't set keyword args when we aren't creating the mock
             # XXXX If new is a Mock we could call new.configure_mock(**kwargs)
@@ -1733,9 +1710,7 @@ def _patch_object(
     for choosing which methods to wrap.
     """
     if type(target) is str:
-        raise TypeError(
-            f"{target!r} must be the actual object to be patched, not a str"
-        )
+        raise TypeError(f"{target!r} must be the actual object to be patched, not a str")
     getter = lambda: target
     return _patch(
         getter,
@@ -1786,15 +1761,11 @@ def _patch_multiple(
         getter = lambda: target
 
     if not kwargs:
-        raise ValueError(
-            "Must supply at least one keyword argument with patch.multiple"
-        )
+        raise ValueError("Must supply at least one keyword argument with patch.multiple")
     # need to wrap in a list for python 3, where items is a view
     items = list(kwargs.items())
     attribute, new = items[0]
-    patcher = _patch(
-        getter, attribute, new, spec, create, spec_set, autospec, new_callable, {}
-    )
+    patcher = _patch(getter, attribute, new, spec, create, spec_set, autospec, new_callable, {})
     patcher.attribute_name = attribute
     for attribute, new in items[1:]:
         this_patcher = _patch(
@@ -2121,10 +2092,7 @@ def _get_method(name, func):
     return method
 
 
-_magics = {
-    f"__{method}__"
-    for method in f"{magic_methods} {numerics} {inplace} {right}".split()
-}
+_magics = {f"__{method}__" for method in f"{magic_methods} {numerics} {inplace} {right}".split()}
 
 # Magic methods used for async `with` statements
 _async_method_magics = {"__aenter__", "__aexit__", "__anext__"}
@@ -2150,9 +2118,7 @@ _calculate_return_value = {
     "__hash__": lambda self: object.__hash__(self),
     "__str__": lambda self: object.__str__(self),
     "__sizeof__": lambda self: object.__sizeof__(self),
-    "__fspath__": lambda self: (
-        f"{type(self).__name__}/{self._extract_mock_name()}/{id(self)}"
-    ),
+    "__fspath__": lambda self: f"{type(self).__name__}/{self._extract_mock_name()}/{id(self)}",
 }
 
 _return_values = {
@@ -2365,9 +2331,7 @@ class AsyncMockMixin(Base):
             code_mock.__dict__["_spec_signature"] = _CODE_SIG
         else:
             code_mock = NonCallableMock(spec_set=CodeType)
-        code_mock.co_flags = (
-            inspect.CO_COROUTINE + inspect.CO_VARARGS + inspect.CO_VARKEYWORDS
-        )
+        code_mock.co_flags = inspect.CO_COROUTINE + inspect.CO_VARARGS + inspect.CO_VARKEYWORDS
         code_mock.co_argcount = 0
         code_mock.co_varnames = ("args", "kwargs")
         code_mock.co_posonlyargcount = 0
@@ -2501,9 +2465,7 @@ class AsyncMockMixin(Base):
                 else:
                     problem = f"Error processing expected awaits.\nErrors: {[e if isinstance(e, Exception) else None for e in expected]}"
                 raise AssertionError(
-                    f"{problem}\n"
-                    f"Expected: {_CallList(calls)}\n"
-                    f"Actual: {self.await_args_list}"
+                    f"{problem}\nExpected: {_CallList(calls)}\nActual: {self.await_args_list}"
                 ) from cause
             return
 
@@ -2516,9 +2478,7 @@ class AsyncMockMixin(Base):
             except ValueError:
                 not_found.append(kall)
         if not_found:
-            raise AssertionError(
-                f"{tuple(not_found)!r} not all found in await list"
-            ) from cause
+            raise AssertionError(f"{tuple(not_found)!r} not all found in await list") from cause
 
     def assert_not_awaited(self):
         """
@@ -2864,16 +2824,13 @@ def create_autospec(
     elif is_async_func:
         if instance:
             raise RuntimeError(
-                "Instance can not be True when create_autospec "
-                "is mocking an async function"
+                "Instance can not be True when create_autospec is mocking an async function"
             )
         Klass = AsyncMock
     elif not _callable(spec) or is_type and instance and not _instance_callable(spec):
         Klass = NonCallableMagicMock
 
-    mock = Klass(
-        parent=_parent, _new_parent=_parent, _new_name=_new_name, name=_name, **_kwargs
-    )
+    mock = Klass(parent=_parent, _new_parent=_parent, _new_name=_new_name, name=_name, **_kwargs)
 
     if isinstance(spec, FunctionTypes):
         # should only happen at the top level because we don't
@@ -2989,9 +2946,7 @@ def _must_skip(spec, entry, is_type):
 
 
 class _SpecState:
-    def __init__(
-        self, spec, spec_set=False, parent=None, name=None, ids=None, instance=False
-    ):
+    def __init__(self, spec, spec_set=False, parent=None, name=None, ids=None, instance=False):
         self.spec = spec
         self.ids = ids
         self.spec_set = spec_set

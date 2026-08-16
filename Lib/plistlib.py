@@ -70,11 +70,11 @@ import binascii
 import codecs
 import datetime
 import enum
+from io import BytesIO
 import itertools
 import os
 import re
 import struct
-from io import BytesIO
 from xml.parsers.expat import ParserCreate
 
 PlistFormat = enum.Enum("PlistFormat", "FMT_XML FMT_BINARY", module=__name__)
@@ -223,9 +223,7 @@ class _PlistParser:
         # Reject plist files with entity declarations to avoid XML vulnerabilities in expat.
         # Regular plist files don't contain those declarations, and Apple's plutil tool does not
         # accept them either.
-        raise InvalidFileException(
-            "XML entity declarations are not supported in plist files"
-        )
+        raise InvalidFileException("XML entity declarations are not supported in plist files")
 
     def handle_begin_element(self, element, attrs):
         self.data = []
@@ -417,9 +415,7 @@ class _PlistWriter(_DumbXMLWriter):
     def write_bytes(self, data):
         self.begin_element("data")
         self._indent_level -= 1
-        maxlinelength = max(
-            16, 76 - len(self.indent.replace(b"\t", b" " * 8) * self._indent_level)
-        )
+        maxlinelength = max(16, 76 - len(self.indent.replace(b"\t", b" " * 8) * self._indent_level))
 
         for line in _encode_base64(data, maxlinelength).split(b"\n"):
             if line:
@@ -571,8 +567,7 @@ class _BinaryPlistParser:
             if not size:
                 raise InvalidFileException()
             return tuple(
-                int.from_bytes(data[i : i + size], "big")
-                for i in range(0, size * n, size)
+                int.from_bytes(data[i : i + size], "big") for i in range(0, size * n, size)
             )
 
     def _read_refs(self, n):
@@ -609,9 +604,7 @@ class _BinaryPlistParser:
             result = b""
 
         elif tokenH == 0x10:  # int
-            result = int.from_bytes(
-                self._fp.read(1 << tokenL), "big", signed=tokenL >= 3
-            )
+            result = int.from_bytes(self._fp.read(1 << tokenL), "big", signed=tokenL >= 3)
 
         elif token == 0x22:  # real
             result = struct.unpack(">f", self._fp.read(4))[0]

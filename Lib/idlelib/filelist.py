@@ -19,9 +19,7 @@ class FileList:
         filename = self.canonize(filename)
         if os.path.isdir(filename):
             # This can happen when bad filename is passed on command line:
-            messagebox.showerror(
-                "File Error", f"{filename!r} is a directory.", master=self.root
-            )
+            messagebox.showerror("File Error", f"{filename!r} is a directory.", master=self.root)
             return None
         key = os.path.normcase(filename)
         if key in self.dict:

@@ -6,14 +6,14 @@
 
 __all__ = ["BytesGenerator", "DecodedGenerator", "Generator"]
 
-import random
-import re
-import sys
-import time
 from copy import deepcopy
 from email.errors import HeaderWriteError
 from email.utils import _has_surrogates
 from io import BytesIO, StringIO
+import random
+import re
+import sys
+import time
 
 UNDERSCORE = "_"
 NL = "\n"  # XXX: no longer used by the code below.
@@ -234,9 +234,7 @@ class Generator:
                         f"folded header does not end with {linesep!r}: {folded!r}"
                     )
                 if NEWLINE_WITHOUT_FWSP.search(folded.removesuffix(linesep)):
-                    raise HeaderWriteError(
-                        f"folded header contains newline: {folded!r}"
-                    )
+                    raise HeaderWriteError(f"folded header contains newline: {folded!r}")
             self.write(folded)
         # A blank line always separates headers from body
         self.write(self._NL)
@@ -443,9 +441,7 @@ class BytesGenerator(Generator):
                         f"folded header does not end with {linesep!r}: {folded!r}"
                     )
                 if NEWLINE_WITHOUT_FWSP_BYTES.search(folded.removesuffix(linesep)):
-                    raise HeaderWriteError(
-                        f"folded header contains newline: {folded!r}"
-                    )
+                    raise HeaderWriteError(f"folded header contains newline: {folded!r}")
             self._fp.write(folded)
         # A blank line always separates headers from body
         self.write(self._NL)
@@ -480,9 +476,7 @@ class DecodedGenerator(Generator):
     with a format string representing the part.
     """
 
-    def __init__(
-        self, outfp, mangle_from_=None, maxheaderlen=None, fmt=None, *, policy=None
-    ):
+    def __init__(self, outfp, mangle_from_=None, maxheaderlen=None, fmt=None, *, policy=None):
         """Like Generator.__init__() except that an additional optional
         argument is allowed.
 
@@ -526,12 +520,8 @@ class DecodedGenerator(Generator):
                         "maintype": part.get_content_maintype(),
                         "subtype": part.get_content_subtype(),
                         "filename": part.get_filename("[no filename]"),
-                        "description": part.get(
-                            "Content-Description", "[no description]"
-                        ),
-                        "encoding": part.get(
-                            "Content-Transfer-Encoding", "[no encoding]"
-                        ),
+                        "description": part.get("Content-Description", "[no description]"),
+                        "encoding": part.get("Content-Transfer-Encoding", "[no encoding]"),
                     },
                     file=self,
                 )

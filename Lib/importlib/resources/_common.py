@@ -7,8 +7,8 @@ import os
 import pathlib
 import tempfile
 import types
-import warnings
 from typing import Union, cast
+import warnings
 
 from ._adapters import wrap_spec
 from .abc import ResourceReader, Traversable

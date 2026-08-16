@@ -10,11 +10,11 @@ except ModuleNotFoundError:
     else:
         raise ImportError("The required _crypt module was not built as part of CPython")
 
+from collections import namedtuple as _namedtuple
 import errno
+from random import SystemRandom as _SystemRandom
 import string as _string
 import warnings
-from collections import namedtuple as _namedtuple
-from random import SystemRandom as _SystemRandom
 
 warnings._deprecated(__name__, remove=(3, 13))
 
@@ -40,9 +40,7 @@ def mksalt(method=None, *, rounds=None):
     if method is None:
         method = methods[0]
     if rounds is not None and not isinstance(rounds, int):
-        raise TypeError(
-            f"{rounds.__class__.__name__} object cannot be interpreted as an integer"
-        )
+        raise TypeError(f"{rounds.__class__.__name__} object cannot be interpreted as an integer")
     if not method.ident:  # traditional
         s = ""
     else:  # modular

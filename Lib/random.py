@@ -50,28 +50,32 @@ General notes on the underlying Mersenne Twister core generator:
 # Adrian Baddeley.  Adapted by Raymond Hettinger for use with
 # the Mersenne Twister  and os.urandom() core generators.
 
-import _random
-import os as _os
 from _collections_abc import Sequence as _Sequence
+import _random
 from bisect import bisect as _bisect
-from itertools import accumulate as _accumulate
-from itertools import repeat as _repeat
-from math import acos as _acos
-from math import ceil as _ceil
-from math import cos as _cos
-from math import e as _e
-from math import exp as _exp
-from math import fabs as _fabs
-from math import floor as _floor
-from math import isfinite as _isfinite
-from math import lgamma as _lgamma
-from math import log as _log
-from math import log2 as _log2
-from math import pi as _pi
-from math import sin as _sin
-from math import sqrt as _sqrt
-from math import tau as TWOPI
+from itertools import (
+    accumulate as _accumulate,
+    repeat as _repeat,
+)
+from math import (
+    acos as _acos,
+    ceil as _ceil,
+    cos as _cos,
+    e as _e,
+    exp as _exp,
+    fabs as _fabs,
+    floor as _floor,
+    isfinite as _isfinite,
+    lgamma as _lgamma,
+    log as _log,
+    log2 as _log2,
+    pi as _pi,
+    sin as _sin,
+    sqrt as _sqrt,
+    tau as TWOPI,
+)
 from operator import index as _index
+import os as _os
 from os import urandom as _urandom
 from warnings import warn as _warn
 
@@ -177,8 +181,7 @@ class Random(_random.Random):
 
         elif not isinstance(a, (type(None), int, float, str, bytes, bytearray)):
             raise TypeError(
-                "The only supported seed types are: None,\n"
-                "int, float, str, bytes, and bytearray."
+                "The only supported seed types are: None,\nint, float, str, bytes, and bytearray."
             )
 
         super().seed(a)
@@ -419,9 +422,7 @@ class Random(_random.Random):
         # causing them to eat more entropy than necessary.
 
         if not isinstance(population, _Sequence):
-            raise TypeError(
-                "Population must be a sequence.  For dicts or sets, use sorted(d)."
-            )
+            raise TypeError("Population must be a sequence.  For dicts or sets, use sorted(d).")
         n = len(population)
         if counts is not None:
             cum_counts = list(_accumulate(counts))
@@ -481,9 +482,7 @@ class Random(_random.Random):
                 if not isinstance(weights, int):
                     raise
                 k = weights
-                raise TypeError(
-                    f"The number of choices must be a keyword argument: {k=}"
-                ) from None
+                raise TypeError(f"The number of choices must be a keyword argument: {k=}") from None
         elif weights is not None:
             raise TypeError("Cannot specify both weights and cumulative weights")
         if len(cum_weights) != n:
@@ -495,10 +494,7 @@ class Random(_random.Random):
             raise ValueError("Total of weights must be finite")
         bisect = _bisect
         hi = n - 1
-        return [
-            population[bisect(cum_weights, random() * total, 0, hi)]
-            for i in _repeat(None, k)
-        ]
+        return [population[bisect(cum_weights, random() * total, 0, hi)] for i in _repeat(None, k)]
 
     ## -------------------- real-valued distributions  -------------------
 
@@ -958,8 +954,10 @@ randbytes = _inst.randbytes
 
 
 def _test_generator(n, func, args):
-    from statistics import fmean as mean
-    from statistics import stdev
+    from statistics import (
+        fmean as mean,
+        stdev,
+    )
     from time import perf_counter
 
     t0 = perf_counter()

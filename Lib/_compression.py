@@ -23,13 +23,9 @@ class BaseStream(io.BufferedIOBase):
 
     def _check_can_seek(self):
         if not self.readable():
-            raise io.UnsupportedOperation(
-                "Seeking is only supported on files open for reading"
-            )
+            raise io.UnsupportedOperation("Seeking is only supported on files open for reading")
         if not self.seekable():
-            raise io.UnsupportedOperation(
-                "The underlying file object does not support seeking"
-            )
+            raise io.UnsupportedOperation("The underlying file object does not support seeking")
 
 
 class DecompressReader(io.RawIOBase):
@@ -97,8 +93,7 @@ class DecompressReader(io.RawIOBase):
                     rawblock = self._fp.read(BUFFER_SIZE)
                     if not rawblock:
                         raise EOFError(
-                            "Compressed file ended before the "
-                            "end-of-stream marker was reached"
+                            "Compressed file ended before the end-of-stream marker was reached"
                         )
                 else:
                     rawblock = b""

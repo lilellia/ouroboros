@@ -1,7 +1,7 @@
+from collections import namedtuple
 import csv
 import re
 import textwrap
-from collections import namedtuple
 
 from . import NOT_SET, fsutil, strutil
 
@@ -33,10 +33,7 @@ def fix_row(row, **markers):
     elif not unknown:
         row = (EMPTY if val in empty else val for val in row)
     else:
-        row = (
-            EMPTY if val in empty else (UNKNOWN if val in unknown else val)
-            for val in row
-        )
+        row = (EMPTY if val in empty else (UNKNOWN if val in unknown else val) for val in row)
     return tuple(row)
 
 

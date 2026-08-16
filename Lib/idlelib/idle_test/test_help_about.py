@@ -3,13 +3,13 @@ help_about.build_bits branches on sys.platform='darwin'.
 '100% combines coverage on Mac and others.
 """
 
-import os.path
-import unittest
 from idlelib import help_about, textview
 from idlelib.idle_test.mock_idle import Func
 from idlelib.idle_test.mock_tk import Mbox_func
+import os.path
 from platform import python_version
 from tkinter import TclError, Tk
+import unittest
 
 from test.support import findfile, requires
 

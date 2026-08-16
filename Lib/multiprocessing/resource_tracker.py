@@ -69,9 +69,7 @@ class ResourceTracker:
         # gets interrupted by a garbage collection, invoking a finalizer (*)
         # that itself calls back into ResourceTracker.
         #   (*) for example the SemLock finalizer
-        raise ReentrantCallError(
-            "Reentrant call into the multiprocessing resource tracker"
-        )
+        raise ReentrantCallError("Reentrant call into the multiprocessing resource tracker")
 
     def __del__(self):
         # making sure child processess are cleaned before ResourceTracker
@@ -174,9 +172,7 @@ class ResourceTracker:
                 prev_sigmask = None
                 try:
                     if _HAVE_SIGMASK:
-                        prev_sigmask = signal.pthread_sigmask(
-                            signal.SIG_BLOCK, _IGNORED_SIGNALS
-                        )
+                        prev_sigmask = signal.pthread_sigmask(signal.SIG_BLOCK, _IGNORED_SIGNALS)
                     pid = util.spawnv_passfds(exe, args, fds_to_pass)
                 finally:
                     if prev_sigmask is not None:
@@ -286,8 +282,7 @@ def main(fd):
                 try:
                     warnings.warn(
                         "resource_tracker: There appear to be %d "  # noqa: UP031
-                        "leaked %s objects to clean up at shutdown"
-                        % (len(rtype_cache), rtype)
+                        "leaked %s objects to clean up at shutdown" % (len(rtype_cache), rtype)
                     )
                 except Exception:  # noqa: BLE001, S110
                     pass

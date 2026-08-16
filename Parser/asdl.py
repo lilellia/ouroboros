@@ -19,8 +19,8 @@
 # [1] "The Zephyr Abstract Syntax Description Language" by Wang, et. al. See
 #     http://asdl.sourceforge.net/
 # -------------------------------------------------------------------------------
-import re
 from collections import namedtuple
+import re
 
 __all__ = [
     "AST",
@@ -349,9 +349,7 @@ class ASDLParser:
         else:
             # Otherwise it's a sum. Look for ConstructorId
             sumlist = [
-                Constructor(
-                    self._match(TokenKind.ConstructorId), self._parse_optional_fields()
-                )
+                Constructor(self._match(TokenKind.ConstructorId), self._parse_optional_fields())
             ]
             while self.cur_token.kind == TokenKind.Pipe:
                 # More constructors
@@ -426,11 +424,7 @@ class ASDLParser:
         * Returns the value of the current token
         * Reads in the next token
         """
-        if (
-            isinstance(kind, tuple)
-            and self.cur_token.kind in kind
-            or self.cur_token.kind == kind
-        ):
+        if isinstance(kind, tuple) and self.cur_token.kind in kind or self.cur_token.kind == kind:
             value = self.cur_token.value
             self._advance()
             return value
@@ -441,6 +435,4 @@ class ASDLParser:
             )
 
     def _at_keyword(self, keyword):
-        return (
-            self.cur_token.kind == TokenKind.TypeId and self.cur_token.value == keyword
-        )
+        return self.cur_token.kind == TokenKind.TypeId and self.cur_token.value == keyword

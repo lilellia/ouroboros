@@ -7,15 +7,18 @@
 __all__ = ["EmailMessage", "Message"]
 
 import binascii
-import quopri
-import re
-from email import charset as _charset
 
 # Intrapackage imports
-from email import errors, utils
+from email import (
+    charset as _charset,
+    errors,
+    utils,
+)
 from email._encoded_words import decode_b
 from email._policybase import compat32
 from io import BytesIO, StringIO
+import quopri
+import re
 
 Charset = _charset.Charset
 
@@ -243,9 +246,7 @@ class Message:
             try:
                 self._payload.append(payload)
             except AttributeError:
-                raise TypeError(
-                    "Attach is not valid on a message with a non-multipart payload"
-                )
+                raise TypeError("Attach is not valid on a message with a non-multipart payload")
 
     def get_payload(self, i=None, decode=False):
         """Return a reference to the payload.
@@ -305,9 +306,7 @@ class Message:
                 try:
                     bpayload = payload.encode("ascii", "surrogateescape")
                     try:
-                        payload = bpayload.decode(
-                            self.get_content_charset("ascii"), "replace"
-                        )
+                        payload = bpayload.decode(self.get_content_charset("ascii"), "replace")
                     except LookupError:
                         payload = bpayload.decode("ascii", "replace")
                 except UnicodeEncodeError:
@@ -385,9 +384,7 @@ class Message:
         if "MIME-Version" not in self:
             self.add_header("MIME-Version", "1.0")
         if "Content-Type" not in self:
-            self.add_header(
-                "Content-Type", "text/plain", charset=charset.get_output_charset()
-            )
+            self.add_header("Content-Type", "text/plain", charset=charset.get_output_charset())
         else:
             self.set_param("charset", charset.get_output_charset())
         if charset != charset.get_output_charset():
@@ -1189,10 +1186,7 @@ class MIMEPart(Message):
         self._make_multipart("mixed", (), boundary)
 
     def _add_multipart(self, _subtype, *args, _disp=None, **kw):
-        if (
-            self.get_content_maintype() != "multipart"
-            or self.get_content_subtype() != _subtype
-        ):
+        if self.get_content_maintype() != "multipart" or self.get_content_subtype() != _subtype:
             getattr(self, "make_" + _subtype)()
         part = type(self)(policy=self.policy)
         part.set_content(*args, **kw)
@@ -1214,9 +1208,7 @@ class MIMEPart(Message):
         self._payload = None
 
     def clear_content(self):
-        self._headers = [
-            (n, v) for n, v in self._headers if not n.lower().startswith("content-")
-        ]
+        self._headers = [(n, v) for n, v in self._headers if not n.lower().startswith("content-")]
         self._payload = None
 
 

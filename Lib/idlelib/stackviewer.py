@@ -1,10 +1,10 @@
 # Rename to stackbrowser or possibly consolidate with browser.
 
+from idlelib.debugobj import ObjectTreeItem, make_objecttreeitem
+from idlelib.tree import ScrolledCanvas, TreeItem, TreeNode
 import linecache
 import os
 import tkinter as tk
-from idlelib.debugobj import ObjectTreeItem, make_objecttreeitem
-from idlelib.tree import ScrolledCanvas, TreeItem, TreeNode
 
 
 def StackBrowser(root, exc, flist=None, top=None):

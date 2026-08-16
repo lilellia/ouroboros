@@ -304,9 +304,7 @@ def generate_runtime_init(identifiers, strings):
         with printer.block("#define _Py_bytes_characters_INIT", continuation=True):
             for i in range(256):
                 printer.write(f"_PyBytes_CHAR_INIT({i}),")
-                immortal_objects.append(
-                    f"(PyObject *)&_Py_SINGLETON(bytes_characters)[{i}]"
-                )
+                immortal_objects.append(f"(PyObject *)&_Py_SINGLETON(bytes_characters)[{i}]")
         printer.write("")
         with printer.block("#define _Py_str_literals_INIT", continuation=True):
             for literal, name in sorted(strings.items(), key=lambda x: x[1]):
@@ -322,9 +320,7 @@ def generate_runtime_init(identifiers, strings):
         with printer.block("#define _Py_str_ascii_INIT", continuation=True):
             for i in range(128):
                 printer.write(f'_PyASCIIObject_INIT("\\x{i:02x}"),')
-                immortal_objects.append(
-                    f"(PyObject *)&_Py_SINGLETON(strings).ascii[{i}]"
-                )
+                immortal_objects.append(f"(PyObject *)&_Py_SINGLETON(strings).ascii[{i}]")
         printer.write("")
         with printer.block("#define _Py_str_latin1_INIT", continuation=True):
             for i in range(128, 256):
@@ -333,9 +329,7 @@ def generate_runtime_init(identifiers, strings):
                     utf8.append(f"\\x{c:02x}")
                 utf8.append('"')
                 printer.write(f'_PyUnicode_LATIN1_INIT("\\x{i:02x}", {"".join(utf8)}),')
-                immortal_objects.append(
-                    f"(PyObject *)&_Py_SINGLETON(strings).latin1[{i} - 128]"
-                )
+                immortal_objects.append(f"(PyObject *)&_Py_SINGLETON(strings).latin1[{i} - 128]")
         printer.write(END)
         printer.write(after)
         return immortal_objects
@@ -434,14 +428,11 @@ def get_identifiers_and_strings() -> "tuple[set[str], dict[str, str]]":
             if string not in strings:
                 strings[string] = name
             elif name != strings[string]:
-                raise ValueError(
-                    f"string mismatch for {name!r} ({string!r} != {strings[name]!r}"
-                )
+                raise ValueError(f"string mismatch for {name!r} ({string!r} != {strings[name]!r}")
     overlap = identifiers & set(strings.keys())
     if overlap:
         raise ValueError(
-            "do not use both _Py_ID and _Py_DECLARE_STR for the same string: "
-            + repr(overlap)
+            "do not use both _Py_ID and _Py_DECLARE_STR for the same string: " + repr(overlap)
         )
     return identifiers, strings
 

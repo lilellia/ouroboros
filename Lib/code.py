@@ -2,9 +2,9 @@
 
 # Inspired by similar code by Jeff Epler and Fredrik Lundh.
 
+from codeop import CommandCompiler, compile_command
 import sys
 import traceback
-from codeop import CommandCompiler, compile_command
 
 __all__ = [
     "InteractiveConsole",

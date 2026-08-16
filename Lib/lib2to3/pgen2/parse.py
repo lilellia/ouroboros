@@ -18,9 +18,7 @@ class ParseError(Exception):
     """Exception to signal the parser is stuck."""
 
     def __init__(self, msg, type, value, context):
-        Exception.__init__(
-            self, f"{msg}: type={type!r}, value={value!r}, context={context!r}"
-        )
+        Exception.__init__(self, f"{msg}: type={type!r}, value={value!r}, context={context!r}")
         self.msg = msg
         self.type = type
         self.value = value

@@ -1,7 +1,7 @@
 """Editor window that can serve as an output file."""
 
-import re
 from idlelib.editor import EditorWindow
+import re
 from tkinter import messagebox
 
 file_line_pats = [

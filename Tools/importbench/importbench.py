@@ -8,6 +8,7 @@ thus has no external changes made to import-related attributes in sys.
 import decimal
 import importlib
 import importlib.machinery
+from importlib.util import cache_from_source
 import json
 import os
 import py_compile
@@ -15,7 +16,6 @@ import sys
 import tabnanny
 import timeit
 import types
-from importlib.util import cache_from_source
 
 from test.test_importlib import util
 
@@ -57,9 +57,7 @@ def builtin_mod(seconds, repeat):
     if name in sys.modules:
         del sys.modules[name]
     # Relying on built-in importer being implicit.
-    yield from bench(
-        name, lambda: sys.modules.pop(name), repeat=repeat, seconds=seconds
-    )
+    yield from bench(name, lambda: sys.modules.pop(name), repeat=repeat, seconds=seconds)
 
 
 def source_wo_bytecode(seconds, repeat):
@@ -76,9 +74,7 @@ def source_wo_bytecode(seconds, repeat):
                 importlib.machinery.SOURCE_SUFFIXES,
             )
             sys.path_hooks.append(importlib.machinery.FileFinder.path_hook(loader))
-            yield from bench(
-                name, lambda: sys.modules.pop(name), repeat=repeat, seconds=seconds
-            )
+            yield from bench(name, lambda: sys.modules.pop(name), repeat=repeat, seconds=seconds)
     finally:
         sys.dont_write_bytecode = False
 
@@ -93,9 +89,7 @@ def _wo_bytecode(module):
             os.unlink(bytecode_path)
         sys.dont_write_bytecode = True
         try:
-            yield from bench(
-                name, lambda: sys.modules.pop(name), repeat=repeat, seconds=seconds
-            )
+            yield from bench(name, lambda: sys.modules.pop(name), repeat=repeat, seconds=seconds)
         finally:
             sys.dont_write_bytecode = False
 
@@ -161,9 +155,7 @@ def source_using_bytecode(seconds, repeat):
         sys.path_hooks.append(importlib.machinery.FileFinder.path_hook(loader))
         py_compile.compile(mapping[name])
         assert os.path.exists(cache_from_source(mapping[name]))
-        yield from bench(
-            name, lambda: sys.modules.pop(name), repeat=repeat, seconds=seconds
-        )
+        yield from bench(name, lambda: sys.modules.pop(name), repeat=repeat, seconds=seconds)
 
 
 def _using_bytecode(module):
@@ -172,9 +164,7 @@ def _using_bytecode(module):
     def using_bytecode_benchmark(seconds, repeat):
         """Source w/ bytecode: {}"""
         py_compile.compile(module.__file__)
-        yield from bench(
-            name, lambda: sys.modules.pop(name), repeat=repeat, seconds=seconds
-        )
+        yield from bench(name, lambda: sys.modules.pop(name), repeat=repeat, seconds=seconds)
 
     using_bytecode_benchmark.__doc__ = using_bytecode_benchmark.__doc__.format(name)
     return using_bytecode_benchmark
@@ -247,9 +237,7 @@ def main(import_, options):
             benchmark_name = benchmark.__doc__
             old_result = max(prev_results[benchmark_name])
             new_result = max(new_results[benchmark_name])
-            result = (
-                f"{new_result:,d} vs. {old_result:,d} ({new_result / old_result:%})"
-            )
+            result = f"{new_result:,d} vs. {old_result:,d} ({new_result / old_result:%})"
             print(benchmark_name, ":", result)
     if options.dest_file:
         with options.dest_file:
@@ -282,9 +270,7 @@ if __name__ == "__main__":
         type=argparse.FileType("w"),
         help="file to write benchmark data to",
     )
-    parser.add_argument(
-        "--benchmark", dest="benchmark", help="specific benchmark to run"
-    )
+    parser.add_argument("--benchmark", dest="benchmark", help="specific benchmark to run")
     options = parser.parse_args()
     import_ = __import__
     if not options.builtin:

@@ -36,10 +36,10 @@ saferepr()
 
 import collections as _collections
 import dataclasses as _dataclasses
+from io import StringIO as _StringIO
 import re
 import sys as _sys
 import types as _types
-from io import StringIO as _StringIO
 
 __all__ = [
     "PrettyPrinter",
@@ -247,9 +247,7 @@ class PrettyPrinter:
                 and "__create_fn__" in object.__repr__.__wrapped__.__qualname__
             ):
                 context[objid] = 1
-                self._pprint_dataclass(
-                    object, stream, indent, allowance, context, level + 1
-                )
+                self._pprint_dataclass(object, stream, indent, allowance, context, level + 1)
                 del context[objid]
                 return
         stream.write(rep)
@@ -257,11 +255,7 @@ class PrettyPrinter:
     def _pprint_dataclass(self, object, stream, indent, allowance, context, level):
         cls_name = object.__class__.__name__
         indent += len(cls_name) + 1
-        items = [
-            (f.name, getattr(object, f.name))
-            for f in _dataclasses.fields(object)
-            if f.repr
-        ]
+        items = [(f.name, getattr(object, f.name)) for f in _dataclasses.fields(object) if f.repr]
         stream.write(cls_name + "(")
         self._format_namespace_items(items, stream, indent, allowance, context, level)
         stream.write(")")
@@ -279,9 +273,7 @@ class PrettyPrinter:
                 items = sorted(object.items(), key=_safe_tuple)
             else:
                 items = object.items()
-            self._format_dict_items(
-                items, stream, indent, allowance + 1, context, level
-            )
+            self._format_dict_items(items, stream, indent, allowance + 1, context, level)
         write("}")
 
     _dispatch[dict.__repr__] = _pprint_dict
@@ -314,9 +306,7 @@ class PrettyPrinter:
     def _pprint_tuple(self, object, stream, indent, allowance, context, level):
         stream.write("(")
         endchar = ",)" if len(object) == 1 else ")"
-        self._format_items(
-            object, stream, indent, allowance + len(endchar), context, level
-        )
+        self._format_items(object, stream, indent, allowance + len(endchar), context, level)
         stream.write(endchar)
 
     _dispatch[tuple.__repr__] = _pprint_tuple
@@ -334,9 +324,7 @@ class PrettyPrinter:
             endchar = "})"
             indent += len(typ.__name__) + 1
         object = sorted(object, key=_safe_key)
-        self._format_items(
-            object, stream, indent, allowance + len(endchar), context, level
-        )
+        self._format_items(object, stream, indent, allowance + len(endchar), context, level)
         stream.write(endchar)
 
     _dispatch[set.__repr__] = _pprint_set
@@ -417,9 +405,7 @@ class PrettyPrinter:
     def _pprint_bytearray(self, object, stream, indent, allowance, context, level):
         write = stream.write
         write("bytearray(")
-        self._pprint_bytes(
-            bytes(object), stream, indent + 10, allowance + 1, context, level + 1
-        )
+        self._pprint_bytes(bytes(object), stream, indent + 10, allowance + 1, context, level + 1)
         write(")")
 
     _dispatch[bytearray.__repr__] = _pprint_bytearray
@@ -431,9 +417,7 @@ class PrettyPrinter:
 
     _dispatch[_types.MappingProxyType.__repr__] = _pprint_mappingproxy
 
-    def _pprint_simplenamespace(
-        self, object, stream, indent, allowance, context, level
-    ):
+    def _pprint_simplenamespace(self, object, stream, indent, allowance, context, level):
         if type(object) is _types.SimpleNamespace:
             # The SimpleNamespace repr is "namespace" instead of the class
             # name, so we do the same here. For subclasses; use the class name.
@@ -533,9 +517,7 @@ class PrettyPrinter:
             self._format(ent, stream, indent, allowance if last else 1, context, level)
 
     def _repr(self, object, context, level):
-        repr, readable, recursive = self.format(
-            object, context.copy(), self._depth, level
-        )
+        repr, readable, recursive = self.format(object, context.copy(), self._depth, level)
         if not readable:
             self._readable = False
         if recursive:

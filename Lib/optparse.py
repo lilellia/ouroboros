@@ -273,9 +273,7 @@ class HelpFormatter:
         """
         text_width = max(self.width - self.current_indent, 11)
         indent = " " * self.current_indent
-        return textwrap.fill(
-            text, text_width, initial_indent=indent, subsequent_indent=indent
-        )
+        return textwrap.fill(text, text_width, initial_indent=indent, subsequent_indent=indent)
 
     def format_description(self, description):
         if description:
@@ -357,12 +355,8 @@ class HelpFormatter:
         """Return a comma-separated list of option strings & metavariables."""
         if option.takes_value():
             metavar = option.metavar or option.dest.upper()
-            short_opts = [
-                self._short_opt_fmt % (sopt, metavar) for sopt in option._short_opts
-            ]
-            long_opts = [
-                self._long_opt_fmt % (lopt, metavar) for lopt in option._long_opts
-            ]
+            short_opts = [self._short_opt_fmt % (sopt, metavar) for sopt in option._short_opts]
+            long_opts = [self._long_opt_fmt % (lopt, metavar) for lopt in option._long_opts]
         else:
             short_opts = option._short_opts
             long_opts = option._long_opts
@@ -378,12 +372,8 @@ class HelpFormatter:
 class IndentedHelpFormatter(HelpFormatter):
     """Format help with indented section bodies."""
 
-    def __init__(
-        self, indent_increment=2, max_help_position=24, width=None, short_first=1
-    ):
-        HelpFormatter.__init__(
-            self, indent_increment, max_help_position, width, short_first
-        )
+    def __init__(self, indent_increment=2, max_help_position=24, width=None, short_first=1):
+        HelpFormatter.__init__(self, indent_increment, max_help_position, width, short_first)
 
     def format_usage(self, usage):
         return _("Usage: %s\n") % usage
@@ -395,12 +385,8 @@ class IndentedHelpFormatter(HelpFormatter):
 class TitledHelpFormatter(HelpFormatter):
     """Format help with underlined section headers."""
 
-    def __init__(
-        self, indent_increment=0, max_help_position=24, width=None, short_first=0
-    ):
-        HelpFormatter.__init__(
-            self, indent_increment, max_help_position, width, short_first
-        )
+    def __init__(self, indent_increment=0, max_help_position=24, width=None, short_first=0):
+        HelpFormatter.__init__(self, indent_increment, max_help_position, width, short_first)
 
     def format_usage(self, usage):
         return "{}  {}\n".format(self.format_heading(_("Usage")), usage)
@@ -440,9 +426,7 @@ def check_builtin(option, opt, value):
     try:
         return cvt(value)
     except ValueError:
-        raise OptionValueError(
-            _("option %s: invalid %s value: %r") % (opt, what, value)
-        )
+        raise OptionValueError(_("option %s: invalid %s value: %r") % (opt, what, value))
 
 
 def check_choice(option, opt, value):
@@ -608,8 +592,7 @@ class Option:
         for opt in opts:
             if len(opt) < 2:
                 raise OptionError(
-                    f"invalid option string {opt!r}: "
-                    "must be at least two characters long",
+                    f"invalid option string {opt!r}: must be at least two characters long",
                     self,
                 )
             elif len(opt) == 2:
@@ -641,9 +624,7 @@ class Option:
                     setattr(self, attr, None)
         if attrs:
             attrs = sorted(attrs.keys())
-            raise OptionError(
-                "invalid keyword arguments: {}".format(", ".join(attrs)), self
-            )
+            raise OptionError("invalid keyword arguments: {}".format(", ".join(attrs)), self)
 
     # -- Constructor validation methods --------------------------------
 
@@ -674,16 +655,12 @@ class Option:
             if self.type not in self.TYPES:
                 raise OptionError(f"invalid option type: {self.type!r}", self)
             if self.action not in self.TYPED_ACTIONS:
-                raise OptionError(
-                    f"must not supply a type for action {self.action!r}", self
-                )
+                raise OptionError(f"must not supply a type for action {self.action!r}", self)
 
     def _check_choice(self):
         if self.type == "choice":
             if self.choices is None:
-                raise OptionError(
-                    "must supply a list of choices for type 'choice'", self
-                )
+                raise OptionError("must supply a list of choices for type 'choice'", self)
             elif not isinstance(self.choices, (tuple, list)):
                 raise OptionError(
                     "choices must be a list of strings ('{}' supplied)".format(
@@ -709,33 +686,25 @@ class Option:
 
     def _check_const(self):
         if self.action not in self.CONST_ACTIONS and self.const is not None:
-            raise OptionError(
-                f"'const' must not be supplied for action {self.action!r}", self
-            )
+            raise OptionError(f"'const' must not be supplied for action {self.action!r}", self)
 
     def _check_nargs(self):
         if self.action in self.TYPED_ACTIONS:
             if self.nargs is None:
                 self.nargs = 1
         elif self.nargs is not None:
-            raise OptionError(
-                f"'nargs' must not be supplied for action {self.action!r}", self
-            )
+            raise OptionError(f"'nargs' must not be supplied for action {self.action!r}", self)
 
     def _check_callback(self):
         if self.action == "callback":
             if not callable(self.callback):
                 raise OptionError(f"callback not callable: {self.callback!r}", self)
-            if self.callback_args is not None and not isinstance(
-                self.callback_args, tuple
-            ):
+            if self.callback_args is not None and not isinstance(self.callback_args, tuple):
                 raise OptionError(
                     f"callback_args, if supplied, must be a tuple: not {self.callback_args!r}",
                     self,
                 )
-            if self.callback_kwargs is not None and not isinstance(
-                self.callback_kwargs, dict
-            ):
+            if self.callback_kwargs is not None and not isinstance(self.callback_kwargs, dict):
                 raise OptionError(
                     f"callback_kwargs, if supplied, must be a dict: not {self.callback_kwargs!r}",
                     self,
@@ -747,13 +716,9 @@ class Option:
                     self,
                 )
             if self.callback_args is not None:
-                raise OptionError(
-                    "callback_args supplied for non-callback option", self
-                )
+                raise OptionError("callback_args supplied for non-callback option", self)
             if self.callback_kwargs is not None:
-                raise OptionError(
-                    "callback_kwargs supplied for non-callback option", self
-                )
+                raise OptionError("callback_kwargs supplied for non-callback option", self)
 
     # -- Miscellaneous methods -----------------------------------------
 
@@ -1086,9 +1051,7 @@ class OptionContainer:
 class OptionGroup(OptionContainer):
     def __init__(self, parser, title, description=None):
         self.parser = parser
-        OptionContainer.__init__(
-            self, parser.option_class, parser.conflict_handler, description
-        )
+        OptionContainer.__init__(self, parser.option_class, parser.conflict_handler, description)
         self.title = title
 
     def _create_option_list(self):
@@ -1240,9 +1203,7 @@ class OptionParser(OptionContainer):
         self._create_option_mappings()
 
     def _add_help_option(self):
-        self.add_option(
-            "-h", "--help", action="help", help=_("show this help message and exit")
-        )
+        self.add_option("-h", "--help", action="help", help=_("show this help message and exit"))
 
     def _add_version_option(self):
         self.add_option(

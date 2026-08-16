@@ -104,17 +104,17 @@ server.handle_request()
 # Written by Brian Quinlan (brian@sweetapp.com).
 # Based on code written by Fredrik Lundh.
 
+from functools import partial
 import html
 import http.server
+from http.server import BaseHTTPRequestHandler
+from inspect import signature
 import os
 import pydoc
 import re
 import socketserver
 import sys
 import traceback
-from functools import partial
-from http.server import BaseHTTPRequestHandler
-from inspect import signature
 from xmlrpc.client import Fault, dumps, gzip_decode, gzip_encode, loads
 
 try:
@@ -367,9 +367,7 @@ class SimpleXMLRPCDispatcher:
                 # multicall. If someone cares they should fix this.
                 results.append([self._dispatch(method_name, params)])
             except Fault as fault:
-                results.append(
-                    {"faultCode": fault.faultCode, "faultString": fault.faultString}
-                )
+                results.append({"faultCode": fault.faultCode, "faultString": fault.faultString})
             except BaseException as exc:  # noqa: BLE001
                 results.append({"faultCode": 1, "faultString": f"{type(exc)}:{exc}"})
         return results
@@ -412,9 +410,7 @@ class SimpleXMLRPCDispatcher:
 
             # call the instance's method directly
             try:
-                func = resolve_dotted_attribute(
-                    self.instance, method, self.allow_dotted_names
-                )
+                func = resolve_dotted_attribute(self.instance, method, self.allow_dotted_names)
             except AttributeError:
                 pass
             else:
@@ -653,9 +649,7 @@ class MultiPathXMLRPCServer(SimpleXMLRPCServer):
 
     def _marshaled_dispatch(self, data, dispatch_method=None, path=None):
         try:
-            response = self.dispatchers[path]._marshaled_dispatch(
-                data, dispatch_method, path
-            )
+            response = self.dispatchers[path]._marshaled_dispatch(data, dispatch_method, path)
         except BaseException as exc:  # noqa: BLE001
             # report low level exception back to server
             # (each dispatcher should have handled their own
@@ -787,9 +781,7 @@ class ServerHTMLDoc(pydoc.HTMLDoc):
         results.append(escape(text[here:]))
         return "".join(results)
 
-    def docroutine(
-        self, object, name, mod=None, funcs=None, classes=None, methods=None, cl=None
-    ):
+    def docroutine(self, object, name, mod=None, funcs=None, classes=None, methods=None, cl=None):
         """Produce HTML documentation for a function or method object."""
 
         if methods is None:
@@ -801,9 +793,7 @@ class ServerHTMLDoc(pydoc.HTMLDoc):
         anchor = (cl and cl.__name__ or "") + "-" + name
         note = ""
 
-        title = (
-            f'<a name="{self.escape(anchor)}"><strong>{self.escape(name)}</strong></a>'
-        )
+        title = f'<a name="{self.escape(anchor)}"><strong>{self.escape(name)}</strong></a>'
 
         if callable(object):
             argspec = str(signature(object))
@@ -817,9 +807,7 @@ class ServerHTMLDoc(pydoc.HTMLDoc):
             docstring = pydoc.getdoc(object)
 
         decl = (
-            title
-            + argspec
-            + (note and self.grey(f'<font face="helvetica, arial">{note}</font>'))
+            title + argspec + (note and self.grey(f'<font face="helvetica, arial">{note}</font>'))
         )
 
         doc = self.markup(docstring, self.preformat, funcs, classes, methods)
@@ -927,16 +915,12 @@ class XMLRPCDocGenerator:
                 else:
                     method = method_info
             else:
-                assert 0, (
-                    "Could not find method in self.functions and no instance installed"
-                )
+                assert 0, "Could not find method in self.functions and no instance installed"
 
             methods[method_name] = method
 
         documenter = ServerHTMLDoc()
-        documentation = documenter.docserver(
-            self.server_name, self.server_documentation, methods
-        )
+        documentation = documenter.docserver(self.server_name, self.server_documentation, methods)
 
         return documenter.page(html.escape(self.server_title), documentation)
 
@@ -1055,9 +1039,7 @@ if __name__ == "__main__":
         server.register_instance(ExampleService(), allow_dotted_names=True)
         server.register_multicall_functions()
         print("Serving XML-RPC on localhost port 8000")
-        print(
-            "It is advisable to run this example server within a secure, closed network."
-        )
+        print("It is advisable to run this example server within a secure, closed network.")
         try:
             server.serve_forever()
         except KeyboardInterrupt:

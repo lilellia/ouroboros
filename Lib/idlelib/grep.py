@@ -5,10 +5,10 @@ to prepare search pattern.
 """
 
 import fnmatch
-import os
-import sys
 from idlelib import searchengine
 from idlelib.searchbase import SearchDialogBase
+import os
+import sys
 from tkinter import BooleanVar, StringVar
 from tkinter.ttk import Checkbutton  # Frame imported in ...Base
 
@@ -54,9 +54,7 @@ def findfiles(folder, pattern, recursive):
     """
     for dirpath, _, filenames in os.walk(folder, onerror=walk_error):
         yield from (
-            os.path.join(dirpath, name)
-            for name in filenames
-            if fnmatch.fnmatch(name, pattern)
+            os.path.join(dirpath, name) for name in filenames if fnmatch.fnmatch(name, pattern)
         )
         if not recursive:
             break

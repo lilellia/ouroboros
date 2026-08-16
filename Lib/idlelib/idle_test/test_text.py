@@ -3,8 +3,8 @@
 Run same tests with both by creating a mixin class.
 """
 
-import unittest
 from _tkinter import TclError
+import unittest
 
 from test.support import requires
 

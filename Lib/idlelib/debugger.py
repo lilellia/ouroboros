@@ -16,10 +16,10 @@ for more.
 """
 
 import bdb
-import os
 from idlelib import macosx
 from idlelib.scrolledlist import ScrolledList
 from idlelib.window import ListedToplevel
+import os
 from tkinter import *
 from tkinter.ttk import Frame, Scrollbar
 

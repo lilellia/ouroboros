@@ -4,8 +4,8 @@
 # on accessible hardware.
 #
 
-import sys
 from decimal import *
+import sys
 
 from gmpy import mpz
 

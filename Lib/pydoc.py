@@ -59,6 +59,7 @@ import __future__
 
 import ast
 import builtins
+from collections import deque
 import importlib._bootstrap
 import importlib._bootstrap_external
 import importlib.machinery
@@ -69,15 +70,14 @@ import os
 import pkgutil
 import platform
 import re
+from reprlib import Repr
 import sys
 import sysconfig
 import time
 import tokenize
+from traceback import format_exception_only
 import urllib.parse
 import warnings
-from collections import deque
-from reprlib import Repr
-from traceback import format_exception_only
 
 # --------------------------------------------------------- common routines
 
@@ -444,9 +444,7 @@ def synopsis(filename, cache=None):
             # Must be a binary module, which has to be imported.
             loader = loader_cls("__temp__", filename)
             # XXX We probably don't need to pass in the loader here.
-            spec = importlib.util.spec_from_file_location(
-                "__temp__", filename, loader=loader
-            )
+            spec = importlib.util.spec_from_file_location("__temp__", filename, loader=loader)
             try:
                 module = importlib._bootstrap._load(spec)
             except:  # noqa: E722
@@ -550,7 +548,8 @@ def safeimport(path, forceload=0, cache=None):
 
 class Doc:
     PYTHONDOCS = os.environ.get(
-        "PYTHONDOCS", "https://docs.python.org/%d.%d/library" % sys.version_info[:2]  # noqa: UP031
+        "PYTHONDOCS",
+        "https://docs.python.org/%d.%d/library" % sys.version_info[:2],  # noqa: UP031
     )
 
     def document(self, object, name=None, *args):
@@ -617,9 +616,7 @@ class Doc:
             and object.__name__ not in ("xml.etree", "test.test_pydoc.pydoc_mod")
         ):
             if docloc.startswith(("http://", "https://")):
-                docloc = "{}/{}.html".format(
-                    docloc.rstrip("/"), object.__name__.lower()
-                )
+                docloc = "{}/{}.html".format(docloc.rstrip("/"), object.__name__.lower())
             else:
                 docloc = os.path.join(docloc, object.__name__.lower() + ".html")
         else:
@@ -706,9 +703,7 @@ class HTMLDoc(Doc):
 <td class="extra">{}</td></tr></table>
     """.format(title, extras or "&nbsp;")
 
-    def section(
-        self, title, cls, contents, width=6, prelude="", marginalia=None, gap="&nbsp;"
-    ):
+    def section(self, title, cls, contents, width=6, prelude="", marginalia=None, gap="&nbsp;"):
         """Format a section with a heading."""
         if marginalia is None:
             marginalia = '<span class="code">' + "&nbsp;" * width + "</span>"
@@ -742,9 +737,7 @@ class HTMLDoc(Doc):
     def preformat(self, text):
         """Format literal preformatted text."""
         text = self.escape(text.expandtabs())
-        return replace(
-            text, "\n\n", "\n \n", "\n\n", "\n \n", " ", "&nbsp;", "\n", "<br>\n"
-        )
+        return replace(text, "\n\n", "\n \n", "\n\n", "\n \n", " ", "&nbsp;", "\n", "<br>\n")
 
     def multicolumn(self, list, format):
         """Format a list of items into a multi-column list."""
@@ -895,9 +888,7 @@ class HTMLDoc(Doc):
         links = []
         for i in range(len(parts) - 1):
             links.append(
-                '<a href="{}.html" class="white">{}</a>'.format(
-                    ".".join(parts[: i + 1]), parts[i]
-                )
+                '<a href="{}.html" class="white">{}</a>'.format(".".join(parts[: i + 1]), parts[i])
             )
         linkedname = ".".join(links + parts[-1:])
         head = f'<strong class="title">{linkedname}</strong>'
@@ -945,9 +936,7 @@ class HTMLDoc(Doc):
         for key, value in inspect.getmembers(object, inspect.isroutine):
             # if __all__ exists, believe it.  Otherwise use old heuristic.
             if (
-                all is not None
-                or inspect.isbuiltin(value)
-                or inspect.getmodule(value) is object
+                all is not None or inspect.isbuiltin(value) or inspect.getmodule(value) is object
             ) and visiblename(key, all, object):
                 funcs.append((key, value))
                 fdict[key] = "#-" + key
@@ -968,9 +957,7 @@ class HTMLDoc(Doc):
                 modpkgs.append((modname, name, ispkg, 0))
             modpkgs.sort()
             contents = self.multicolumn(modpkgs, self.modpkglink)
-            result = result + self.bigsection(
-                "Package Contents", "pkg-content", contents
-            )
+            result = result + self.bigsection("Package Contents", "pkg-content", contents)
         elif modules:
             contents = self.multicolumn(modules, lambda t: self.modulelink(t[1]))
             result = result + self.bigsection("Modules", "pkg-content", contents)
@@ -985,9 +972,7 @@ class HTMLDoc(Doc):
             contents = []
             for key, value in funcs:
                 contents.append(self.document(value, key, name, fdict, cdict))
-            result = result + self.bigsection(
-                "Functions", "functions", " ".join(contents)
-            )
+            result = result + self.bigsection("Functions", "functions", " ".join(contents))
         if data:
             contents = []
             for key, value in data:
@@ -1050,9 +1035,7 @@ class HTMLDoc(Doc):
                         push(self.docdata(value, name, mod))
                     else:
                         push(
-                            self.document(
-                                value, name, mod, funcs, classes, mdict, object, homecls
-                            )
+                            self.document(value, name, mod, funcs, classes, mdict, object, homecls)
                         )
                     push("\n")
             return attrs
@@ -1077,9 +1060,7 @@ class HTMLDoc(Doc):
                     if not doc:
                         push(f"<dl><dt>{base}</dl>\n")
                     else:
-                        doc = self.markup(
-                            getdoc(value), self.preformat, funcs, classes, mdict
-                        )
+                        doc = self.markup(getdoc(value), self.preformat, funcs, classes, mdict)
                         doc = f'<dd><span class="code">{doc}</span>'
                         push(f"<dl><dt>{base}{doc}</dl>\n")
                     push("\n")
@@ -1127,12 +1108,8 @@ class HTMLDoc(Doc):
 
             # Pump out the attrs, segregated by kind.
             attrs = spill(f"Methods {tag}", attrs, lambda t: t[1] == "method")
-            attrs = spill(
-                f"Class methods {tag}", attrs, lambda t: t[1] == "class method"
-            )
-            attrs = spill(
-                f"Static methods {tag}", attrs, lambda t: t[1] == "static method"
-            )
+            attrs = spill(f"Class methods {tag}", attrs, lambda t: t[1] == "class method")
+            attrs = spill(f"Static methods {tag}", attrs, lambda t: t[1] == "static method")
             attrs = spilldescriptors(
                 f"Readonly properties {tag}",
                 attrs,
@@ -1141,9 +1118,7 @@ class HTMLDoc(Doc):
             attrs = spilldescriptors(
                 f"Data descriptors {tag}", attrs, lambda t: t[1] == "data descriptor"
             )
-            attrs = spilldata(
-                f"Data and other attributes {tag}", attrs, lambda t: t[1] == "data"
-            )
+            attrs = spilldata(f"Data and other attributes {tag}", attrs, lambda t: t[1] == "data")
             assert attrs == []
             attrs = inherited
 
@@ -1440,9 +1415,7 @@ location listed above.
         for key, value in inspect.getmembers(object, inspect.isroutine):
             # if __all__ exists, believe it.  Otherwise use old heuristic.
             if (
-                all is not None
-                or inspect.isbuiltin(value)
-                or inspect.getmodule(value) is object
+                all is not None or inspect.isbuiltin(value) or inspect.getmodule(value) is object
             ) and visiblename(key, all, object):
                 funcs.append((key, value))
         data = []
@@ -1649,12 +1622,8 @@ location listed above.
 
             # Pump out the attrs, segregated by kind.
             attrs = spill(f"Methods {tag}:\n", attrs, lambda t: t[1] == "method")
-            attrs = spill(
-                f"Class methods {tag}:\n", attrs, lambda t: t[1] == "class method"
-            )
-            attrs = spill(
-                f"Static methods {tag}:\n", attrs, lambda t: t[1] == "static method"
-            )
+            attrs = spill(f"Class methods {tag}:\n", attrs, lambda t: t[1] == "class method")
+            attrs = spill(f"Static methods {tag}:\n", attrs, lambda t: t[1] == "static method")
             attrs = spilldescriptors(
                 f"Readonly properties {tag}:\n",
                 attrs,
@@ -1777,9 +1746,7 @@ location listed above.
 
     docproperty = docdata
 
-    def docother(
-        self, object, name=None, mod=None, parent=None, *ignored, maxlen=None, doc=None
-    ):
+    def docother(self, object, name=None, mod=None, parent=None, *ignored, maxlen=None, doc=None):
         """Produce text documentation for a data object."""
         repr = self.repr(object)
         if maxlen:
@@ -1859,9 +1826,7 @@ def pipepager(text, cmd):
     """Page through text by feeding it to another program."""
     import subprocess
 
-    proc = subprocess.Popen(
-        cmd, shell=True, stdin=subprocess.PIPE, errors="backslashreplace"
-    )
+    proc = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE, errors="backslashreplace")
     try:
         with proc.stdin as pipe:
             try:
@@ -2025,9 +1990,7 @@ Use help(str) for help on the str class."""
         return thing, name if isinstance(name, str) else None
 
 
-def render_doc(
-    thing, title="Python Library Documentation: %s", forceload=0, renderer=None
-):
+def render_doc(thing, title="Python Library Documentation: %s", forceload=0, renderer=None):
     """Render text documentation, given an object or a path to an object."""
     if renderer is None:
         renderer = text
@@ -2219,10 +2182,7 @@ class Helper:
     topics = {  # noqa: RUF012
         "TYPES": (
             "types",
-            (
-                "STRINGS UNICODE NUMBERS SEQUENCES MAPPINGS "
-                "FUNCTIONS CLASSES MODULES FILES inspect"
-            ),
+            ("STRINGS UNICODE NUMBERS SEQUENCES MAPPINGS FUNCTIONS CLASSES MODULES FILES inspect"),
         ),
         "STRINGS": ("strings", "str UNICODE SEQUENCES STRINGMETHODS FORMATTING TYPES"),
         "STRINGMETHODS": ("string-methods", "STRINGS FORMATTING"),
@@ -2930,9 +2890,7 @@ def _url_handler(url, content_type="text/html"):
         )
         for name, desc in search_result:
             results.append(bltinlink(name) + desc)
-        contents = heading + html.bigsection(
-            f"key = {key}", "index", "<br>".join(results)
-        )
+        contents = heading + html.bigsection(f"key = {key}", "index", "<br>".join(results))
         return "Search Results", contents
 
     def html_topics():
@@ -3000,9 +2958,7 @@ def _url_handler(url, content_type="text/html"):
         heading = html.heading(
             '<strong class="title">Error</strong>',
         )
-        contents = "<br>".join(
-            html.escape(line) for line in format_exception_only(type(exc), exc)
-        )
+        contents = "<br>".join(html.escape(line) for line in format_exception_only(type(exc), exc))
         contents = heading + html.bigsection(url, "error", contents)
         return f"Error - {url}", contents
 

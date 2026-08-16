@@ -15,6 +15,7 @@ the "typical" Unix-style command-line C compiler:
 
 import os
 import sys
+
 from distutils.ccompiler import CCompiler, gen_preprocess_options
 from distutils.dep_util import newer
 from distutils.errors import CompileError, DistutilsExecError

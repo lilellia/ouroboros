@@ -1,10 +1,10 @@
 "Test format, coverage 99%."
 
-import unittest
 from idlelib import format as ft
 from idlelib.editor import EditorWindow
 from idlelib.idle_test.mock_idle import Editor as MockEditor
 from tkinter import Text, Tk
+import unittest
 from unittest import mock
 
 from test.support import requires
@@ -75,12 +75,7 @@ class FindTest(unittest.TestCase):
         comment = "# Comment block with no blank lines before\n# Comment line\n\n"
         self.runcase(comment, 3, ("1.0", "3.0", "#", comment[0:58]))
 
-        comment = (
-            "\n"
-            "# Comment block with whitespace line before and after\n"
-            "# Comment line\n"
-            "\n"
-        )
+        comment = "\n# Comment block with whitespace line before and after\n# Comment line\n\n"
         self.runcase(comment, 4, ("2.0", "4.0", "#", comment[1:70]))
 
         comment = (
@@ -110,9 +105,7 @@ class FindTest(unittest.TestCase):
         teststring = '"""String with no blank lines before\nString line\n"""\n\n'
         self.runcase(teststring, 4, ("1.0", "4.0", "", teststring[0:53]))
 
-        teststring = (
-            '\n"""String with whitespace line before and after\nString line.\n"""\n\n'
-        )
+        teststring = '\n"""String with whitespace line before and after\nString line.\n"""\n\n'
         self.runcase(teststring, 5, ("2.0", "5.0", "", teststring[1:66]))
 
         teststring = (

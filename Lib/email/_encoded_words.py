@@ -41,9 +41,9 @@ to a public API if there is demand.
 
 import base64
 import binascii
+from email import errors
 import functools
 import re
-from email import errors
 from string import ascii_letters, digits
 
 __all__ = [
@@ -202,8 +202,7 @@ def decode(ew):
         if charset.lower() != "unknown-8bit":
             defects.append(
                 errors.CharsetError(
-                    f"Unknown charset {charset!r} "
-                    f"in encoded word; decoded as unknown bytes"
+                    f"Unknown charset {charset!r} in encoded word; decoded as unknown bytes"
                 )
             )
     return string, charset, lang, defects

@@ -4,11 +4,11 @@ Includes BaseSideBar which can be extended for other sidebar based extensions
 
 import contextlib
 import functools
-import itertools
-import tkinter as tk
 from idlelib import macosx
 from idlelib.config import idleConf
 from idlelib.delegator import Delegator
+import itertools
+import tkinter as tk
 from tkinter.font import Font
 
 
@@ -250,9 +250,7 @@ class BaseSideBar:
                 self.text.yview_scroll(-1 + y, "pixels")
                 drag_update_selection_and_insert_mark(y)
             elif y > self.main_widget.winfo_height():
-                self.text.yview_scroll(
-                    1 + y - self.main_widget.winfo_height(), "pixels"
-                )
+                self.text.yview_scroll(1 + y - self.main_widget.winfo_height(), "pixels")
                 drag_update_selection_and_insert_mark(y)
             auto_scrolling_after_id = self.main_widget.after(50, text_auto_scroll)
 
@@ -539,9 +537,7 @@ class ShellSidebar(BaseSideBar):
 
     def update_colors(self):
         """Update the sidebar text colors, usually after config changes."""
-        linenumbers_colors = idleConf.GetHighlight(
-            idleConf.CurrentTheme(), "linenumber"
-        )
+        linenumbers_colors = idleConf.GetHighlight(idleConf.CurrentTheme(), "linenumber")
         prompt_colors = idleConf.GetHighlight(idleConf.CurrentTheme(), "console")
         foreground = prompt_colors["foreground"]
         background = linenumbers_colors["background"]

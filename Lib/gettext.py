@@ -181,9 +181,7 @@ def _as_int(n):
     try:
         round(n)
     except TypeError:
-        raise TypeError(
-            f"Plural value must be an integer, got {n.__class__.__name__}"
-        ) from None
+        raise TypeError(f"Plural value must be an integer, got {n.__class__.__name__}") from None
 
     import warnings
 

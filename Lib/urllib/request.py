@@ -95,7 +95,6 @@ import string
 import sys
 import tempfile
 import time
-import warnings
 from urllib.error import ContentTooShortError, HTTPError, URLError
 from urllib.parse import (
     _splitattr,
@@ -118,6 +117,7 @@ from urllib.parse import (
     urlunparse,
 )
 from urllib.response import addclosehook, addinfourl
+import warnings
 
 # check for SSL
 try:
@@ -236,20 +236,15 @@ def urlopen(
         import warnings
 
         warnings.warn(
-            "cafile, capath and cadefault are deprecated, use a "
-            "custom context instead.",
+            "cafile, capath and cadefault are deprecated, use a custom context instead.",
             DeprecationWarning,
             2,
         )
         if context is not None:
-            raise ValueError(
-                "You can't pass both context and any of cafile, capath, and cadefault"
-            )
+            raise ValueError("You can't pass both context and any of cafile, capath, and cadefault")
         if not _have_ssl:
             raise ValueError("SSL support not available")
-        context = ssl.create_default_context(
-            ssl.Purpose.SERVER_AUTH, cafile=cafile, capath=capath
-        )
+        context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH, cafile=cafile, capath=capath)
         # send ALPN extension to indicate HTTP/1.1 protocol
         context.set_alpn_protocols(["http/1.1"])
         https_handler = HTTPSHandler(context=context)
@@ -327,7 +322,8 @@ def urlretrieve(url, filename=None, reporthook=None, data=None):
 
     if size >= 0 and read < size:
         raise ContentTooShortError(
-            "retrieval incomplete: got only %i out of %i bytes" % (read, size), result  # noqa: UP031
+            "retrieval incomplete: got only %i out of %i bytes" % (read, size),  # noqa: UP031
+            result,
         )
 
     return result
@@ -471,9 +467,7 @@ class Request:
         return header_name in self.headers or header_name in self.unredirected_hdrs
 
     def get_header(self, header_name, default=None):
-        return self.headers.get(
-            header_name, self.unredirected_hdrs.get(header_name, default)
-        )
+        return self.headers.get(header_name, self.unredirected_hdrs.get(header_name, default))
 
     def remove_header(self, header_name):
         self.headers.pop(header_name, None)
@@ -575,9 +569,7 @@ class OpenerDirector:
             meth = getattr(processor, meth_name)
             req = meth(req)
 
-        sys.audit(
-            "urllib.Request", req.full_url, req.data, req.headers, req.get_method()
-        )
+        sys.audit("urllib.Request", req.full_url, req.data, req.headers, req.get_method())
         response = self._open(req, data)
 
         # post-process response
@@ -752,9 +744,7 @@ class HTTPRedirectHandler(BaseHandler):
         newurl = newurl.replace(" ", "%20")
 
         CONTENT_HEADERS = ("content-length", "content-type")
-        newheaders = {
-            k: v for k, v in req.headers.items() if k.lower() not in CONTENT_HEADERS
-        }
+        newheaders = {k: v for k, v in req.headers.items() if k.lower() not in CONTENT_HEADERS}
         return Request(
             newurl,
             headers=newheaders,
@@ -813,10 +803,7 @@ class HTTPRedirectHandler(BaseHandler):
         # .redirect_dict has a key url if url was previously visited.
         if hasattr(req, "redirect_dict"):
             visited = new.redirect_dict = req.redirect_dict
-            if (
-                visited.get(newurl, 0) >= self.max_repeats
-                or len(visited) >= self.max_redirections
-            ):
+            if visited.get(newurl, 0) >= self.max_repeats or len(visited) >= self.max_redirections:
                 raise HTTPError(req.full_url, code, self.inf_msg + msg, headers, fp)
         else:
             visited = new.redirect_dict = req.redirect_dict = {}
@@ -886,9 +873,7 @@ class ProxyHandler(BaseHandler):
             setattr(
                 self,
                 f"{type}_open",
-                lambda r, proxy=url, type=type, meth=self.proxy_open: meth(
-                    r, proxy, type
-                ),
+                lambda r, proxy=url, type=type, meth=self.proxy_open: meth(r, proxy, type),
             )
 
     def proxy_open(self, req, proxy, type):
@@ -1090,8 +1075,7 @@ class AbstractBasicAuthHandler:
 
         if unsupported is not None:
             raise ValueError(
-                "AbstractBasicAuthHandler does not "
-                f"support the following scheme: {scheme!r}"
+                f"AbstractBasicAuthHandler does not support the following scheme: {scheme!r}"
             )
 
     def retry_http_basic_auth(self, host, req, realm):
@@ -1107,9 +1091,9 @@ class AbstractBasicAuthHandler:
             return None
 
     def http_request(self, req):
-        if not hasattr(
-            self.passwd, "is_authenticated"
-        ) or not self.passwd.is_authenticated(req.full_url):
+        if not hasattr(self.passwd, "is_authenticated") or not self.passwd.is_authenticated(
+            req.full_url
+        ):
             return req
 
         if not req.has_header("Authorization"):
@@ -1149,9 +1133,7 @@ class ProxyBasicAuthHandler(AbstractBasicAuthHandler, BaseHandler):
         # should not, RFC 3986 s. 3.2.1) support requests for URLs containing
         # userinfo.
         authority = req.host
-        response = self.http_error_auth_reqed(
-            "proxy-authenticate", authority, req, headers
-        )
+        response = self.http_error_auth_reqed("proxy-authenticate", authority, req, headers)
         return response
 
 
@@ -1199,8 +1181,7 @@ class AbstractDigestAuthHandler:
                 return self.retry_http_digest_auth(req, authreq)
             elif scheme.lower() != "basic":
                 raise ValueError(
-                    "AbstractDigestAuthHandler does not support"
-                    f" the following scheme: '{scheme}'"
+                    f"AbstractDigestAuthHandler does not support the following scheme: '{scheme}'"
                 )
 
     def retry_http_digest_auth(self, req, auth):
@@ -1296,9 +1277,7 @@ class AbstractDigestAuthHandler:
             H = lambda x: hashlib.sha1(x.encode("ascii")).hexdigest()
         # XXX MD5-sess
         else:
-            raise ValueError(
-                f"Unsupported digest authentication algorithm {algorithm!r}"
-            )
+            raise ValueError(f"Unsupported digest authentication algorithm {algorithm!r}")
         KD = lambda s, d: H(f"{s}:{d}")
         return H, KD
 
@@ -1338,18 +1317,14 @@ class ProxyDigestAuthHandler(BaseHandler, AbstractDigestAuthHandler):
 class AbstractHTTPHandler(BaseHandler):
     def __init__(self, debuglevel=None):
         self._debuglevel = (
-            debuglevel
-            if debuglevel is not None
-            else http.client.HTTPConnection.debuglevel
+            debuglevel if debuglevel is not None else http.client.HTTPConnection.debuglevel
         )
 
     def set_http_debuglevel(self, level):
         self._debuglevel = level
 
     def _get_content_length(self, request):
-        return http.client.HTTPConnection._get_content_length(
-            request.data, request.get_method()
-        )
+        return http.client.HTTPConnection._get_content_length(request.data, request.get_method())
 
     def do_request_(self, request):
         host = request.host
@@ -1365,17 +1340,13 @@ class AbstractHTTPHandler(BaseHandler):
                 )
                 raise TypeError(msg)
             if not request.has_header("Content-type"):
-                request.add_unredirected_header(
-                    "Content-type", "application/x-www-form-urlencoded"
-                )
+                request.add_unredirected_header("Content-type", "application/x-www-form-urlencoded")
             if not request.has_header("Content-length") and not request.has_header(
                 "Transfer-encoding"
             ):
                 content_length = self._get_content_length(request)
                 if content_length is not None:
-                    request.add_unredirected_header(
-                        "Content-length", str(content_length)
-                    )
+                    request.add_unredirected_header("Content-length", str(content_length))
                 else:
                     request.add_unredirected_header("Transfer-encoding", "chunked")
 
@@ -1475,9 +1446,7 @@ if hasattr(http.client, "HTTPSConnection"):
     class HTTPSHandler(AbstractHTTPHandler):
         def __init__(self, debuglevel=None, context=None, check_hostname=None):
             debuglevel = (
-                debuglevel
-                if debuglevel is not None
-                else http.client.HTTPSConnection.debuglevel
+                debuglevel if debuglevel is not None else http.client.HTTPSConnection.debuglevel
             )
             AbstractHTTPHandler.__init__(self, debuglevel)
             if context is None:
@@ -1580,11 +1549,7 @@ class FileHandler(BaseHandler):
     # Use local file or FTP depending on form of URL
     def file_open(self, req):
         url = req.selector
-        if (
-            url[:2] == "//"
-            and url[2:3] != "/"
-            and (req.host and req.host != "localhost")
-        ):
+        if url[:2] == "//" and url[2:3] != "/" and (req.host and req.host != "localhost"):
             if not req.host in self.get_names():
                 raise URLError("file:// scheme is supported only on localhost")
         else:
@@ -2142,9 +2107,7 @@ class URLopener:
     def open_file(self, url):
         """Use local file or FTP depending on form of URL."""
         if not isinstance(url, str):
-            raise URLError(
-                "file error: proxy support for file protocol currently not implemented"
-            )
+            raise URLError("file error: proxy support for file protocol currently not implemented")
         if url[:2] == "//" and url[2:3] != "/" and url[2:12].lower() != "localhost/":
             raise ValueError("file:// scheme is supported only on localhost")
         else:
@@ -2188,9 +2151,7 @@ class URLopener:
     def open_ftp(self, url):
         """Use FTP protocol."""
         if not isinstance(url, str):
-            raise URLError(
-                "ftp error: proxy support for ftp protocol currently not implemented"
-            )
+            raise URLError("ftp error: proxy support for ftp protocol currently not implemented")
         import mimetypes
 
         host, path = _splithost(url)
@@ -2255,9 +2216,7 @@ class URLopener:
     def open_data(self, url, data=None):
         """Use "data" URL."""
         if not isinstance(url, str):
-            raise URLError(
-                "data error: proxy support for data protocol currently not implemented"
-            )
+            raise URLError("data error: proxy support for data protocol currently not implemented")
         # ignore POSTed data
         #
         # syntax of data URLs:
@@ -2279,9 +2238,7 @@ class URLopener:
             encoding = ""
         msg = []
         msg.append(
-            "Date: {}".format(
-                time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime(time.time()))
-            )
+            "Date: {}".format(time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime(time.time())))
         )
         msg.append(f"Content-type: {type}")
         if encoding == "base64":
@@ -2321,9 +2278,7 @@ class FancyURLopener(URLopener):
                     meth = self.http_error_500
                 else:
                     meth = self.http_error_default
-                return meth(
-                    url, fp, 500, "Internal Server Error: Redirect Recursion", headers
-                )
+                return meth(url, fp, 500, "Internal Server Error: Redirect Recursion", headers)
             result = self.redirect_internal(url, fp, errcode, errmsg, headers, data)
             return result
         finally:
@@ -2512,9 +2467,7 @@ class FancyURLopener(URLopener):
 
         try:
             user = input(f"Enter username for {realm} at {host}: ")
-            passwd = getpass.getpass(
-                f"Enter password for {user} in {realm} at {host}: "
-            )
+            passwd = getpass.getpass(f"Enter password for {user} in {realm} at {host}: ")
             return user, passwd
         except KeyboardInterrupt:
             print()
@@ -2898,14 +2851,10 @@ elif os.name == "nt":
             proxyEnable = winreg.QueryValueEx(internetSettings, "ProxyEnable")[0]
             if proxyEnable:
                 # Returned as Unicode but problems if not converted to ASCII
-                proxyServer = str(
-                    winreg.QueryValueEx(internetSettings, "ProxyServer")[0]
-                )
+                proxyServer = str(winreg.QueryValueEx(internetSettings, "ProxyServer")[0])
                 if "=" not in proxyServer and ";" not in proxyServer:
                     # Use one setting for all protocols.
-                    proxyServer = (
-                        f"http={proxyServer};https={proxyServer};ftp={proxyServer}"
-                    )
+                    proxyServer = f"http={proxyServer};https={proxyServer};ftp={proxyServer}"
                 for p in proxyServer.split(";"):
                     protocol, address = p.split("=", 1)
                     # See if address has a type:// prefix
@@ -2952,9 +2901,7 @@ elif os.name == "nt":
                 r"Software\Microsoft\Windows\CurrentVersion\Internet Settings",
             )
             proxyEnable = winreg.QueryValueEx(internetSettings, "ProxyEnable")[0]
-            proxyOverride = str(
-                winreg.QueryValueEx(internetSettings, "ProxyOverride")[0]
-            )
+            proxyOverride = str(winreg.QueryValueEx(internetSettings, "ProxyOverride")[0])
             # ^^^^ Returned as Unicode but problems if not converted to ASCII
         except OSError:
             return False

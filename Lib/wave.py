@@ -72,9 +72,9 @@ is destroyed.
 """
 
 import builtins
+from collections import namedtuple
 import struct
 import sys
-from collections import namedtuple
 
 __all__ = ["Error", "Wave_read", "Wave_write", "open"]
 
@@ -90,9 +90,7 @@ KSDATAFORMAT_SUBTYPE_PCM = b"\x01\x00\x00\x00\x00\x00\x10\x00\x80\x00\x00\xaa\x0
 
 _array_fmts = None, "b", "h", None, "i"
 
-_wave_params = namedtuple(
-    "_wave_params", "nchannels sampwidth framerate nframes comptype compname"
-)
+_wave_params = namedtuple("_wave_params", "nchannels sampwidth framerate nframes comptype compname")
 
 
 def _byteswap(data, width):
@@ -371,9 +369,7 @@ class Wave_read:
             data = _byteswap(data, self._sampwidth)
         if self._convert and data:
             data = self._convert(data)
-        self._soundpos = self._soundpos + len(data) // (
-            self._nchannels * self._sampwidth
-        )
+        self._soundpos = self._soundpos + len(data) // (self._nchannels * self._sampwidth)
         return data
 
     #
@@ -412,9 +408,7 @@ class Wave_read:
                 try:
                     import uuid
 
-                    subformat_msg = (
-                        f"unknown extended format: {uuid.UUID(bytes_le=SubFormat)}"
-                    )
+                    subformat_msg = f"unknown extended format: {uuid.UUID(bytes_le=SubFormat)}"
                 except Exception:  # noqa: BLE001
                     subformat_msg = "unknown extended format"
                 raise Error(subformat_msg)

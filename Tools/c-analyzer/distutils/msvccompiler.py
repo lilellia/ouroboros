@@ -10,6 +10,7 @@ for the Microsoft Visual Studio.
 
 import os
 import sys
+
 from distutils import log
 from distutils.ccompiler import CCompiler
 from distutils.errors import DistutilsPlatformError

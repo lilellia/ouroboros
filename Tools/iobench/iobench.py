@@ -1,10 +1,10 @@
 import itertools
+from optparse import OptionParser
 import os
 import platform
 import re
 import sys
 import time
-from optparse import OptionParser
 
 out = sys.stdout
 
@@ -31,10 +31,7 @@ def get_binary_files():
 
 
 def get_text_files():
-    return (
-        (f"{name}-{TEXT_ENCODING}-{NEWLINES}.txt", size)
-        for name, size in get_file_sizes()
-    )
+    return ((f"{name}-{TEXT_ENCODING}-{NEWLINES}.txt", size) for name, size in get_file_sizes())
 
 
 def with_open_mode(mode):
@@ -307,9 +304,7 @@ def run_all_tests(options):
         out.write(bw.rjust(12) + "\n")
         if cpu < 0.90 * real:
             out.write(
-                "   warning: test above used only "
-                f"{cpu / real:%} CPU, "
-                "result may be flawed!\n"
+                f"   warning: test above used only {cpu / real:%} CPU, result may be flawed!\n"
             )
 
     def run_one_test(name, size, open_func, test_func, *args):

@@ -494,17 +494,12 @@ class HeapTypeObjectPtr(PyObjectPtr):
             dictoffset = int_from_int(typeobj.field("tp_dictoffset"))
             if dictoffset != 0:
                 if dictoffset < 0:
-                    if (
-                        int_from_int(typeobj.field("tp_flags"))
-                        & Py_TPFLAGS_MANAGED_DICT
-                    ):
+                    if int_from_int(typeobj.field("tp_flags")) & Py_TPFLAGS_MANAGED_DICT:
                         assert dictoffset == -1
                         dictoffset = -3 * _sizeof_void_p()
                     else:
                         type_PyVarObject_ptr = gdb.lookup_type("PyVarObject").pointer()
-                        tsize = int_from_int(
-                            self._gdbval.cast(type_PyVarObject_ptr)["ob_size"]
-                        )
+                        tsize = int_from_int(self._gdbval.cast(type_PyVarObject_ptr)["ob_size"])
                         if tsize < 0:
                             tsize = -tsize
                         size = _PyObject_VAR_SIZE(typeobj, tsize)
@@ -580,9 +575,7 @@ class HeapTypeObjectPtr(PyObjectPtr):
         pyop_attrs = self.get_keys_values()
         if not pyop_attrs:
             pyop_attrs = self.get_attr_dict()
-        _write_instance_repr(
-            out, visited, self.safe_tp_name(), pyop_attrs, self.as_address()
-        )
+        _write_instance_repr(out, visited, self.safe_tp_name(), pyop_attrs, self.as_address())
 
 
 class ProxyException(Exception):
@@ -1781,10 +1774,7 @@ class Frame:
                 func = frame.read_var(arg_name)
                 return str(func)
             except ValueError:
-                return (
-                    f"PyCFunction invocation (unable to read {arg_name}: "
-                    "missing debuginfos?)"
-                )
+                return f"PyCFunction invocation (unable to read {arg_name}: missing debuginfos?)"
             except RuntimeError:
                 return f"PyCFunction invocation (unable to read {arg_name})"
 
@@ -1794,10 +1784,7 @@ class Frame:
                 func = frame.read_var(arg_name)
                 return str(func)
             except ValueError:
-                return (
-                    f"<wrapper_call invocation (unable to read {arg_name}: "
-                    "missing debuginfos?)>"
-                )
+                return f"<wrapper_call invocation (unable to read {arg_name}: missing debuginfos?)>"
             except RuntimeError:
                 return f"<wrapper_call invocation (unable to read {arg_name})>"
 

@@ -1,7 +1,7 @@
+from collections.abc import Iterable
 import os
 import pathlib
 import types
-from collections.abc import Iterable
 from typing import Any, BinaryIO, ContextManager, TextIO, Union  # noqa: UP035
 
 from . import _common

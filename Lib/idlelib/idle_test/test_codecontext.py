@@ -1,11 +1,11 @@
 "Test codecontext, coverage 100%"
 
-import re
-import unittest
-import unittest.mock
 from idlelib import codecontext, config
+import re
 from tkinter import NSEW, Frame, TclError, Text, Tk
+import unittest
 from unittest import mock
+import unittest.mock
 
 from test.support import requires
 

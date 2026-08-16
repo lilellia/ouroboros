@@ -1,8 +1,8 @@
 "Test pyparse, coverage 96%."
 
-import unittest
 from collections import namedtuple
 from idlelib import pyparse
+import unittest
 
 
 class ParseMapTest(unittest.TestCase):
@@ -16,9 +16,7 @@ class ParseMapTest(unittest.TestCase):
     def test_trans(self):
         # trans is the production instance of ParseMap, used in _study1
         pyparse.Parser(4, 4)
-        self.assertEqual(
-            "\t a([{b}])b\"c'd\n".translate(pyparse.trans), "xxx(((x)))x\"x'x\n"
-        )
+        self.assertEqual("\t a([{b}])b\"c'd\n".translate(pyparse.trans), "xxx(((x)))x\"x'x\n")
 
 
 class PyParseTest(unittest.TestCase):
@@ -172,9 +170,7 @@ class PyParseTest(unittest.TestCase):
             TestInfo('("""Complete string in bracket"""\n', [0, 1], BRACKET),
             TestInfo('("""Open string in bracket\n', [0, 1], FIRST),
             TestInfo("a = (1 + 2) - 5 *\\\n", [0, 1], BACKSLASH),  # No bracket.
-            TestInfo(
-                "\n   def function1(self, a,\n                 b):\n", [0, 1, 3], NONE
-            ),
+            TestInfo("\n   def function1(self, a,\n                 b):\n", [0, 1, 3], NONE),
             TestInfo("\n   def function1(self, a,\\\n", [0, 1, 2], BRACKET),
             TestInfo("\n   def function1(self, a,\n", [0, 1, 2], BRACKET),
             TestInfo("())\n", [0, 1], NONE),  # Extra closer.
@@ -239,9 +235,7 @@ class PyParseTest(unittest.TestCase):
             # A comment without a space is a special case
             TestInfo(" #Comment\\\n", 0, 0, "", None, ((0, 0),)),
             # Backslash continuation.
-            TestInfo(
-                "a = (1 + 2) - 5 *\\\n", 0, 19, "*", None, ((0, 0), (4, 1), (11, 0))
-            ),
+            TestInfo("a = (1 + 2) - 5 *\\\n", 0, 19, "*", None, ((0, 0), (4, 1), (11, 0))),
             # Bracket continuation with close.
             TestInfo(
                 "\n   def function1(self, a,\n                 b):\n",
@@ -252,13 +246,9 @@ class PyParseTest(unittest.TestCase):
                 ((1, 0), (17, 1), (46, 0)),
             ),
             # Bracket continuation with unneeded backslash.
-            TestInfo(
-                "\n   def function1(self, a,\\\n", 1, 28, ",", 17, ((1, 0), (17, 1))
-            ),
+            TestInfo("\n   def function1(self, a,\\\n", 1, 28, ",", 17, ((1, 0), (17, 1))),
             # Bracket continuation.
-            TestInfo(
-                "\n   def function1(self, a,\n", 1, 27, ",", 17, ((1, 0), (17, 1))
-            ),
+            TestInfo("\n   def function1(self, a,\n", 1, 27, ",", 17, ((1, 0), (17, 1))),
             # Bracket continuation with comment at end of line with text.
             TestInfo(
                 "\n   def function1(self, a,  # End of line comment.\n",
@@ -280,9 +270,7 @@ class PyParseTest(unittest.TestCase):
             TestInfo("())\n", 0, 4, ")", None, ((0, 0), (0, 1), (2, 0), (3, 0))),
             TestInfo(")(\n", 0, 3, "(", 1, ((0, 0), (1, 0), (1, 1))),
             # Wrong closers still decrement stack level.
-            TestInfo(
-                "{)(]\n", 0, 5, "]", None, ((0, 0), (0, 1), (2, 0), (2, 1), (4, 0))
-            ),
+            TestInfo("{)(]\n", 0, 5, "]", None, ((0, 0), (0, 1), (2, 0), (2, 1), (4, 0))),
             # Character after backslash.
             TestInfo(":\\a\n", 0, 4, "\\a", None, ((0, 0),)),
             TestInfo("\n", 0, 0, "", None, ((0, 0),)),
@@ -500,9 +488,7 @@ class PyParseTest(unittest.TestCase):
             TestInfo("(\n())\n", ((0, 0), (0, 1), (2, 2), (4, 1), (5, 0))),
             # Same as matched test.
             TestInfo("{)(]\n", ((0, 0), (0, 1), (2, 0), (2, 1), (4, 0))),
-            TestInfo(
-                "(((())\n", ((0, 0), (0, 1), (1, 2), (2, 3), (3, 4), (5, 3), (6, 2))
-            ),
+            TestInfo("(((())\n", ((0, 0), (0, 1), (1, 2), (2, 3), (3, 4), (5, 3), (6, 2))),
         )
 
         for test in tests:

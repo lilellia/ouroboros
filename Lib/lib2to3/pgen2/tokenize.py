@@ -28,10 +28,10 @@ each time a new token is found."""
 __author__ = "Ka-Ping Yee <ping@lfw.org>"
 __credits__ = "GvR, ESR, Tim Peters, Thomas Wouters, Fred Drake, Skip Montanaro"
 
-import re
-import string
 from codecs import BOM_UTF8, lookup
 from lib2to3.pgen2.token import *
+import re
+import string
 
 from . import token
 
@@ -77,9 +77,7 @@ Octnumber = r"0[oO]?_?[0-7]+(?:_[0-7]+)*[lL]?"
 Decnumber = group(r"[1-9]\d*(?:_\d+)*[lL]?", "0[lL]?")
 Intnumber = group(Binnumber, Hexnumber, Octnumber, Decnumber)
 Exponent = r"[eE][-+]?\d+(?:_\d+)*"
-Pointfloat = group(r"\d+(?:_\d+)*\.(?:\d+(?:_\d+)*)?", r"\.\d+(?:_\d+)*") + maybe(
-    Exponent
-)
+Pointfloat = group(r"\d+(?:_\d+)*\.(?:\d+(?:_\d+)*)?", r"\.\d+(?:_\d+)*") + maybe(Exponent)
 Expfloat = r"\d+(?:_\d+)*" + Exponent
 Floatnumber = group(Pointfloat, Expfloat)
 Imagnumber = group(r"\d+(?:_\d+)*[jJ]", Floatnumber + r"[jJ]")
@@ -520,9 +518,7 @@ def generate_tokens(readline):
                 spos, epos, pos = (lnum, start), (lnum, end), end
                 token, initial = line[start:end], line[start]
 
-                if initial in string.digits or (
-                    initial == "." and token != "."
-                ):  # ordinary number
+                if initial in string.digits or (initial == "." and token != "."):  # ordinary number
                     yield (NUMBER, token, spos, epos, line)
                 elif initial in "\r\n":
                     newline = NEWLINE
@@ -561,11 +557,7 @@ def generate_tokens(readline):
                     or token[:3] in single_quoted
                 ):
                     if token[-1] == "\n":  # continued string
-                        endprog = (
-                            endprogs[initial]
-                            or endprogs[token[1]]
-                            or endprogs[token[2]]
-                        )
+                        endprog = endprogs[initial] or endprogs[token[1]] or endprogs[token[2]]
                         contstr, needcont = line[start:], 1
                         contline = line
                         break

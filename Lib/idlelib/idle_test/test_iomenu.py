@@ -1,10 +1,10 @@
 "Test , coverage 17%."
 
-import unittest
 from idlelib import iomenu, util
 from idlelib.editor import EditorWindow
 from idlelib.idle_test.mock_idle import Func
 from tkinter import Tk
+import unittest
 
 # Fail if either tokenize.open and t.detect_encoding does not exist.
 # These are used in loadfile and encode.
@@ -58,8 +58,7 @@ class IOBindingTest(unittest.TestCase):
 
 def _extension_in_filetypes(extension):
     return any(
-        f"*{extension}" in filetype_tuple[1]
-        for filetype_tuple in iomenu.IOBinding.filetypes
+        f"*{extension}" in filetype_tuple[1] for filetype_tuple in iomenu.IOBinding.filetypes
     )
 
 

@@ -340,11 +340,7 @@ def _EndRecData(fpin):
     except OSError:
         return None
     data = fpin.read(sizeEndCentDir)
-    if (
-        len(data) == sizeEndCentDir
-        and data[0:4] == stringEndArchive
-        and data[-2:] == b"\000\000"
-    ):
+    if len(data) == sizeEndCentDir and data[0:4] == stringEndArchive and data[-2:] == b"\000\000":
         # the signature is correct and there's no comment, unpack structure
         endrec = struct.unpack(structEndArchive, data)
         endrec = list(endrec)
@@ -516,9 +512,7 @@ class ZipInfo:
             zip64 = file_size > ZIP64_LIMIT or compress_size > ZIP64_LIMIT
         if zip64:
             fmt = "<HHQQ"
-            extra = extra + struct.pack(
-                fmt, 1, struct.calcsize(fmt) - 4, file_size, compress_size
-            )
+            extra = extra + struct.pack(fmt, 1, struct.calcsize(fmt) - 4, file_size, compress_size)
             file_size = 0xFFFFFFFF
             compress_size = 0xFFFFFFFF
             min_version = ZIP64_VERSION
@@ -578,9 +572,7 @@ class ZipInfo:
                         field = "Header offset"
                         (self.header_offset,) = unpack("<Q", data[:8])
                 except struct.error:
-                    raise BadZipFile(
-                        f"Corrupt zip64 extra field. {field} not found."
-                    ) from None
+                    raise BadZipFile(f"Corrupt zip64 extra field. {field} not found.") from None
             elif tp == 0x7075:
                 data = extra[4 : ln + 4]
                 # Unicode Path Extra Field
@@ -593,9 +585,7 @@ class ZipInfo:
                         else:
                             import warnings
 
-                            warnings.warn(
-                                "Empty unicode path extra field (0x7075)", stacklevel=2
-                            )
+                            warnings.warn("Empty unicode path extra field (0x7075)", stacklevel=2)
                 except struct.error as e:
                     raise BadZipFile("Corrupt unicode path extra field (0x7075)") from e
                 except UnicodeDecodeError as e:
@@ -1197,9 +1187,7 @@ class ZipExtFile(io.BufferedIOBase):
         elif whence == os.SEEK_END:
             new_pos = self._orig_file_size + offset
         else:
-            raise ValueError(
-                "whence must be os.SEEK_SET (0), os.SEEK_CUR (1), or os.SEEK_END (2)"
-            )
+            raise ValueError("whence must be os.SEEK_SET (0), os.SEEK_CUR (1), or os.SEEK_END (2)")
 
         new_pos = min(new_pos, self._orig_file_size)
 
@@ -1213,11 +1201,7 @@ class ZipExtFile(io.BufferedIOBase):
             self._offset = buff_offset
             read_offset = 0
         # Fast seek uncompressed unencrypted file
-        elif (
-            self._compress_type == ZIP_STORED
-            and self._decrypter is None
-            and read_offset != 0
-        ):
+        elif self._compress_type == ZIP_STORED and self._decrypter is None and read_offset != 0:
             # disable CRC checking after first seeking - it would be invalid
             self._expected_crc = None
             # seek actual file taking already buffered data into account
@@ -1257,9 +1241,7 @@ class ZipExtFile(io.BufferedIOBase):
             raise ValueError("tell on closed file.")
         if not self._seekable:
             raise io.UnsupportedOperation("underlying stream is not seekable")
-        filepos = (
-            self._orig_file_size - self._left - len(self._readbuffer) + self._offset
-        )
+        filepos = self._orig_file_size - self._left - len(self._readbuffer) + self._offset
         return filepos
 
 
@@ -1319,9 +1301,7 @@ class _ZipWriteFile(io.BufferedIOBase):
                 if self._file_size > ZIP64_LIMIT:
                     raise RuntimeError("File size too large, try using force_zip64")
                 if self._compress_size > ZIP64_LIMIT:
-                    raise RuntimeError(
-                        "Compressed size too large, try using force_zip64"
-                    )
+                    raise RuntimeError("Compressed size too large, try using force_zip64")
 
             # Write updated header info
             if self._zinfo.flag_bits & _MASK_USE_DATA_DESCRIPTOR:
@@ -1577,9 +1557,7 @@ class ZipFile:
                 x.file_size,
             ) = centdir[1:12]
             if x.extract_version > MAX_EXTRACT_VERSION:
-                raise NotImplementedError(
-                    "zip file version %.1f" % (x.extract_version / 10)
-                )
+                raise NotImplementedError("zip file version %.1f" % (x.extract_version / 10))
             x.volume, x.internal_attr, x.external_attr = centdir[15:18]
             # Convert date/time code to (year, month, day, hour, min, sec)
             x._raw_time = t
@@ -1609,9 +1587,7 @@ class ZipFile:
                 print("total", total)
 
         end_offset = self.start_dir
-        for zinfo in sorted(
-            self.filelist, key=lambda zinfo: zinfo.header_offset, reverse=True
-        ):
+        for zinfo in sorted(self.filelist, key=lambda zinfo: zinfo.header_offset, reverse=True):
             zinfo._end_offset = end_offset
             end_offset = zinfo.header_offset
 
@@ -1785,14 +1761,12 @@ class ZipFile:
                     import warnings
 
                     warnings.warn(
-                        f"Overlapped entries: {zinfo.orig_filename!r} "
-                        f"(possible zip bomb)",
+                        f"Overlapped entries: {zinfo.orig_filename!r} (possible zip bomb)",
                         skip_file_prefixes=(os.path.dirname(__file__),),
                     )
                 else:
                     raise BadZipFile(
-                        f"Overlapped entries: {zinfo.orig_filename!r} "
-                        f"(possible zip bomb)"
+                        f"Overlapped entries: {zinfo.orig_filename!r} (possible zip bomb)"
                     )
 
             # check for encrypted flag & handle password
@@ -1817,8 +1791,7 @@ class ZipFile:
     def _open_to_write(self, zinfo, force_zip64=False):
         if force_zip64 and not self._allowZip64:
             raise ValueError(
-                "force_zip64 is True, but allowZip64 was False when opening "
-                "the ZIP file."
+                "force_zip64 is True, but allowZip64 was False when opening the ZIP file."
             )
         if self._writing:
             raise ValueError(
@@ -1988,13 +1961,9 @@ class ZipFile:
         if not self.fp:
             raise ValueError("Attempt to write to ZIP archive that was already closed")
         if self._writing:
-            raise ValueError(
-                "Can't write to ZIP archive while an open writing handle exists"
-            )
+            raise ValueError("Can't write to ZIP archive while an open writing handle exists")
 
-        zinfo = ZipInfo.from_file(
-            filename, arcname, strict_timestamps=self._strict_timestamps
-        )
+        zinfo = ZipInfo.from_file(filename, arcname, strict_timestamps=self._strict_timestamps)
 
         if zinfo.is_dir():
             zinfo.compress_size = 0
@@ -2023,9 +1992,7 @@ class ZipFile:
         if isinstance(data, str):
             data = data.encode("utf-8")
         if not isinstance(zinfo_or_arcname, ZipInfo):
-            zinfo = ZipInfo(
-                filename=zinfo_or_arcname, date_time=time.localtime(time.time())[:6]
-            )
+            zinfo = ZipInfo(filename=zinfo_or_arcname, date_time=time.localtime(time.time())[:6])
             zinfo.compress_type = self.compression
             zinfo._compresslevel = self.compresslevel
             if zinfo.filename.endswith("/"):
@@ -2039,9 +2006,7 @@ class ZipFile:
         if not self.fp:
             raise ValueError("Attempt to write to ZIP archive that was already closed")
         if self._writing:
-            raise ValueError(
-                "Can't write to ZIP archive while an open writing handle exists."
-            )
+            raise ValueError("Can't write to ZIP archive while an open writing handle exists.")
 
         if compress_type is not None:
             zinfo.compress_type = compress_type
@@ -2143,8 +2108,7 @@ class ZipFile:
                 # Append a ZIP64 field to the extra's
                 extra_data = _strip_extra(extra_data, (1,))
                 extra_data = (
-                    struct.pack("<HH" + "Q" * len(extra), 1, 8 * len(extra), *extra)
-                    + extra_data
+                    struct.pack("<HH" + "Q" * len(extra), 1, 8 * len(extra), *extra) + extra_data
                 )
 
                 min_version = ZIP64_VERSION
@@ -2250,12 +2214,8 @@ class ZipFile:
 class PyZipFile(ZipFile):
     """Class to create ZIP archives with Python library files and packages."""
 
-    def __init__(
-        self, file, mode="r", compression=ZIP_STORED, allowZip64=True, optimize=-1
-    ):
-        ZipFile.__init__(
-            self, file, mode=mode, compression=compression, allowZip64=allowZip64
-        )
+    def __init__(self, file, mode="r", compression=ZIP_STORED, allowZip64=True, optimize=-1):
+        ZipFile.__init__(self, file, mode=mode, compression=compression, allowZip64=allowZip64)
         self._optimize = optimize
 
     def writepy(self, pathname, basename="", filterfunc=None):
@@ -2302,9 +2262,7 @@ class PyZipFile(ZipFile):
                     if os.path.isdir(path):
                         if os.path.isfile(os.path.join(path, "__init__.py")):
                             # This is a package directory, add it
-                            self.writepy(
-                                path, basename, filterfunc=filterfunc
-                            )  # Recursive call
+                            self.writepy(path, basename, filterfunc=filterfunc)  # Recursive call
                     elif ext == ".py":
                         if filterfunc and not filterfunc(path):
                             if self.debug:
@@ -2365,10 +2323,7 @@ class PyZipFile(ZipFile):
         pycache_opt2 = importlib.util.cache_from_source(file_py, optimization=2)
         if self._optimize == -1:
             # legacy mode: use whatever file is present
-            if (
-                os.path.isfile(file_pyc)
-                and os.stat(file_pyc).st_mtime >= os.stat(file_py).st_mtime
-            ):
+            if os.path.isfile(file_pyc) and os.stat(file_pyc).st_mtime >= os.stat(file_py).st_mtime:
                 # Use .pyc file.
                 arcname = fname = file_pyc
             elif (
@@ -2422,8 +2377,7 @@ class PyZipFile(ZipFile):
                     msg = f"invalid value for 'optimize': {self._optimize!r}"
                     raise ValueError(msg)
             if not (
-                os.path.isfile(fname)
-                and os.stat(fname).st_mtime >= os.stat(file_py).st_mtime
+                os.path.isfile(fname) and os.stat(fname).st_mtime >= os.stat(file_py).st_mtime
             ) and not _compile(file_py, optimize=self._optimize):
                 fname = arcname = file_py
         archivename = os.path.split(arcname)[1]
@@ -2438,9 +2392,7 @@ def main(args=None):
     description = "A simple command-line interface for zipfile module."
     parser = argparse.ArgumentParser(description=description)
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument(
-        "-l", "--list", metavar="<zipfile>", help="Show listing of a zipfile"
-    )
+    group.add_argument("-l", "--list", metavar="<zipfile>", help="Show listing of a zipfile")
     group.add_argument(
         "-e",
         "--extract",
@@ -2455,9 +2407,7 @@ def main(args=None):
         metavar=("<name>", "<file>"),
         help="Create zipfile from sources",
     )
-    group.add_argument(
-        "-t", "--test", metavar="<zipfile>", help="Test if a zipfile is valid"
-    )
+    group.add_argument("-t", "--test", metavar="<zipfile>", help="Test if a zipfile is valid")
     parser.add_argument(
         "--metadata-encoding",
         metavar="<encoding>",

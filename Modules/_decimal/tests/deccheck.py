@@ -36,15 +36,15 @@ import time
 RANDSEED = int(time.time())
 random.seed(RANDSEED)
 
-import argparse
-import os
-import subprocess
-import sys
 from _pydecimal import _dec_from_triple
+import argparse
 from collections import defaultdict
 from copy import copy
+import os
 from queue import Empty, Queue
+import subprocess
 from subprocess import PIPE, STDOUT
+import sys
 from threading import Event, Lock, Thread
 
 from formathelper import rand_format, rand_locale
@@ -1448,9 +1448,7 @@ if __name__ == "__main__":
             f()
 
     # Decimal methods:
-    for method in (
-        Functions["unary"] + Functions["unary_ctx"] + Functions["unary_rnd_ctx"]
-    ):
+    for method in Functions["unary"] + Functions["unary_ctx"] + Functions["unary_rnd_ctx"]:
         do_single(method, lambda: test_method(method, testspecs, test_unary))  # noqa: B023
 
     for method in Functions["binary"] + Functions["binary_ctx"]:
@@ -1462,12 +1460,8 @@ if __name__ == "__main__":
 
     do_single("__format__", lambda: test_method("__format__", testspecs, test_format))
     do_single("__round__", lambda: test_method("__round__", testspecs, test_round))
-    do_single(
-        "from_float", lambda: test_method("from_float", testspecs, test_from_float)
-    )
-    do_single(
-        "quantize_api", lambda: test_method("quantize", testspecs, test_quantize_api)
-    )
+    do_single("from_float", lambda: test_method("from_float", testspecs, test_from_float))
+    do_single("quantize_api", lambda: test_method("quantize", testspecs, test_quantize_api))
 
     # Context methods:
     for method in ContextFunctions["unary"]:
@@ -1482,9 +1476,7 @@ if __name__ == "__main__":
 
     do_single(
         "context.create_decimal_from_float",
-        lambda: test_method(
-            "context.create_decimal_from_float", testspecs, test_from_float
-        ),
+        lambda: test_method("context.create_decimal_from_float", testspecs, test_from_float),
     )
 
     if args.multicore:

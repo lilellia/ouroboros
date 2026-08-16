@@ -127,18 +127,18 @@ __all__ = [
     "variance",
 ]
 
-import math
-import numbers
-import random
-import sys
 from bisect import bisect_left, bisect_right
 from collections import Counter, defaultdict, namedtuple
 from decimal import Decimal
 from fractions import Fraction
 from functools import reduce
 from itertools import count, groupby, repeat
+import math
 from math import erf, exp, fabs, fsum, hypot, log, sqrt, sumprod, tau
+import numbers
 from operator import itemgetter
+import random
+import sys
 
 _SQRT2 = sqrt(2.0)
 
@@ -1188,11 +1188,7 @@ def _normal_dist_inv_cdf(p, mu, sigma):
                     (
                         (
                             (
-                                (
-                                    2.50908_09287_30122_6727e3 * r
-                                    + 3.34305_75583_58812_8105e4
-                                )
-                                * r
+                                (2.50908_09287_30122_6727e3 * r + 3.34305_75583_58812_8105e4) * r
                                 + 6.72657_70927_00870_0853e4
                             )
                             * r
@@ -1215,11 +1211,7 @@ def _normal_dist_inv_cdf(p, mu, sigma):
                 (
                     (
                         (
-                            (
-                                5.22649_52788_52854_5610e3 * r
-                                + 2.87290_85735_72194_2674e4
-                            )
-                            * r
+                            (5.22649_52788_52854_5610e3 * r + 2.87290_85735_72194_2674e4) * r
                             + 3.93078_95800_09271_0610e4
                         )
                         * r
@@ -1246,11 +1238,7 @@ def _normal_dist_inv_cdf(p, mu, sigma):
                 (
                     (
                         (
-                            (
-                                7.74545_01427_83414_07640e-4 * r
-                                + 2.27238_44989_26918_45833e-2
-                            )
-                            * r
+                            (7.74545_01427_83414_07640e-4 * r + 2.27238_44989_26918_45833e-2) * r
                             + 2.41780_72517_74506_11770e-1
                         )
                         * r
@@ -1270,11 +1258,7 @@ def _normal_dist_inv_cdf(p, mu, sigma):
                 (
                     (
                         (
-                            (
-                                1.05075_00716_44416_84324e-9 * r
-                                + 5.47593_80849_95344_94600e-4
-                            )
-                            * r
+                            (1.05075_00716_44416_84324e-9 * r + 5.47593_80849_95344_94600e-4) * r
                             + 1.51986_66563_61645_71966e-2
                         )
                         * r
@@ -1297,11 +1281,7 @@ def _normal_dist_inv_cdf(p, mu, sigma):
                 (
                     (
                         (
-                            (
-                                2.01033_43992_92288_13265e-7 * r
-                                + 2.71155_55687_43487_57815e-5
-                            )
-                            * r
+                            (2.01033_43992_92288_13265e-7 * r + 2.71155_55687_43487_57815e-5) * r
                             + 1.24266_09473_88078_43860e-3
                         )
                         * r
@@ -1321,11 +1301,7 @@ def _normal_dist_inv_cdf(p, mu, sigma):
                 (
                     (
                         (
-                            (
-                                2.04426_31033_89939_78564e-15 * r
-                                + 1.42151_17583_16445_88870e-7
-                            )
-                            * r
+                            (2.04426_31033_89939_78564e-15 * r + 1.42151_17583_16445_88870e-7) * r
                             + 1.84631_83175_10054_68180e-5
                         )
                         * r

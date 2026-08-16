@@ -1,7 +1,7 @@
 "Test , coverage %."
 
-import unittest
 from tkinter import Tk
+import unittest
 
 from test.support import requires
 

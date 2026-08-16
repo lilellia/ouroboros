@@ -4,8 +4,12 @@ __all__ = ("staggered_race",)
 
 import contextlib
 
-from . import events, locks, tasks
-from . import exceptions as exceptions_mod
+from . import (
+    events,
+    exceptions as exceptions_mod,
+    locks,
+    tasks,
+)
 
 
 async def staggered_race(coro_fns, delay, *, loop=None):
@@ -71,11 +75,7 @@ async def staggered_race(coro_fns, delay, *, loop=None):
 
     def task_done(task):
         running_tasks.discard(task)
-        if (
-            on_completed_fut is not None
-            and not on_completed_fut.done()
-            and not running_tasks
-        ):
+        if on_completed_fut is not None and not on_completed_fut.done() and not running_tasks:
             on_completed_fut.set_result(None)
 
         if task.cancelled():
@@ -164,7 +164,7 @@ async def staggered_race(coro_fns, delay, *, loop=None):
         if __debug__ and unhandled_exceptions:
             # If run_one_coro raises an unhandled exception, it's probably a
             # programming error, and I want to see it.
-            raise ExceptionGroup("staggered race failed", unhandled_exceptions)  # noqa: F821
+            raise ExceptionGroup("staggered race failed", unhandled_exceptions)
         if propagate_cancellation_error is not None:
             raise propagate_cancellation_error
         return winner_result, winner_index, exceptions

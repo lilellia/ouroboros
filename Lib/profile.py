@@ -559,12 +559,10 @@ class Profile:
 
 
 def main():
-    import os
     from optparse import OptionParser
+    import os
 
-    usage = (
-        "profile.py [-o output_file_path] [-s sort] [-m module | scriptfile] [arg] ..."
-    )
+    usage = "profile.py [-o output_file_path] [-s sort] [-m module | scriptfile] [arg] ..."
     parser = OptionParser(usage=usage)
     parser.allow_interspersed_args = False
     parser.add_option(
@@ -608,9 +606,7 @@ def main():
             sys.path.insert(0, os.path.dirname(progname))
             with io.open_code(progname) as fp:
                 code = compile(fp.read(), progname, "exec")
-            spec = importlib.machinery.ModuleSpec(
-                name="__main__", loader=None, origin=progname
-            )
+            spec = importlib.machinery.ModuleSpec(name="__main__", loader=None, origin=progname)
             globs = {
                 "__spec__": spec,
                 "__file__": spec.origin,

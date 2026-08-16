@@ -316,15 +316,11 @@ class Overflow(Inexact, Rounded):
         if sign == 0:
             if context.rounding == ROUND_CEILING:
                 return _SignedInfinity[sign]
-            return _dec_from_triple(
-                sign, "9" * context.prec, context.Emax - context.prec + 1
-            )
+            return _dec_from_triple(sign, "9" * context.prec, context.Emax - context.prec + 1)
         if sign == 1:
             if context.rounding == ROUND_FLOOR:
                 return _SignedInfinity[sign]
-            return _dec_from_triple(
-                sign, "9" * context.prec, context.Emax - context.prec + 1
-            )
+            return _dec_from_triple(sign, "9" * context.prec, context.Emax - context.prec + 1)
 
 
 class Underflow(Inexact, Rounded, Subnormal):
@@ -773,21 +769,13 @@ class Decimal:
 
         if self._is_special or other._is_special:
             if self.is_snan():
-                return context._raise_error(
-                    InvalidOperation, "comparison involving sNaN", self
-                )
+                return context._raise_error(InvalidOperation, "comparison involving sNaN", self)
             elif other.is_snan():
-                return context._raise_error(
-                    InvalidOperation, "comparison involving sNaN", other
-                )
+                return context._raise_error(InvalidOperation, "comparison involving sNaN", other)
             elif self.is_qnan():
-                return context._raise_error(
-                    InvalidOperation, "comparison involving NaN", self
-                )
+                return context._raise_error(InvalidOperation, "comparison involving NaN", self)
             elif other.is_qnan():
-                return context._raise_error(
-                    InvalidOperation, "comparison involving NaN", other
-                )
+                return context._raise_error(InvalidOperation, "comparison involving NaN", other)
         return 0
 
     def __bool__(self):
@@ -1397,9 +1385,7 @@ class Decimal:
                 )
 
         # Here the quotient is too large to be representable
-        ans = context._raise_error(
-            DivisionImpossible, "quotient too large in //, % or divmod"
-        )
+        ans = context._raise_error(DivisionImpossible, "quotient too large in //, % or divmod")
         return ans, ans
 
     def __rtruediv__(self, other, context=None):
@@ -1583,9 +1569,7 @@ class Decimal:
 
         if not other:
             if self:
-                return context._raise_error(
-                    DivisionByZero, "x // 0", self._sign ^ other._sign
-                )
+                return context._raise_error(DivisionByZero, "x // 0", self._sign ^ other._sign)
             else:
                 return context._raise_error(DivisionUndefined, "0 // 0")
 
@@ -1780,9 +1764,7 @@ class Decimal:
 
     def _round_half_even(self, prec):
         """Round 5 to even, rest to nearest."""
-        if _exact_half(self._int, prec) and (
-            prec == 0 or self._int[prec - 1] in "02468"
-        ):
+        if _exact_half(self._int, prec) and (prec == 0 or self._int[prec - 1] in "02468"):
             return -1
         else:
             return self._round_half_up(prec)
@@ -1998,9 +1980,7 @@ class Decimal:
                 "pow() 2nd argument cannot be negative when 3rd argument specified",
             )
         if not modulo:
-            return context._raise_error(
-                InvalidOperation, "pow() 3rd argument cannot be 0"
-            )
+            return context._raise_error(InvalidOperation, "pow() 3rd argument cannot be 0")
 
         # additional restriction for decimal: the modulus must be less
         # than 10**prec in absolute value
@@ -2474,9 +2454,7 @@ class Decimal:
             # ensures that the Rounded signal will be raised.
             if len(ans._int) <= context.prec:
                 expdiff = context.prec + 1 - len(ans._int)
-                ans = _dec_from_triple(
-                    ans._sign, ans._int + "0" * expdiff, ans._exp - expdiff
-                )
+                ans = _dec_from_triple(ans._sign, ans._int + "0" * expdiff, ans._exp - expdiff)
 
             # create a copy of the current context, with cleared flags/traps
             newcontext = context.copy()
@@ -2620,12 +2598,7 @@ class Decimal:
         """
         other = _convert_other(other, raiseit=True)
         if self._is_special or other._is_special:
-            return (
-                self.is_nan()
-                and other.is_nan()
-                or self.is_infinite()
-                and other.is_infinite()
-            )
+            return self.is_nan() and other.is_nan() or self.is_infinite() and other.is_infinite()
         return self._exp == other._exp
 
     def _rescale(self, exp, rounding):
@@ -2646,9 +2619,7 @@ class Decimal:
 
         if self._exp >= exp:
             # pad answer with zeros if necessary
-            return _dec_from_triple(
-                self._sign, self._int + "0" * (self._exp - exp), exp
-            )
+            return _dec_from_triple(self._sign, self._int + "0" * (self._exp - exp), exp)
 
         # too many digits; round and lose data.  If self.adjusted() <
         # exp-1, replace self by 10**(exp-1) before rounding
@@ -3582,9 +3553,7 @@ class Decimal:
 
         # decide which flags to raise using value of ans
         if ans._isinfinity():
-            context._raise_error(
-                Overflow, "Infinite result from next_toward", ans._sign
-            )
+            context._raise_error(Overflow, "Infinite result from next_toward", ans._sign)
             context._raise_error(Inexact)
             context._raise_error(Rounded)
         elif ans.adjusted() < context.Emin:
@@ -4165,9 +4134,7 @@ class Context:
 
         d = Decimal(num, context=self)
         if d._isnan() and len(d._int) > self.prec - self.clamp:
-            return self._raise_error(
-                ConversionSyntax, "diagnostic info too long in NaN"
-            )
+            return self._raise_error(ConversionSyntax, "diagnostic info too long in NaN")
         return d._fix(self)
 
     def create_decimal_from_float(self, f):
@@ -5823,9 +5790,7 @@ def _ilog(x, M, L=8):
     # argument reduction; R = number of reductions performed
     R = 0
     while R <= L and abs(y) << L - R >= M or R > L and abs(y) >> R - L >= M:
-        y = _div_nearest(
-            (M * y) << 1, M + _sqrt_nearest(M * (M + _rshift_nearest(y, R)), M)
-        )
+        y = _div_nearest((M * y) << 1, M + _sqrt_nearest(M * (M + _rshift_nearest(y, R)), M))
         R += 1
 
     # Taylor series with T terms
@@ -6138,9 +6103,7 @@ def _convert_for_comparison(self, other, equality_op=False):
     # comparison result.
     if isinstance(other, _numbers.Rational):
         if not self._is_special:
-            self = _dec_from_triple(
-                self._sign, str(int(self._int) * other.denominator), self._exp
-            )
+            self = _dec_from_triple(self._sign, str(int(self._int) * other.denominator), self._exp)
         return self, Decimal(other.numerator)
 
     # Comparisons with float and complex types.  == and != comparisons
@@ -6314,9 +6277,7 @@ def _parse_format_specifier(format_spec, _localeconv=None):
                 "Fill character conflicts with '0' in format specifier: " + format_spec
             )
         if align is not None:
-            raise ValueError(
-                "Alignment conflicts with '0' in format specifier: " + format_spec
-            )
+            raise ValueError("Alignment conflicts with '0' in format specifier: " + format_spec)
     format_dict["fill"] = fill or " "
     # PEP 3101 originally specified that the default alignment should
     # be left;  it was later agreed that right-aligned makes more sense

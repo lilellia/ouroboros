@@ -11,11 +11,11 @@ __all__ = [
 ]
 
 import binascii
+from email import charset as _charset
 import email.base64mime
+from email.errors import HeaderParseError
 import email.quoprimime
 import re
-from email import charset as _charset
-from email.errors import HeaderParseError
 
 Charset = _charset.Charset
 
@@ -165,9 +165,7 @@ def make_header(decoded_seq, maxlinelen=None, header_name=None, continuation_ws=
     instance.  Optional maxlinelen, header_name, and continuation_ws are as in
     the Header constructor.
     """
-    h = Header(
-        maxlinelen=maxlinelen, header_name=header_name, continuation_ws=continuation_ws
-    )
+    h = Header(maxlinelen=maxlinelen, header_name=header_name, continuation_ws=continuation_ws)
     for s, charset in decoded_seq:
         # None means us-ascii but we can simply pass it on to h.append()
         if charset is not None and not isinstance(charset, Charset):
@@ -356,9 +354,7 @@ class Header:
         # _ValueFormatter algorithm much simpler.
         if maxlinelen == 0:
             maxlinelen = 1000000
-        formatter = _ValueFormatter(
-            self._headerlen, maxlinelen, self._continuation_ws, splitchars
-        )
+        formatter = _ValueFormatter(self._headerlen, maxlinelen, self._continuation_ws, splitchars)
         lastcs = None
         hasspace = lastspace = None
         for string, charset in self._chunks:
@@ -391,9 +387,7 @@ class Header:
             formatter.add_transition()
         value = formatter._str(linesep)
         if _embedded_header.search(value):
-            raise HeaderParseError(
-                f"header value appears to contain an embedded header: {value!r}"
-            )
+            raise HeaderParseError(f"header value appears to contain an embedded header: {value!r}")
         return value
 
     def _normalize(self):

@@ -41,9 +41,7 @@ class _Printer:
         self.__name = name
         self.__data = data
         self.__lines = None
-        self.__filenames = [
-            os.path.join(dir, filename) for dir in dirs for filename in files
-        ]
+        self.__filenames = [os.path.join(dir, filename) for dir in dirs for filename in files]
 
     def __setup(self):
         if self.__lines:
@@ -100,9 +98,7 @@ class _Helper:
     """
 
     def __repr__(self):
-        return (
-            "Type help() for interactive help, or help(object) for help about object."
-        )
+        return "Type help() for interactive help, or help(object) for help about object."
 
     def __call__(self, *args, **kwds):
         import pydoc

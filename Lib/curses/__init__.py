@@ -10,9 +10,9 @@ the package, and perhaps a particular module inside it.
 
 """
 
+from _curses import *
 import os as _os
 import sys as _sys
-from _curses import *
 
 # Some constants, most notably the ACS_* ones, are only added to the C
 # _curses module's dictionary after initscr() is called.  (Some

@@ -72,9 +72,7 @@ def generate_python_code(
 argparser = argparse.ArgumentParser(
     prog="pegen", description="Experimental PEG-like parser generator"
 )
-argparser.add_argument(
-    "-q", "--quiet", action="store_true", help="Don't print the parsed grammar"
-)
+argparser.add_argument("-q", "--quiet", action="store_true", help="Don't print the parsed grammar")
 argparser.add_argument(
     "-v",
     "--verbose",

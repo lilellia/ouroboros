@@ -44,6 +44,7 @@ Example:
 import base64
 import copy
 import datetime
+from email.base64mime import body_encode as encode_base64
 import email.generator
 import email.message
 import email.utils
@@ -52,7 +53,6 @@ import io
 import re
 import socket
 import sys
-from email.base64mime import body_encode as encode_base64
 
 __all__ = [
     "SMTP",
@@ -402,9 +402,7 @@ class SMTP:
             s = f"{cmd} {args}"
         if "\r" in s or "\n" in s:
             s = s.replace("\n", "\\n").replace("\r", "\\r")
-            raise ValueError(
-                f"command and arguments contain prohibited newline characters: {s}"
-            )
+            raise ValueError(f"command and arguments contain prohibited newline characters: {s}")
         self.send(f"{s}{CRLF}")
 
     def getreply(self):
@@ -428,9 +426,7 @@ class SMTP:
                 line = self.file.readline(_MAXLINE + 1)
             except OSError as e:
                 self.close()
-                raise SMTPServerDisconnected(
-                    "Connection unexpectedly closed: " + str(e)
-                )
+                raise SMTPServerDisconnected("Connection unexpectedly closed: " + str(e))
             if not line:
                 self.close()
                 raise SMTPServerDisconnected("Connection unexpectedly closed")
@@ -686,8 +682,7 @@ class SMTP:
             # If server keeps sending challenges, something is wrong.
             if self._auth_challenge_count > _MAXCHALLENGE:
                 raise SMTPException(
-                    "Server AUTH mechanism infinite loop. Last response: "
-                    + repr((code, resp))
+                    "Server AUTH mechanism infinite loop. Last response: " + repr((code, resp))
                 )
         if code in (235, 503):
             return (code, resp)
@@ -700,9 +695,7 @@ class SMTP:
         if challenge is None:
             return None
         return (
-            self.user
-            + " "
-            + hmac.HMAC(self.password.encode("ascii"), challenge, "md5").hexdigest()
+            self.user + " " + hmac.HMAC(self.password.encode("ascii"), challenge, "md5").hexdigest()
         )
 
     def auth_plain(self, challenge=None):
@@ -930,9 +923,7 @@ class SMTP:
         # if we got here then somebody got our mail
         return senderrs
 
-    def send_message(
-        self, msg, from_addr=None, to_addrs=None, mail_options=(), rcpt_options=()
-    ):
+    def send_message(self, msg, from_addr=None, to_addrs=None, mail_options=(), rcpt_options=()):
         """Converts message to a bytestring and passes it to sendmail.
 
         The arguments are as for sendmail, except that msg is an
@@ -1006,9 +997,7 @@ class SMTP:
             international = True
         with io.BytesIO() as bytesmsg:
             if international:
-                g = email.generator.BytesGenerator(
-                    bytesmsg, policy=msg.policy.clone(utf8=True)
-                )
+                g = email.generator.BytesGenerator(bytesmsg, policy=msg.policy.clone(utf8=True))
                 mail_options = (*mail_options, "SMTPUTF8", "BODY=8BITMIME")
             else:
                 g = email.generator.BytesGenerator(bytesmsg)
@@ -1074,9 +1063,7 @@ if _have_ssl:
             if self.debuglevel > 0:
                 self._print_debug("connect:", (host, port))
             new_socket = super()._get_socket(host, port, timeout)
-            new_socket = self.context.wrap_socket(
-                new_socket, server_hostname=self._host
-            )
+            new_socket = self.context.wrap_socket(new_socket, server_hostname=self._host)
             return new_socket
 
     __all__.append("SMTP_SSL")

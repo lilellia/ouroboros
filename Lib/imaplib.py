@@ -24,15 +24,15 @@ __version__ = "2.58"
 
 import binascii
 import calendar
+from datetime import UTC, datetime, timedelta, timezone
 import errno
+from io import DEFAULT_BUFFER_SIZE
 import random
 import re
 import socket
 import subprocess
 import sys
 import time
-from datetime import datetime, timedelta, timezone
-from io import DEFAULT_BUFFER_SIZE
 
 try:
     import ssl
@@ -144,9 +144,7 @@ MapCRLF = re.compile(rb"\r\n|\r|\n")
 Response_code = re.compile(rb"\[(?P<type>[A-Z-]+)( (?P<data>.*))?\]")
 Untagged_response = re.compile(rb"\* (?P<type>[A-Z-]+)( (?P<data>.*))?")
 # Untagged_status is no longer used; kept for backward compatibility
-Untagged_status = re.compile(
-    rb"\* (?P<data>\d+) (?P<type>[A-Z-]+)( (?P<data2>.*))?", re.ASCII
-)
+Untagged_status = re.compile(rb"\* (?P<data>\d+) (?P<type>[A-Z-]+)( (?P<data2>.*))?", re.ASCII)
 # We compile these in _mode_xxx.
 _Literal = rb".*{(?P<size>\d+)}$"
 _Untagged_status = rb"\* (?P<data>\d+) (?P<type>[A-Z-]+)( (?P<data2>.*))?"
@@ -623,11 +621,7 @@ class IMAP4:
         """Authobject to use with CRAM-MD5 authentication."""
         import hmac
 
-        pwd = (
-            self.password.encode("utf-8")
-            if isinstance(self.password, str)
-            else self.password
-        )
+        pwd = self.password.encode("utf-8") if isinstance(self.password, str) else self.password
         return self.user + " " + hmac.HMAC(pwd, challenge, "md5").hexdigest()
 
     def logout(self):
@@ -844,9 +838,7 @@ class IMAP4:
         (type, [data]) = <instance>.thread(threading_algorithm, charset, search_criteria, ...)
         """
         name = "THREAD"
-        typ, dat = self._simple_command(
-            name, threading_algorithm, charset, *search_criteria
-        )
+        typ, dat = self._simple_command(name, threading_algorithm, charset, *search_criteria)
         return self._untagged_response(typ, dat, name)
 
     def uid(self, command, *args):
@@ -921,9 +913,7 @@ class IMAP4:
         ur = self.untagged_responses
         if __debug__ and self.debug >= 5:
             self._mesg(
-                'untagged_responses[{}] {} += ["{!r}"]'.format(
-                    typ, len(ur.get(typ, "")), dat
-                )
+                'untagged_responses[{}] {} += ["{!r}"]'.format(typ, len(ur.get(typ, "")), dat)
             )
         if typ in ur:
             ur[typ].append(dat)
@@ -1254,9 +1244,7 @@ if HAVE_SSL:
         for more documentation see the docstring of the parent class IMAP4.
         """
 
-        def __init__(
-            self, host="", port=IMAP4_SSL_PORT, *, ssl_context=None, timeout=None
-        ):
+        def __init__(self, host="", port=IMAP4_SSL_PORT, *, ssl_context=None, timeout=None):
             if ssl_context is None:
                 ssl_context = ssl._create_stdlib_context()
             self.ssl_context = ssl_context
@@ -1461,7 +1449,7 @@ def Time2Internaldate(date_time):
     be in the correct format.
     """
     if isinstance(date_time, (int, float)):
-        dt = datetime.fromtimestamp(date_time, timezone.utc).astimezone()
+        dt = datetime.fromtimestamp(date_time, UTC).astimezone()
     elif isinstance(date_time, tuple):
         try:
             gmtoff = date_time.tm_gmtoff
@@ -1515,14 +1503,10 @@ if __name__ == "__main__":
     host = args[0]
 
     USER = getpass.getuser()
-    PASSWD = getpass.getpass(
-        "IMAP password for {} on {}: ".format(USER, host or "localhost")
-    )
+    PASSWD = getpass.getpass("IMAP password for {} on {}: ".format(USER, host or "localhost"))
 
-    test_mesg = (
-        "From: {user}@localhost{lf}Subject: IMAP4 test{lf}{lf}data...{lf}".format(
-            user=USER, lf="\n"
-        )
+    test_mesg = "From: {user}@localhost{lf}Subject: IMAP4 test{lf}{lf}data...{lf}".format(
+        user=USER, lf="\n"
     )
     test_seq1 = (
         ("login", (USER, PASSWD)),

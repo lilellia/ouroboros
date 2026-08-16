@@ -5,12 +5,12 @@ Much of IdleConf is also exercised by ConfigDialog and test_configdialog.
 """
 
 import idlelib
+from idlelib import config
+from idlelib.idle_test.mock_idle import Func
 import os
 import sys
 import tempfile
 import unittest
-from idlelib import config
-from idlelib.idle_test.mock_idle import Func
 from unittest import mock
 
 from test.support import captured_stderr, findfile
@@ -244,9 +244,7 @@ class IdleConfTest(unittest.TestCase):
                 with self.assertRaises(FileNotFoundError):
                     conf.GetUserCfgDir()
 
-    @unittest.skipIf(
-        not sys.platform.startswith("win"), "this is test for Windows system"
-    )
+    @unittest.skipIf(not sys.platform.startswith("win"), "this is test for Windows system")
     def test_get_user_cfg_dir_windows(self):
         # Test to get user config directory under Windows.
         conf = self.new_config(_utest=True)
@@ -289,9 +287,7 @@ class IdleConfTest(unittest.TestCase):
 
         # Check config path are correct
         for cfg_type, parser in conf.defaultCfg.items():
-            self.assertEqual(
-                parser.file, os.path.join(idle_dir, f"config-{cfg_type}.def")
-            )
+            self.assertEqual(parser.file, os.path.join(idle_dir, f"config-{cfg_type}.def"))
         for cfg_type, parser in conf.userCfg.items():
             self.assertEqual(
                 parser.file, os.path.join(conf.userdir or "#", f"config-{cfg_type}.cfg")
@@ -578,8 +574,7 @@ class IdleConfTest(unittest.TestCase):
             self.assertEqual(conf.GetExtraHelpSourceList("bad"), [])
         self.assertCountEqual(
             conf.GetAllExtraHelpSourcesList(),
-            conf.GetExtraHelpSourceList("default")
-            + conf.GetExtraHelpSourceList("user"),
+            conf.GetExtraHelpSourceList("default") + conf.GetExtraHelpSourceList("user"),
         )
 
         # Add help source to user config
@@ -605,8 +600,7 @@ class IdleConfTest(unittest.TestCase):
         )
         self.assertCountEqual(
             conf.GetAllExtraHelpSourcesList(),
-            conf.GetExtraHelpSourceList("default")
-            + conf.GetExtraHelpSourceList("user"),
+            conf.GetExtraHelpSourceList("default") + conf.GetExtraHelpSourceList("user"),
         )
 
     def test_get_font(self):

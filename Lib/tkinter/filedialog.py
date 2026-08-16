@@ -118,9 +118,7 @@ class FileDialog:
 
         self.dirsbar = Scrollbar(self.midframe)
         self.dirsbar.pack(side=LEFT, fill=Y)
-        self.dirs = Listbox(
-            self.midframe, exportselection=0, yscrollcommand=(self.dirsbar, "set")
-        )
+        self.dirs = Listbox(self.midframe, exportselection=0, yscrollcommand=(self.dirsbar, "set"))
         self.dirs.pack(side=LEFT, expand=YES, fill=BOTH)
         self.dirsbar.config(command=(self.dirs, "yview"))
         btags = self.dirs.bindtags()
@@ -130,13 +128,9 @@ class FileDialog:
 
         self.ok_button = Button(self.botframe, text="OK", command=self.ok_command)
         self.ok_button.pack(side=LEFT)
-        self.filter_button = Button(
-            self.botframe, text="Filter", command=self.filter_command
-        )
+        self.filter_button = Button(self.botframe, text="Filter", command=self.filter_command)
         self.filter_button.pack(side=LEFT, expand=YES)
-        self.cancel_button = Button(
-            self.botframe, text="Cancel", command=self.cancel_command
-        )
+        self.cancel_button = Button(self.botframe, text="Cancel", command=self.cancel_command)
         self.cancel_button.pack(side=RIGHT)
 
         self.top.protocol("WM_DELETE_WINDOW", self.cancel_command)

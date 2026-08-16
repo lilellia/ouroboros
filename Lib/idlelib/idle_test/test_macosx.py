@@ -1,9 +1,9 @@
 "Test macosx, coverage 45% on Windows."
 
-import tkinter as tk
-import unittest
 from idlelib import macosx
 from idlelib.filelist import FileList
+import tkinter as tk
+import unittest
 from unittest import mock
 
 from test.support import requires
@@ -75,9 +75,7 @@ class IsTypeTkTest(unittest.TestCase):
             for tktype in alltypes:
                 with self.subTest(func=func, whentrue=whentrue, tktype=tktype):
                     macosx._tk_type = tktype
-                    (self.assertTrue if tktype in whentrue else self.assertFalse)(
-                        func()
-                    )
+                    (self.assertTrue if tktype in whentrue else self.assertFalse)(func())
 
 
 class SetupTest(unittest.TestCase):

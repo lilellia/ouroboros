@@ -1,9 +1,9 @@
 """Access to Python's configuration information."""
 
 import os
+from os.path import realpath
 import sys
 import threading
-from os.path import realpath
 
 __all__ = [
     "get_config_h_filename",
@@ -220,9 +220,7 @@ if os.name == "nt":  # noqa: SIM102
     # `_BASE_PREFIX` is used as the base installation is where the source
     # will be.  The realpath is needed to prevent mount point confusion
     # that can occur with just string comparisons.
-    if _safe_realpath(_PROJECT_BASE).startswith(
-        _safe_realpath(f"{_BASE_PREFIX}\\PCbuild")
-    ):
+    if _safe_realpath(_PROJECT_BASE).startswith(_safe_realpath(f"{_BASE_PREFIX}\\PCbuild")):
         _PROJECT_BASE = _BASE_PREFIX
 
 # set for cross builds
@@ -349,9 +347,7 @@ def _parse_makefile(filename, vars=None, keep_unresolved=True):
     done = {}
     notdone = {}
 
-    with open(
-        filename, encoding=sys.getfilesystemencoding(), errors="surrogateescape"
-    ) as f:
+    with open(filename, encoding=sys.getfilesystemencoding(), errors="surrogateescape") as f:
         lines = f.readlines()
 
     for line in lines:
@@ -667,9 +663,7 @@ def _init_config_vars():
     _PREFIX = os.path.normpath(sys.prefix)
     _EXEC_PREFIX = os.path.normpath(sys.exec_prefix)
     _CONFIG_VARS["prefix"] = _PREFIX  # FIXME: This gets overwriten by _init_posix.
-    _CONFIG_VARS["exec_prefix"] = (
-        _EXEC_PREFIX  # FIXME: This gets overwriten by _init_posix.
-    )
+    _CONFIG_VARS["exec_prefix"] = _EXEC_PREFIX  # FIXME: This gets overwriten by _init_posix.
     _CONFIG_VARS["py_version"] = _PY_VERSION
     _CONFIG_VARS["py_version_short"] = _PY_VERSION_SHORT
     _CONFIG_VARS["py_version_nodot"] = _PY_VERSION_SHORT_NO_DOT

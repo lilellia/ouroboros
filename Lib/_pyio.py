@@ -2,15 +2,14 @@
 Python implementation of the io module.
 """
 
+# Import _thread instead of threading to reduce startup cost
+from _thread import allocate_lock as Lock
 import abc
 import codecs
 import errno
 import os
 import stat
 import sys
-
-# Import _thread instead of threading to reduce startup cost
-from _thread import allocate_lock as Lock
 
 if sys.platform in {"win32", "cygwin"}:
     from msvcrt import setmode as _setmode
@@ -65,9 +64,7 @@ def text_encoding(encoding, stacklevel=2):
         if sys.flags.warn_default_encoding:
             import warnings
 
-            warnings.warn(
-                "'encoding' argument not specified.", EncodingWarning, stacklevel + 1
-            )
+            warnings.warn("'encoding' argument not specified.", EncodingWarning, stacklevel + 1)
     return encoding
 
 
@@ -461,9 +458,7 @@ class IOBase(metaclass=abc.ABCMeta):
     def _checkSeekable(self, msg=None):
         """Internal: raise UnsupportedOperation if file is not seekable"""
         if not self.seekable():
-            raise UnsupportedOperation(
-                "File or stream is not seekable." if msg is None else msg
-            )
+            raise UnsupportedOperation("File or stream is not seekable." if msg is None else msg)
 
     def readable(self):
         """Return a bool indicating whether object was opened for reading.
@@ -475,9 +470,7 @@ class IOBase(metaclass=abc.ABCMeta):
     def _checkReadable(self, msg=None):
         """Internal: raise UnsupportedOperation if file is not readable"""
         if not self.readable():
-            raise UnsupportedOperation(
-                "File or stream is not readable." if msg is None else msg
-            )
+            raise UnsupportedOperation("File or stream is not readable." if msg is None else msg)
 
     def writable(self):
         """Return a bool indicating whether object was opened for writing.
@@ -489,9 +482,7 @@ class IOBase(metaclass=abc.ABCMeta):
     def _checkWritable(self, msg=None):
         """Internal: raise UnsupportedOperation if file is not writable"""
         if not self.writable():
-            raise UnsupportedOperation(
-                "File or stream is not writable." if msg is None else msg
-            )
+            raise UnsupportedOperation("File or stream is not writable." if msg is None else msg)
 
     @property
     def closed(self):
@@ -1224,9 +1215,7 @@ class BufferedReader(_BufferedIOMixin):
 
     def tell(self):
         # GH-95782: Keep return value non-negative
-        return max(
-            _BufferedIOMixin.tell(self) - len(self._read_buf) + self._read_pos, 0
-        )
+        return max(_BufferedIOMixin.tell(self) - len(self._read_buf) + self._read_pos, 0)
 
     def seek(self, pos, whence=0):
         if whence not in valid_seek_flags:
@@ -1309,13 +1298,10 @@ class BufferedWriter(_BufferedIOMixin):
                 n = self.raw.write(self._write_buf)
             except BlockingIOError:
                 raise RuntimeError(
-                    "self.raw should implement RawIOBase: it "
-                    "should not raise BlockingIOError"
+                    "self.raw should implement RawIOBase: it should not raise BlockingIOError"
                 )
             if n is None:
-                raise BlockingIOError(
-                    errno.EAGAIN, "write could not complete without blocking", 0
-                )
+                raise BlockingIOError(errno.EAGAIN, "write could not complete without blocking", 0)
             if n > len(self._write_buf) or n < 0:
                 raise OSError("write() returned incorrect number of bytes")
             del self._write_buf[:n]
@@ -1536,8 +1522,7 @@ class FileIO(RawIOBase):
             raise ValueError(f"invalid mode: {mode}")
         if sum(c in "rwax" for c in mode) != 1 or mode.count("+") > 1:
             raise ValueError(
-                "Must have exactly one of create/read/write/append "
-                "mode and at most one plus"
+                "Must have exactly one of create/read/write/append mode and at most one plus"
             )
 
         if "x" in mode:
@@ -1592,9 +1577,7 @@ class FileIO(RawIOBase):
             fdfstat = os.fstat(fd)
             try:
                 if stat.S_ISDIR(fdfstat.st_mode):
-                    raise IsADirectoryError(
-                        errno.EISDIR, os.strerror(errno.EISDIR), file
-                    )
+                    raise IsADirectoryError(errno.EISDIR, os.strerror(errno.EISDIR), file)
             except AttributeError:
                 # Ignore the AttributeError if stat.S_ISDIR or errno.EISDIR
                 # don't exist.
@@ -1627,9 +1610,7 @@ class FileIO(RawIOBase):
         if self._fd >= 0 and self._closefd and not self.closed:
             import warnings
 
-            warnings.warn(
-                f"unclosed file {self!r}", ResourceWarning, stacklevel=2, source=self
-            )
+            warnings.warn(f"unclosed file {self!r}", ResourceWarning, stacklevel=2, source=self)
             self.close()
 
     def __getstate__(self):
@@ -2044,10 +2025,7 @@ class TextIOWrapper(TextIOBase):
             raise ValueError(f"invalid encoding: {encoding!r}")  # noqa: TRY004
 
         if not codecs.lookup(encoding)._is_text_encoding:
-            msg = (
-                "%r is not a text encoding; "
-                "use codecs.open() to handle arbitrary codecs"
-            )
+            msg = "%r is not a text encoding; use codecs.open() to handle arbitrary codecs"
             raise LookupError(msg % encoding)
 
         if errors is None:
@@ -2167,8 +2145,7 @@ class TextIOWrapper(TextIOBase):
             encoding is not None or errors is not None or newline is not Ellipsis
         ):
             raise UnsupportedOperation(
-                "It is not possible to set the encoding or newline of stream "
-                "after the first read"
+                "It is not possible to set the encoding or newline of stream after the first read"
             )
 
         if errors is None:
@@ -2346,9 +2323,7 @@ class TextIOWrapper(TextIOBase):
 
         return not eof
 
-    def _pack_cookie(
-        self, position, dec_flags=0, bytes_to_feed=0, need_eof=False, chars_to_skip=0
-    ):
+    def _pack_cookie(self, position, dec_flags=0, bytes_to_feed=0, need_eof=False, chars_to_skip=0):
         # The meaning of a tell() cookie is: seek to position, set the
         # decoder flags to dec_flags, read bytes_to_feed bytes, feed them
         # into the decoder with need_eof as the EOF flag, then skip
@@ -2463,9 +2438,7 @@ class TextIOWrapper(TextIOBase):
                     raise OSError("can't reconstruct logical file position")
 
             # The returned cookie corresponds to the last safe start point.
-            return self._pack_cookie(
-                start_pos, start_flags, bytes_fed, need_eof, chars_to_skip
-            )
+            return self._pack_cookie(start_pos, start_flags, bytes_fed, need_eof, chars_to_skip)
         finally:
             decoder.setstate(saved_state)
 
@@ -2527,9 +2500,7 @@ class TextIOWrapper(TextIOBase):
 
         # The strategy of seek() is to go back to the safe start point
         # and replay the effect of read(chars_to_skip) from there.
-        start_pos, dec_flags, bytes_to_feed, need_eof, chars_to_skip = (
-            self._unpack_cookie(cookie)
-        )
+        start_pos, dec_flags, bytes_to_feed, need_eof, chars_to_skip = self._unpack_cookie(cookie)
 
         # Seek back to the safe start point.
         self.buffer.seek(start_pos)
@@ -2572,9 +2543,7 @@ class TextIOWrapper(TextIOBase):
         decoder = self._decoder or self._get_decoder()
         if size < 0:
             # Read everything.
-            result = self._get_decoded_chars() + decoder.decode(
-                self.buffer.read(), final=True
-            )
+            result = self._get_decoded_chars() + decoder.decode(self.buffer.read(), final=True)
             if self._snapshot is not None:
                 self._set_decoded_chars("")
                 self._snapshot = None
@@ -2703,9 +2672,7 @@ class StringIO(TextIOWrapper):
     """
 
     def __init__(self, initial_value="", newline="\n"):
-        super().__init__(
-            BytesIO(), encoding="utf-8", errors="surrogatepass", newline=newline
-        )
+        super().__init__(BytesIO(), encoding="utf-8", errors="surrogatepass", newline=newline)
         # Issue #5645: make universal newlines semantics the same as in the
         # C version, even under Windows.
         if newline is None:

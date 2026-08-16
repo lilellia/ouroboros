@@ -92,9 +92,7 @@ class TopologicalSorter:
         if self._ready_nodes is not None:
             raise ValueError("cannot prepare() more than once")
 
-        self._ready_nodes = [
-            i.node for i in self._node2info.values() if i.npredecessors == 0
-        ]
+        self._ready_nodes = [i.node for i in self._node2info.values() if i.npredecessors == 0]
         # ready_nodes is set before we look for cycles on purpose:
         # if the user wants to catch the CycleError, that's fine,
         # they can continue using the instance to grab as many
@@ -172,9 +170,7 @@ class TopologicalSorter:
             stat = nodeinfo.npredecessors
             if stat != _NODE_OUT:
                 if stat >= 0:
-                    raise ValueError(
-                        f"node {node!r} was not passed out (still not ready)"
-                    )
+                    raise ValueError(f"node {node!r} was not passed out (still not ready)")
                 elif stat == _NODE_DONE:
                     raise ValueError(f"node {node!r} was already marked done")
                 else:

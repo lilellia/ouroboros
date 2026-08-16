@@ -1,12 +1,12 @@
 # Copyright (C) 2005 Martin v. Löwis
 # Licensed to PSF under a Contributor Agreement.
+from _msi import *
 import fnmatch
 import os
 import re
 import string
 import sys
 import warnings
-from _msi import *
 
 warnings._deprecated(__name__, remove=(3, 13))
 
@@ -28,9 +28,7 @@ type_binary = 0x0800
 type_nullable = 0x1000
 type_key = 0x2000
 # XXX temporary, localizable?
-knownbits = (
-    datasizemask | type_valid | type_localizable | typemask | type_nullable | type_key
-)
+knownbits = datasizemask | type_valid | type_localizable | typemask | type_nullable | type_key
 
 
 class Table:
@@ -242,9 +240,7 @@ _directories = set()
 
 
 class Directory:
-    def __init__(
-        self, db, cab, basedir, physical, _logical, default, componentflags=None
-    ):
+    def __init__(self, db, cab, basedir, physical, _logical, default, componentflags=None):
         """Create a new directory in the Directory table. There is a current component
         at each point in time for the directory, which is either explicitly created
         through start_component, or implicitly when files are added for the first
@@ -278,9 +274,7 @@ class Directory:
             blogical = None
         add_data(db, "Directory", [(logical, blogical, default)])
 
-    def start_component(
-        self, component=None, feature=None, flags=None, keyfile=None, uuid=None
-    ):
+    def start_component(self, component=None, feature=None, flags=None, keyfile=None, uuid=None):
         """Add an entry to the Component table, and make this component the current for this
         directory. If no component name is given, the directory name is used. If no feature
         is given, the current feature is used. If no flags are given, the directory's default
@@ -302,9 +296,7 @@ class Directory:
             self.keyfiles[keyfile] = keyid
         else:
             keyid = None
-        add_data(
-            self.db, "Component", [(component, uuid, self.logical, flags, None, keyid)]
-        )
+        add_data(self.db, "Component", [(component, uuid, self.logical, flags, None, keyid)])
         if feature is None:
             feature = current_feature
         add_data(self.db, "FeatureComponents", [(feature.id, component)])
@@ -352,9 +344,7 @@ class Directory:
                 if pos in (10, 100, 1000):
                     prefix = prefix[:-1]
         self.short_names.add(file)
-        assert not re.search(
-            r'[\?|><:/*"+,;=\[\]]', file
-        )  # restrictions on short names
+        assert not re.search(r'[\?|><:/*"+,;=\[\]]', file)  # restrictions on short names
         return file
 
     def add_file(self, file, src=None, version=None, language=None):
@@ -507,9 +497,7 @@ class Control:
         )
 
     def mapping(self, event, attribute):
-        add_data(
-            self.dlg.db, "EventMapping", [(self.dlg.name, self.name, event, attribute)]
-        )
+        add_data(self.dlg.db, "EventMapping", [(self.dlg.name, self.name, event, attribute)])
 
     def condition(self, action, condition):
         add_data(
@@ -542,9 +530,7 @@ class Dialog:
         self.db = db
         self.name = name
         self.x, self.y, self.w, self.h = x, y, w, h
-        add_data(
-            db, "Dialog", [(name, x, y, w, h, attr, title, first, default, cancel)]
-        )
+        add_data(db, "Dialog", [(name, x, y, w, h, attr, title, first, default, cancel)])
 
     def control(self, name, type, x, y, w, h, attr, prop, text, next, help):
         add_data(
@@ -564,9 +550,7 @@ class Dialog:
         return self.control(name, "Line", x, y, w, h, 1, None, None, None, None)
 
     def pushbutton(self, name, x, y, w, h, attr, text, next):
-        return self.control(
-            name, "PushButton", x, y, w, h, attr, None, text, next, None
-        )
+        return self.control(name, "PushButton", x, y, w, h, attr, None, text, next, None)
 
     def radiogroup(self, name, x, y, w, h, attr, prop, text, next):
         add_data(

@@ -31,10 +31,9 @@ __all__ = [
 #
 
 import array
+from queue import Queue
 import sys
 import threading
-import weakref
-from queue import Queue
 from threading import (
     Barrier,
     BoundedSemaphore,
@@ -44,6 +43,7 @@ from threading import (
     RLock,
     Semaphore,
 )
+import weakref
 
 from .connection import Pipe
 

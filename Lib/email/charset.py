@@ -9,10 +9,10 @@ __all__ = [
     "add_codec",
 ]
 
-import email.base64mime
-import email.quoprimime
 from email import errors
+import email.base64mime
 from email.encoders import encode_7or8bit
+import email.quoprimime
 from functools import partial
 
 # Flags for types of header encodings

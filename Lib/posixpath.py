@@ -23,10 +23,10 @@ altsep = None
 devnull = "/dev/null"
 
 import genericpath
+from genericpath import *
 import os
 import stat
 import sys
-from genericpath import *
 
 __all__ = [
     "ALLOW_MISSING",

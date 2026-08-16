@@ -1,7 +1,7 @@
 """Implementation of JSONDecoder"""
 
-import re
 from json import scanner
+import re
 
 try:
     from _json import scanstring as c_scanstring
@@ -176,9 +176,7 @@ def JSONObject(
                 pairs = object_hook(pairs)
             return pairs, end + 1
         elif nextchar != '"':
-            raise JSONDecodeError(
-                "Expecting property name enclosed in double quotes", s, end
-            )
+            raise JSONDecodeError("Expecting property name enclosed in double quotes", s, end)
     end += 1
     while True:
         key, end = scanstring(s, end, strict)
@@ -221,9 +219,7 @@ def JSONObject(
         nextchar = s[end : end + 1]
         end += 1
         if nextchar != '"':
-            raise JSONDecodeError(
-                "Expecting property name enclosed in double quotes", s, end - 1
-            )
+            raise JSONDecodeError("Expecting property name enclosed in double quotes", s, end - 1)
     if object_pairs_hook is not None:
         result = object_pairs_hook(pairs)
         return result, end

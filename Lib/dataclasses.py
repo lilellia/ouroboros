@@ -326,9 +326,7 @@ class Field:
         "type",
     )
 
-    def __init__(
-        self, default, default_factory, init, repr, hash, compare, metadata, kw_only
-    ):
+    def __init__(self, default, default_factory, init, repr, hash, compare, metadata, kw_only):
         self.name = None
         self.type = None
         self.default = default
@@ -337,9 +335,7 @@ class Field:
         self.repr = repr
         self.hash = hash
         self.compare = compare
-        self.metadata = (
-            _EMPTY_METADATA if metadata is None else types.MappingProxyType(metadata)
-        )
+        self.metadata = _EMPTY_METADATA if metadata is None else types.MappingProxyType(metadata)
         self.kw_only = kw_only
         self._field_type = None
 
@@ -526,9 +522,7 @@ def _field_assign(frozen, name, value, self_name):
     # self_name is what "self" is called in this function: don't
     # hard-code "self", since that might be a field name.
     if frozen:
-        return (
-            f"__dataclass_builtins_object__.__setattr__({self_name},{name!r},{value})"
-        )
+        return f"__dataclass_builtins_object__.__setattr__({self_name},{name!r},{value})"
     return f"{self_name}.{name}={value}"
 
 
@@ -543,9 +537,7 @@ def _field_init(f, frozen, globals, self_name, slots):
             # given, use it.  If not, call the factory.
             globals[default_name] = f.default_factory
             value = (
-                f"{default_name}() "
-                f"if {f.name} is __dataclass_HAS_DEFAULT_FACTORY__ "
-                f"else {f.name}"
+                f"{default_name}() if {f.name} is __dataclass_HAS_DEFAULT_FACTORY__ else {f.name}"
             )
         else:
             # This is a field that's not in the __init__ params, but
@@ -613,9 +605,7 @@ def _init_param(f):
     return f"{f.name}:__dataclass_type_{f.name}__{default}"
 
 
-def _init_fn(
-    fields, std_fields, kw_only_fields, frozen, has_post_init, self_name, globals, slots
-):
+def _init_fn(fields, std_fields, kw_only_fields, frozen, has_post_init, self_name, globals, slots):
     # fields contains both real fields and InitVar pseudo-fields.
 
     # Make sure we don't have fields without defaults following fields
@@ -631,9 +621,7 @@ def _init_fn(
             if not (f.default is MISSING and f.default_factory is MISSING):
                 seen_default = True
             elif seen_default:
-                raise TypeError(
-                    f"non-default argument {f.name!r} follows default argument"
-                )
+                raise TypeError(f"non-default argument {f.name!r} follows default argument")
 
     locals = {f"__dataclass_type_{f.name}__": f.type for f in fields}
     locals.update(
@@ -742,9 +730,7 @@ def _cmp_fn(name, op, self_tuple, other_tuple, globals):
 
 def _hash_fn(fields, globals):
     self_tuple = _tuple_str("self", fields)
-    return _create_fn(
-        "__hash__", ("self",), [f"return hash({self_tuple})"], globals=globals
-    )
+    return _create_fn("__hash__", ("self",), [f"return hash({self_tuple})"], globals=globals)
 
 
 def _is_classvar(a_type, typing):
@@ -868,8 +854,7 @@ def _get_field(cls, a_name, a_type, default_kw_only):
     if typing and (
         _is_classvar(a_type, typing)
         or (
-            isinstance(f.type, str)
-            and _is_type(f.type, cls, typing, typing.ClassVar, _is_classvar)
+            isinstance(f.type, str) and _is_type(f.type, cls, typing, typing.ClassVar, _is_classvar)
         )
     ):
         f._field_type = _FIELD_CLASSVAR
@@ -1083,9 +1068,7 @@ def _process_class(
             # Switch the default to kw_only=True, and ignore this
             # annotation: it's not a real field.
             if KW_ONLY_seen:
-                raise TypeError(
-                    f"{name!r} is KW_ONLY, but KW_ONLY has already been specified"
-                )
+                raise TypeError(f"{name!r} is KW_ONLY, but KW_ONLY has already been specified")
             KW_ONLY_seen = True
             kw_only = True
         else:
@@ -1148,9 +1131,7 @@ def _process_class(
     # Include InitVars and regular fields (so, not ClassVars).  This is
     # initialized here, outside of the "if init:" test, because std_init_fields
     # is used with match_args, below.
-    all_init_fields = [
-        f for f in fields.values() if f._field_type in (_FIELD, _FIELD_INITVAR)
-    ]
+    all_init_fields = [f for f in fields.values() if f._field_type in (_FIELD, _FIELD_INITVAR)]
     (std_init_fields, kw_only_init_fields) = _fields_in_init_order(all_init_fields)
 
     if init:
@@ -1218,14 +1199,10 @@ def _process_class(
     if frozen:
         for fn in _frozen_get_del_attr(cls, field_list, globals):
             if _set_new_attribute(cls, fn.__name__, fn):
-                raise TypeError(
-                    f"Cannot overwrite attribute {fn.__name__} in class {cls.__name__}"
-                )
+                raise TypeError(f"Cannot overwrite attribute {fn.__name__} in class {cls.__name__}")
 
     # Decide if/how we're going to create a hash function.
-    hash_action = _hash_action[
-        bool(unsafe_hash), bool(eq), bool(frozen), has_explicit_hash
-    ]
+    hash_action = _hash_action[bool(unsafe_hash), bool(eq), bool(frozen), has_explicit_hash]
     if hash_action:
         # No need to call _set_new_attribute here, since by the time
         # we're here the overwriting is unconditional.
@@ -1243,9 +1220,7 @@ def _process_class(
 
     if match_args:
         # I could probably compute this once
-        _set_new_attribute(
-            cls, "__match_args__", tuple(f.name for f in std_init_fields)
-        )
+        _set_new_attribute(cls, "__match_args__", tuple(f.name for f in std_init_fields))
 
     # It's an error to specify weakref_slot if slots is False.
     if weakref_slot and not slots:
@@ -1307,9 +1282,7 @@ def _add_slots(cls, is_frozen, weakref_slot):
     cls_dict = dict(cls.__dict__)
     field_names = tuple(f.name for f in fields(cls))
     # Make sure slots don't overlap with those in base classes.
-    inherited_slots = set(
-        itertools.chain.from_iterable(map(_get_slots, cls.__mro__[1:-1]))
-    )
+    inherited_slots = set(itertools.chain.from_iterable(map(_get_slots, cls.__mro__[1:-1])))
     # The slots for our class.  Remove slots from our base classes.  Add
     # '__weakref__' if weakref_slot was given, unless it is already present.
     cls_dict["__slots__"] = tuple(
@@ -1464,9 +1437,7 @@ def _asdict_inner(obj, dict_factory):
     elif _is_dataclass_instance(obj):
         # fast path for the common case
         if dict_factory is dict:
-            return {
-                f.name: _asdict_inner(getattr(obj, f.name), dict) for f in fields(obj)
-            }
+            return {f.name: _asdict_inner(getattr(obj, f.name), dict) for f in fields(obj)}
         else:
             result = []
             for f in fields(obj):
@@ -1508,8 +1479,7 @@ def _asdict_inner(obj, dict_factory):
                 result[_asdict_inner(k, dict_factory)] = _asdict_inner(v, dict_factory)
             return result
         return type(obj)(
-            (_asdict_inner(k, dict_factory), _asdict_inner(v, dict_factory))
-            for k, v in obj.items()
+            (_asdict_inner(k, dict_factory), _asdict_inner(v, dict_factory)) for k, v in obj.items()
         )
     else:
         return copy.deepcopy(obj)
@@ -1568,9 +1538,7 @@ def _astuple_inner(obj, tuple_factory):
             # dict as it requires the default_factory as its first arg.
             result = obj_type(obj.default_factory)
             for k, v in obj.items():
-                result[_astuple_inner(k, tuple_factory)] = _astuple_inner(
-                    v, tuple_factory
-                )
+                result[_astuple_inner(k, tuple_factory)] = _astuple_inner(v, tuple_factory)
             return result
         return obj_type(
             (_astuple_inner(k, tuple_factory), _astuple_inner(v, tuple_factory))

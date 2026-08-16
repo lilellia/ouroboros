@@ -250,8 +250,7 @@ class Reindenter:
                             jline, jlevel = stats[j]
                             if jlevel >= 0:
                                 want = have + (
-                                    getlspace(after[jline - 1])
-                                    - getlspace(lines[jline])
+                                    getlspace(after[jline - 1]) - getlspace(lines[jline])
                                 )
                                 break
                     if want < 0:

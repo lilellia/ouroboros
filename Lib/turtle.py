@@ -98,16 +98,16 @@ Behind the scenes there are some features included with possible
 extensions in mind. These will be commented and documented elsewhere.
 """
 
+from copy import deepcopy
 import inspect
 import math
+from os.path import isfile, join, split
 import sys
 import time
 import tkinter as TK
+from tkinter import simpledialog
 import types
 import warnings
-from copy import deepcopy
-from os.path import isfile, join, split
-from tkinter import simpledialog
 
 _tg_classes = [
     "ScrolledCanvas",
@@ -238,11 +238,7 @@ _tg_turtle_functions = [
 _tg_utilities = ["write_docstringdict", "done"]
 
 __all__ = (  # noqa: PLE0605
-    _tg_classes
-    + _tg_screen_functions
-    + _tg_turtle_functions
-    + _tg_utilities
-    + ["Terminator"]
+    _tg_classes + _tg_screen_functions + _tg_turtle_functions + _tg_utilities + ["Terminator"]
 )
 
 _alias_list = [
@@ -438,8 +434,7 @@ def __methods(cls):
 
 
 __stringBody = (
-    "def %(method)s(self, *args, **kw): return "
-    + "self.%(attribute)s.%(method)s(*args, **kw)"
+    "def %(method)s(self, *args, **kw): return " + "self.%(attribute)s.%(method)s(*args, **kw)"
 )
 
 
@@ -484,13 +479,9 @@ class ScrolledCanvas(TK.Frame):
             relief=TK.SUNKEN,
             borderwidth=2,
         )
-        self.hscroll = TK.Scrollbar(
-            master, command=self._canvas.xview, orient=TK.HORIZONTAL
-        )
+        self.hscroll = TK.Scrollbar(master, command=self._canvas.xview, orient=TK.HORIZONTAL)
         self.vscroll = TK.Scrollbar(master, command=self._canvas.yview)
-        self._canvas.configure(
-            xscrollcommand=self.hscroll.set, yscrollcommand=self.vscroll.set
-        )
+        self._canvas.configure(xscrollcommand=self.hscroll.set, yscrollcommand=self.vscroll.set)
         self.rowconfigure(0, weight=1, minsize=0)
         self.columnconfigure(0, weight=1, minsize=0)
         self._canvas.grid(
@@ -543,12 +534,8 @@ class ScrolledCanvas(TK.Frame):
                 self.canvheight // 2,
             ),
         )
-        self._canvas.xview_moveto(
-            0.5 * (self.canvwidth - self.width + 30) / self.canvwidth
-        )
-        self._canvas.yview_moveto(
-            0.5 * (self.canvheight - self.height + 30) / self.canvheight
-        )
+        self._canvas.xview_moveto(0.5 * (self.canvwidth - self.width + 30) / self.canvwidth)
+        self._canvas.yview_moveto(0.5 * (self.canvheight - self.height + 30) / self.canvheight)
         self.adjustScrolls()
 
     def adjustScrolls(self):
@@ -680,9 +667,7 @@ class TurtleScreenBase:
         """Create an invisible polygon item on canvas self.cv)"""
         return self.cv.create_polygon((0, 0, 0, 0, 0, 0), fill="", outline="")
 
-    def _drawpoly(
-        self, polyitem, coordlist, fill=None, outline=None, width=None, top=False
-    ):
+    def _drawpoly(self, polyitem, coordlist, fill=None, outline=None, width=None, top=False):
         """Configure polygonitem polyitem according to provided
         arguments:
         coordlist is sequence of coordinates
@@ -1164,9 +1149,7 @@ class TurtleScreen(TurtleScreenBase):
 
     _RUNNING = True
 
-    def __init__(
-        self, cv, mode=_CFG["mode"], colormode=_CFG["colormode"], delay=_CFG["delay"]
-    ):
+    def __init__(self, cv, mode=_CFG["mode"], colormode=_CFG["colormode"], delay=_CFG["delay"]):
         TurtleScreenBase.__init__(self, cv)
 
         self._shapes = {
@@ -2777,9 +2760,7 @@ class _TurtleImage:
         elif self._type == "image":
             self._item = screen._createimage(screen._shapes["blank"]._data)
         elif self._type == "compound":
-            self._item = [
-                screen._createpoly() for item in screen._shapes[shapeIndex]._data
-            ]
+            self._item = [screen._createpoly() for item in screen._shapes[shapeIndex]._data]
 
 
 class RawTurtle(TPen, TNavigator):
@@ -3068,8 +3049,7 @@ class RawTurtle(TPen, TNavigator):
             q.turtle._item = screen._createimage(screen._shapes["blank"]._data)
         elif ttype == "compound":
             q.turtle._item = [
-                screen._createpoly()
-                for item in screen._shapes[self.turtle.shapeIndex]._data
+                screen._createpoly() for item in screen._shapes[self.turtle.shapeIndex]._data
             ]
         q.currentLineItem = screen._createline()
         q._update()
@@ -3283,9 +3263,7 @@ class RawTurtle(TPen, TNavigator):
         if t22 is not None:
             m22 = t22
         if t11 * t22 - t12 * t21 == 0:
-            raise TurtleGraphicsError(
-                "Bad shape transform matrix: must not be singular"
-            )
+            raise TurtleGraphicsError("Bad shape transform matrix: must not be singular")
         self._shapetrafo = (m11, m12, m21, m22)
         alfa = math.atan2(-m21, m11) % math.tau
         sa, ca = math.sin(alfa), math.cos(alfa)
@@ -3595,9 +3573,7 @@ class RawTurtle(TPen, TNavigator):
             usepc = pc
         screen._drawline(cLI, pl, fill=usepc, width=ps)
 
-        todelete = [
-            i for i in self.items if (i not in items) and (screen._type(i) == "line")
-        ]
+        todelete = [i for i in self.items if (i not in items) and (screen._type(i) == "line")]
         for i in todelete:
             screen._delete(i)
             self.items.remove(i)
@@ -3615,14 +3591,10 @@ class RawTurtle(TPen, TNavigator):
                     top = False
                 self._position = new + delta * n
                 if drawing:
-                    screen._drawline(
-                        self.drawingLineItem, (start, self._position), pc, ps, top
-                    )
+                    screen._drawline(self.drawingLineItem, (start, self._position), pc, ps, top)
                 self._update()
             if drawing:
-                screen._drawline(
-                    self.drawingLineItem, ((0, 0), (0, 0)), fill="", width=ps
-                )
+                screen._drawline(self.drawingLineItem, ((0, 0), (0, 0)), fill="", width=ps)
         # Turtle now at position old,
         self._position = old
         ##  if undo is done during creating a polygon, the last vertex
@@ -3724,9 +3696,7 @@ class RawTurtle(TPen, TNavigator):
         """
         if self.filling():
             if len(self._fillpath) > 2:
-                self.screen._drawpoly(
-                    self._fillitem, self._fillpath, fill=self._fillcolor
-                )
+                self.screen._drawpoly(self._fillitem, self._fillpath, fill=self._fillcolor)
                 if self.undobuffer:
                     self.undobuffer.push(("dofill", self._fillitem))
             self._fillitem = self._fillpath = None
@@ -4285,10 +4255,7 @@ def getmethparlist(ob):
     call_args = []
     for param in func_sig.parameters.values():
         match param.kind:
-            case (
-                inspect.Parameter.POSITIONAL_ONLY
-                | inspect.Parameter.POSITIONAL_OR_KEYWORD
-            ):
+            case inspect.Parameter.POSITIONAL_ONLY | inspect.Parameter.POSITIONAL_OR_KEYWORD:
                 call_args.append(param.name)
             case inspect.Parameter.VAR_POSITIONAL:
                 call_args.append(f"*{param.name}")
@@ -4364,12 +4331,8 @@ def _make_global_funcs(functions, cls, obj, init, docrevise):
         globals()[methodname].__doc__ = docrevise(method.__doc__)
 
 
-_make_global_funcs(
-    _tg_screen_functions, _Screen, "Turtle._screen", "Screen()", _screen_docrevise
-)
-_make_global_funcs(
-    _tg_turtle_functions, Turtle, "Turtle._pen", "Turtle()", _turtle_docrevise
-)
+_make_global_funcs(_tg_screen_functions, _Screen, "Turtle._screen", "Screen()", _screen_docrevise)
+_make_global_funcs(_tg_turtle_functions, Turtle, "Turtle._pen", "Turtle()", _turtle_docrevise)
 
 
 done = mainloop  # noqa: F821

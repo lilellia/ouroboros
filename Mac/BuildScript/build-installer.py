@@ -117,9 +117,7 @@ _cache_getVersion = None
 def getVersion():
     global _cache_getVersion
     if _cache_getVersion is None:
-        _cache_getVersion = grepValue(
-            os.path.join(SRCDIR, "configure"), "PACKAGE_VERSION"
-        )
+        _cache_getVersion = grepValue(os.path.join(SRCDIR, "configure"), "PACKAGE_VERSION")
     return _cache_getVersion
 
 
@@ -325,13 +323,9 @@ def library_recipes():
 
         else:
             tcl_tk_ver = "8.6.16"
-            tcl_checksum = (
-                "91cb8fa61771c63c262efb553059b7c7ad6757afa5857af6265e4b0bdc2a14a5"
-            )
+            tcl_checksum = "91cb8fa61771c63c262efb553059b7c7ad6757afa5857af6265e4b0bdc2a14a5"
 
-            tk_checksum = (
-                "be9f94d3575d4b3099d84bc3c10de8994df2d7aa405208173c709cc404a7e5fe"
-            )
+            tk_checksum = "be9f94d3575d4b3099d84bc3c10de8994df2d7aa405208173c709cc404a7e5fe"
             tk_patches = []
 
         base_url = "https://prdownloads.sourceforge.net/tcl/{what}{version}-src.tar.gz"
@@ -633,9 +627,7 @@ def getTclTkVersion(configfile, versionline):
             f.close()
             return l
 
-    fatal(
-        f"Version variable {versionline} not found in framework configuration file: {configfile}"
-    )
+    fatal(f"Version variable {versionline} not found in framework configuration file: {configfile}")
 
 
 def checkEnvironment():
@@ -675,15 +667,11 @@ def checkEnvironment():
         if frameworks["Tcl"] != frameworks["Tk"]:
             fatal("The Tcl and Tk frameworks are not the same version.")
 
-        print(
-            " -- Building with external Tcl/Tk {} frameworks".format(frameworks["Tk"])
-        )
+        print(" -- Building with external Tcl/Tk {} frameworks".format(frameworks["Tk"]))
 
         # add files to check after build
         EXPECTED_SHARED_LIBS["_tkinter.so"] = [
-            "/Library/Frameworks/Tcl.framework/Versions/{}/Tcl".format(
-                frameworks["Tcl"]
-            ),
+            "/Library/Frameworks/Tcl.framework/Versions/{}/Tcl".format(frameworks["Tcl"]),
             "/Library/Frameworks/Tk.framework/Versions/{}/Tk".format(frameworks["Tk"]),
         ]
     else:
@@ -808,9 +796,7 @@ def parseOptions(args=None):
     print(f"   * C compiler:          {CC}")
     print(f"   * C++ compiler:        {CXX}")
     print()
-    print(
-        f" -- Building a Python {getVersion()} framework at patch level {getFullVersion()}"
-    )
+    print(f" -- Building a Python {getVersion()} framework at patch level {getFullVersion()}")
     print()
 
 
@@ -998,9 +984,7 @@ def build_universal_openssl(basedir, archList):
         os.path.join(basefw, "include", "openssl"),
     )
 
-    shlib_version_number = grepValue(
-        os.path.join(archsrc, "Makefile"), "SHLIB_VERSION_NUMBER"
-    )
+    shlib_version_number = grepValue(os.path.join(archsrc, "Makefile"), "SHLIB_VERSION_NUMBER")
     #   e.g. -> "1.0.0"
     libcrypto = "libcrypto.dylib"
     libcrypto_versioned = libcrypto.replace(".", "." + shlib_version_number + ".")
@@ -1022,9 +1006,7 @@ def build_universal_openssl(basedir, archList):
     ]:
         runCommand(
             "lipo -create -output "
-            + " ".join(
-                shellQuote(os.path.join(fw, "lib", lib_versioned)) for fw in archbasefws
-            )
+            + " ".join(shellQuote(os.path.join(fw, "lib", lib_versioned)) for fw in archbasefws)
         )
         # and create an unversioned symlink of it
         os.symlink(lib_versioned, os.path.join(basefw, "lib", lib_unversioned))
@@ -1041,9 +1023,7 @@ def build_universal_openssl(basedir, archList):
         ["lib", libcrypto_versioned],
         ["lib", libssl_versioned],
     ]:
-        os.symlink(
-            os.path.join(relative_path, *fn), os.path.join(basedir, "usr", "local", *fn)
-        )
+        os.symlink(os.path.join(relative_path, *fn), os.path.join(basedir, "usr", "local", *fn))
 
 
 def buildRecipe(recipe, basedir, archList):
@@ -1059,9 +1039,7 @@ def buildRecipe(recipe, basedir, archList):
     url = recipe["url"]
     configure = recipe.get("configure", "./configure")
     buildrecipe = recipe.get("buildrecipe", None)
-    install = recipe.get(
-        "install", f"make && make install DESTDIR={shellQuote(basedir)}"
-    )
+    install = recipe.get("install", f"make && make install DESTDIR={shellQuote(basedir)}")
 
     archiveName = os.path.split(url)[-1]
     sourceArchive = os.path.join(DEPSRC, archiveName)
@@ -1129,8 +1107,7 @@ def buildRecipe(recipe, basedir, archList):
         if recipe.get("useLDFlags", 1):
             configure_args.extend(
                 [
-                    "CFLAGS={}-mmacosx-version-min={} -arch {} "
-                    "-I{}/usr/local/include".format(
+                    "CFLAGS={}-mmacosx-version-min={} -arch {} -I{}/usr/local/include".format(
                         recipe.get("extra_cflags", ""),
                         DEPTARGET,
                         " -arch ".join(archList),
@@ -1144,8 +1121,7 @@ def buildRecipe(recipe, basedir, archList):
         else:
             configure_args.extend(
                 [
-                    "CFLAGS={}-mmacosx-version-min={} -arch {} "
-                    "-I{}/usr/local/include".format(
+                    "CFLAGS={}-mmacosx-version-min={} -arch {} -I{}/usr/local/include".format(
                         recipe.get("extra_cflags", ""),
                         DEPTARGET,
                         " -arch ".join(archList),
@@ -1222,9 +1198,7 @@ def buildPythonDocs():
         # Extract the first archive found for this version into build
         runCommand(f"tar xjf {shellQuote(os.path.join(DEPSRC, doctarfile))}")
         # see if tar extracted a directory ending in -docs-html
-        archivefiles = [
-            f for f in os.listdir(".") if f.endswith("-docs-html") if os.path.isdir(f)
-        ]
+        archivefiles = [f for f in os.listdir(".") if f.endswith("-docs-html") if os.path.isdir(f)]
         if archivefiles:
             archivefile = archivefiles[0]
             # make it our 'Docs/build/html' directory
@@ -1540,9 +1514,7 @@ def patchFile(inPath, outPath):
     data = data.replace("$THIRD_PARTY_LIBS", "\\\n".join(THIRD_PARTY_LIBS))
 
     # This one is not handy as a template variable
-    data = data.replace(
-        "$PYTHONFRAMEWORKINSTALLDIR", "/Library/Frameworks/Python.framework"
-    )
+    data = data.replace("$PYTHONFRAMEWORKINSTALLDIR", "/Library/Frameworks/Python.framework")
     fp = open(outPath, "w")  # noqa: SIM115
     fp.write(data)
     fp.close()
@@ -1599,19 +1571,13 @@ def packageFromRecipe(targetDir, recipe):
         if srcdir is not None:
             os.chdir(srcdir)
             runCommand(
-                "pax -wf {} . 2>&1".format(
-                    shellQuote(os.path.join(packageContents, "Archive.pax"))
-                )
+                "pax -wf {} . 2>&1".format(shellQuote(os.path.join(packageContents, "Archive.pax")))
             )
             runCommand(
-                "gzip -9 {} 2>&1".format(
-                    shellQuote(os.path.join(packageContents, "Archive.pax"))
-                )
+                "gzip -9 {} 2>&1".format(shellQuote(os.path.join(packageContents, "Archive.pax")))
             )
             runCommand(
-                "mkbom . {} 2>&1".format(
-                    shellQuote(os.path.join(packageContents, "Archive.bom"))
-                )
+                "mkbom . {} 2>&1".format(shellQuote(os.path.join(packageContents, "Archive.bom")))
             )
 
         fn = os.path.join(packageContents, "PkgInfo")
@@ -1678,9 +1644,7 @@ def makeMpkgPlist(path):
         "IFPkgFlagComponentDirectory": "Contents/Packages",
         "IFPkgFlagPackageList": [
             {
-                "IFPkgFlagPackageLocation": "{}-{}.pkg".format(
-                    item["name"], getVersion()
-                ),
+                "IFPkgFlagPackageLocation": "{}-{}.pkg".format(item["name"], getVersion()),
                 "IFPkgFlagPackageSelection": item.get("selected", "selected"),
             }
             for item in pkg_recipes()
@@ -1744,9 +1708,7 @@ def installSize(clear=False, _saved=None):
     if clear:
         del _saved[:]
     if not _saved:
-        data = captureCommand(
-            "du -ks {}".format(shellQuote(os.path.join(WORKDIR, "_root")))
-        )
+        data = captureCommand("du -ks {}".format(shellQuote(os.path.join(WORKDIR, "_root"))))
         _saved.append("%d" % ((0.5 + (int(data.split()[0]) / 1024.0)),))  # noqa: UP031
     return _saved[0]
 
@@ -1790,9 +1752,7 @@ def buildDMG():
     else:
         os_name = "macos"
         build_system_version = str(build_tuple[0])
-    imagepath = os.path.join(
-        outdir, f"python-{getFullVersion()}-{os_name}{build_system_version}"
-    )
+    imagepath = os.path.join(outdir, f"python-{getFullVersion()}-{os_name}{build_system_version}")
     if INCLUDE_TIMESTAMP:
         imagepath = imagepath + "-%04d-%02d-%02d" % (time.localtime()[:3])  # noqa: UP031
     imagepath = imagepath + ".dmg"
@@ -1834,13 +1794,9 @@ def buildDMG():
         "../Icons/Disk Image.icns",
         os.path.join(WORKDIR, "mnt", volname, ".VolumeIcon.icns"),
     )
-    runCommand(
-        "SetFile -a C {}/".format(shellQuote(os.path.join(WORKDIR, "mnt", volname)))
-    )
+    runCommand("SetFile -a C {}/".format(shellQuote(os.path.join(WORKDIR, "mnt", volname))))
 
-    runCommand(
-        "hdiutil detach {}".format(shellQuote(os.path.join(WORKDIR, "mnt", volname)))
-    )
+    runCommand("hdiutil detach {}".format(shellQuote(os.path.join(WORKDIR, "mnt", volname))))
 
     setIcon(imagepath + ".tmp.dmg", "../Icons/Disk Image.icns")
     runCommand(
@@ -1871,9 +1827,7 @@ def setIcon(filePath, icnsPath):
         appPath = os.path.join(dirPath, "seticon.app/Contents/MacOS")
         if not os.path.exists(appPath):
             os.makedirs(appPath)
-        runCommand(
-            f"cc -o {shellQuote(toolPath)} {shellQuote(dirPath)}/seticon.m -framework Cocoa"
-        )
+        runCommand(f"cc -o {shellQuote(toolPath)} {shellQuote(dirPath)}/seticon.m -framework Cocoa")
 
     runCommand(
         f"{shellQuote(os.path.abspath(toolPath))} {shellQuote(icnsPath)} {shellQuote(filePath)}"
@@ -1930,9 +1884,7 @@ def main():
     patchFile("resources/ReadMe.rtf", os.path.join(WORKDIR, "installer", "ReadMe.rtf"))
 
     # Ditto for the license file.
-    patchFile(
-        "resources/License.rtf", os.path.join(WORKDIR, "installer", "License.rtf")
-    )
+    patchFile("resources/License.rtf", os.path.join(WORKDIR, "installer", "License.rtf"))
 
     fp = open(os.path.join(WORKDIR, "installer", "Build.txt"), "w")  # noqa: SIM115
     fp.write("# BUILD INFO\n")

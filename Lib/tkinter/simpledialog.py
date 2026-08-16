@@ -60,9 +60,7 @@ class SimpleDialog:
         self.root.bind("<Return>", self.return_event)
         for num in range(len(buttons)):
             s = buttons[num]
-            b = Button(
-                self.frame, text=s, command=(lambda self=self, num=num: self.done(num))
-            )
+            b = Button(self.frame, text=s, command=(lambda self=self, num=num: self.done(num)))
             if num == default:
                 b.config(relief=RIDGE, borderwidth=8)
             b.pack(side=LEFT, fill=BOTH, expand=1)

@@ -46,12 +46,13 @@ cygwin in no-cygwin mode).
 #   (ld supports -shared)
 
 import re
+from subprocess import PIPE, Popen, check_output
 import sys
+
 from distutils.errors import CCompilerError
 from distutils.spawn import find_executable
 from distutils.unixccompiler import UnixCCompiler
 from distutils.version import LooseVersion
-from subprocess import PIPE, Popen, check_output
 
 
 def get_msvcr():

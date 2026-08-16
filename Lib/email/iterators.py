@@ -11,8 +11,8 @@ __all__ = [
     # Do not include _structure() since it's part of the debugging API.
 ]
 
-import sys
 from io import StringIO
+import sys
 
 
 # This function will become a method of the Message class

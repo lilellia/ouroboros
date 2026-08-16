@@ -35,8 +35,8 @@ To do:
 import selectors
 import socket
 import sys
-import warnings
 from time import monotonic as _time
+import warnings
 
 warnings._deprecated(__name__, remove=(3, 13))
 
@@ -481,9 +481,7 @@ class Telnet:
                         else:
                             self.sock.sendall(IAC + WONT + opt)
                     elif cmd in (WILL, WONT):
-                        self.msg(
-                            "IAC %s %d", cmd == WILL and "WILL" or "WONT", ord(opt)
-                        )
+                        self.msg("IAC %s %d", cmd == WILL and "WILL" or "WONT", ord(opt))
                         if self.option_callback:
                             self.option_callback(self.sock, cmd, opt)
                         else:

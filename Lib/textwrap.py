@@ -326,10 +326,7 @@ class TextWrapper:
                     lines.append(indent + "".join(cur_line))
                 else:
                     while cur_line:
-                        if (
-                            cur_line[-1].strip()
-                            and cur_len + len(self.placeholder) <= width
-                        ):
+                        if cur_line[-1].strip() and cur_len + len(self.placeholder) <= width:
                             cur_line.append(self.placeholder)
                             lines.append(indent + "".join(cur_line))
                             break
@@ -471,9 +468,7 @@ def dedent(text):
     # sanity check (testing/debugging only)
     if False:
         for line in text.split("\n"):
-            assert not line or line.startswith(margin), (
-                f"line = {line!r}, margin = {margin!r}"
-            )
+            assert not line or line.startswith(margin), f"line = {line!r}, margin = {margin!r}"
 
     if margin:
         text = re.sub(r"(?m)^" + margin, "", text)

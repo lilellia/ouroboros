@@ -66,9 +66,7 @@ class Handle:
         if self._cancelled:
             info.append("cancelled")
         if self._callback is not None:
-            info.append(
-                format_helpers._format_callback_source(self._callback, self._args)
-            )
+            info.append(format_helpers._format_callback_source(self._callback, self._args))
         if self._source_traceback:
             frame = self._source_traceback[-1]
             info.append(f"created at {frame[0]}:{frame[1]}")

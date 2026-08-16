@@ -1,9 +1,9 @@
 "Test editor, coverage 53%."
 
-import unittest
 from collections import namedtuple
 from idlelib import editor
 from tkinter import Text, Tk
+import unittest
 
 from test.support import requires
 

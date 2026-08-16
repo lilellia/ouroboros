@@ -2,13 +2,9 @@
 
 import collections
 import io
-import sys
-import types
 from opcode import *
 from opcode import (
     __all__ as _opcodes_all,
-)
-from opcode import (
     _cache_format,
     _inline_cache_entries,
     _intrinsic_1_descs,
@@ -17,6 +13,8 @@ from opcode import (
     _specializations,
     _specialized_instructions,
 )
+import sys
+import types
 
 __all__ = [  # noqa: PLE0605
     "code_info",
@@ -75,9 +73,7 @@ for spec_op, specialized in zip(_empty_slot, _specialized_instructions):
     _all_opmap[specialized] = spec_op
 
 deoptmap = {
-    specialized: base
-    for base, family in _specializations.items()
-    for specialized in family
+    specialized: base for base, family in _specializations.items() for specialized in family
 }
 
 
@@ -143,9 +139,7 @@ def dis(x=None, *, file=None, depth=None, show_caches=False, adaptive=False):
     elif isinstance(x, (bytes, bytearray)):  # Raw bytecode
         _disassemble_bytes(x, file=file, show_caches=show_caches)
     elif isinstance(x, str):  # Source code
-        _disassemble_str(
-            x, file=file, depth=depth, show_caches=show_caches, adaptive=adaptive
-        )
+        _disassemble_str(x, file=file, depth=depth, show_caches=show_caches, adaptive=adaptive)
     else:
         raise TypeError(f"don't know how to disassemble {type(x).__name__} objects")
 
@@ -323,12 +317,8 @@ _Instruction.arg.__doc__ = "Numeric argument to operation (if any), otherwise No
 _Instruction.argval.__doc__ = "Resolved arg value (if known), otherwise same as arg"
 _Instruction.argrepr.__doc__ = "Human readable description of operation argument"
 _Instruction.offset.__doc__ = "Start index of operation within bytecode sequence"
-_Instruction.starts_line.__doc__ = (
-    "Line started by this opcode (if any), otherwise None"
-)
-_Instruction.is_jump_target.__doc__ = (
-    "True if other code jumps to here, otherwise False"
-)
+_Instruction.starts_line.__doc__ = "Line started by this opcode (if any), otherwise None"
+_Instruction.is_jump_target.__doc__ = "True if other code jumps to here, otherwise False"
 _Instruction.positions.__doc__ = (
     "dis.Positions object holding the span of source code covered by this instruction"
 )
@@ -579,9 +569,7 @@ def _get_instructions_bytes(
                         argrepr += ", "
                     argrepr += "with format"
             elif deop == MAKE_FUNCTION:
-                argrepr = ", ".join(
-                    s for i, s in enumerate(MAKE_FUNCTION_FLAGS) if arg & (1 << i)
-                )
+                argrepr = ", ".join(s for i, s in enumerate(MAKE_FUNCTION_FLAGS) if arg & (1 << i))
             elif deop == BINARY_OP:
                 _, argrepr = _nb_ops[arg]
             elif deop == CALL_INTRINSIC_1:
@@ -648,9 +636,7 @@ def disassemble(co, lasti=-1, *, file=None, show_caches=False, adaptive=False):
     )
 
 
-def _disassemble_recursive(
-    co, *, file=None, depth=None, show_caches=False, adaptive=False
-):
+def _disassemble_recursive(co, *, file=None, depth=None, show_caches=False, adaptive=False):
     disassemble(co, file=file, show_caches=show_caches, adaptive=adaptive)
     if depth is None or depth > 0:
         if depth is not None:
@@ -708,9 +694,7 @@ def _disassemble_bytes(
         co_positions=co_positions,
         show_caches=show_caches,
     ):
-        new_source_line = (
-            show_lineno and instr.starts_line is not None and instr.offset > 0
-        )
+        new_source_line = show_lineno and instr.starts_line is not None and instr.offset > 0
         if new_source_line:
             print(file=file)
         if show_caches:
@@ -722,9 +706,7 @@ def _disassemble_bytes(
                 <= lasti
                 <= instr.offset + 2 * _inline_cache_entries[_deoptop(instr.opcode)]
             )
-        print(
-            instr._disassemble(lineno_width, is_current_instr, offset_width), file=file
-        )
+        print(instr._disassemble(lineno_width, is_current_instr, offset_width), file=file)
     if exception_entries:
         print("ExceptionTable:", file=file)
         for entry in exception_entries:
@@ -823,9 +805,7 @@ def _find_imports(co):
 
     consts = co.co_consts
     names = co.co_names
-    opargs = [
-        (op, arg) for _, op, arg in _unpack_opargs(co.co_code) if op != EXTENDED_ARG
-    ]
+    opargs = [(op, arg) for _, op, arg in _unpack_opargs(co.co_code) if op != EXTENDED_ARG]
     for i, (op, oparg) in enumerate(opargs):
         if op == IMPORT_NAME and i >= 2:
             from_op = opargs[i - 1]

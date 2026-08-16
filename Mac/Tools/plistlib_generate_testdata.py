@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 import binascii
-import datetime
 from collections import OrderedDict
+import datetime
 
 from Cocoa import (
     NSDate,
@@ -93,10 +93,8 @@ def main():
 
     print("TESTDATA={")
     for fmt_name, fmt_key in FORMATS:
-        data, error = (
-            NSPropertyListSerialization.dataWithPropertyList_format_options_error_(
-                pl, fmt_key, 0, None
-            )
+        data, error = NSPropertyListSerialization.dataWithPropertyList_format_options_error_(
+            pl, fmt_key, 0, None
         )
         if data is None:
             print("Cannot serialize", fmt_name, error)
@@ -108,9 +106,7 @@ def main():
                 )
             )
 
-    keyed_archive_data = NSKeyedArchiver.archivedDataWithRootObject_(
-        "KeyArchive UID Test"
-    )
+    keyed_archive_data = NSKeyedArchiver.archivedDataWithRootObject_("KeyArchive UID Test")
     print(
         "    'KEYED_ARCHIVE': binascii.a2b_base64(b'''\n        {}'''),".format(
             _encode_base64(bytes(keyed_archive_data)).decode("ascii")[:-1]

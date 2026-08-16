@@ -83,9 +83,7 @@ class Popen:
             self.returncode = None
             self._handle = hp
             self.sentinel = int(hp)
-            self.finalizer = util.Finalize(
-                self, _close_handles, (self.sentinel, int(rhandle))
-            )
+            self.finalizer = util.Finalize(self, _close_handles, (self.sentinel, int(rhandle)))
 
             # send information to child
             set_spawning_popen(self)

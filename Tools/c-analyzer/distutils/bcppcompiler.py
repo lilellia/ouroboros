@@ -12,6 +12,7 @@ for the Borland C++ compiler.
 # WindowsCCompiler!  --GPW
 
 import os
+
 from distutils.ccompiler import CCompiler, gen_preprocess_options
 from distutils.dep_util import newer
 from distutils.errors import CompileError, DistutilsExecError

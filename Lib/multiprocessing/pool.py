@@ -325,9 +325,7 @@ class Pool:
     def __repr__(self):
         cls = self.__class__
         return (
-            f"<{cls.__module__}.{cls.__qualname__} "
-            f"state={self._state} "
-            f"pool_size={len(self._pool)}>"
+            f"<{cls.__module__}.{cls.__qualname__} state={self._state} pool_size={len(self._pool)}>"
         )
 
     def _get_sentinels(self):
@@ -466,15 +464,11 @@ class Pool:
         """
         return self._map_async(func, iterable, starmapstar, chunksize).get()
 
-    def starmap_async(
-        self, func, iterable, chunksize=None, callback=None, error_callback=None
-    ):
+    def starmap_async(self, func, iterable, chunksize=None, callback=None, error_callback=None):
         """
         Asynchronous version of `starmap()` method.
         """
-        return self._map_async(
-            func, iterable, starmapstar, chunksize, callback, error_callback
-        )
+        return self._map_async(func, iterable, starmapstar, chunksize, callback, error_callback)
 
     def _guarded_task_generation(self, result_job, func, iterable):
         """Provides a generator of tasks for imap and imap_unordered with
@@ -552,15 +546,11 @@ class Pool:
         self._taskqueue.put(([(result._job, 0, func, args, kwds)], None))
         return result
 
-    def map_async(
-        self, func, iterable, chunksize=None, callback=None, error_callback=None
-    ):
+    def map_async(self, func, iterable, chunksize=None, callback=None, error_callback=None):
         """
         Asynchronous version of `map()` method.
         """
-        return self._map_async(
-            func, iterable, mapstar, chunksize, callback, error_callback
-        )
+        return self._map_async(func, iterable, mapstar, chunksize, callback, error_callback)
 
     def _map_async(
         self, func, iterable, mapper, chunksize=None, callback=None, error_callback=None
@@ -580,9 +570,7 @@ class Pool:
             chunksize = 0
 
         task_batches = Pool._get_tasks(func, iterable, chunksize)
-        result = MapResult(
-            self, chunksize, len(iterable), callback, error_callback=error_callback
-        )
+        result = MapResult(self, chunksize, len(iterable), callback, error_callback=error_callback)
         self._taskqueue.put(
             (self._guarded_task_generation(result._job, mapper, task_batches), None)
         )
@@ -756,9 +744,7 @@ class Pool:
             yield (func, x)
 
     def __reduce__(self):
-        raise NotImplementedError(
-            "pool objects cannot be passed between processes or pickled"
-        )
+        raise NotImplementedError("pool objects cannot be passed between processes or pickled")
 
     def close(self):
         util.debug("closing pool")

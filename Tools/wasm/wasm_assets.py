@@ -24,9 +24,7 @@ SRCDIR_LIB = SRCDIR / "Lib"
 
 # Library directory relative to $(prefix).
 WASM_LIB = pathlib.PurePath("lib")
-WASM_STDLIB_ZIP = (
-    WASM_LIB / f"python{sys.version_info.major}{sys.version_info.minor}.zip"
-)
+WASM_STDLIB_ZIP = WASM_LIB / f"python{sys.version_info.major}{sys.version_info.minor}.zip"
 WASM_STDLIB = WASM_LIB / f"python{sys.version_info.major}.{sys.version_info.minor}"
 WASM_DYNLOAD = WASM_STDLIB / "lib-dynload"
 
@@ -233,9 +231,7 @@ def main():
         if not extmods.get(modname):
             omit_files.extend(modfiles)
 
-    args.omit_files_absolute = {
-        (args.srcdir_lib / name).resolve() for name in omit_files
-    }
+    args.omit_files_absolute = {(args.srcdir_lib / name).resolve() for name in omit_files}
 
     # Empty, unused directory for dynamic libs, but required for site initialization.
     args.wasm_dynload.mkdir(parents=True, exist_ok=True)

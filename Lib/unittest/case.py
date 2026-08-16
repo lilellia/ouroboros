@@ -95,9 +95,7 @@ def _addSkip(result, test_case, reason):
     if addSkip is not None:
         addSkip(test_case, reason)
     else:
-        warnings.warn(
-            "TestResult has no addSkip method, skips not reported", RuntimeWarning, 2
-        )
+        warnings.warn("TestResult has no addSkip method, skips not reported", RuntimeWarning, 2)
         result.addSuccess(test_case)
 
 
@@ -248,8 +246,7 @@ class _AssertRaisesBaseContext(_BaseTestCaseContext):
                 self.msg = kwargs.pop("msg", None)
                 if kwargs:
                     raise TypeError(
-                        f"{next(iter(kwargs))!r} is an invalid keyword argument for "
-                        "this function"
+                        f"{next(iter(kwargs))!r} is an invalid keyword argument for this function"
                     )
                 return self
 
@@ -296,9 +293,7 @@ class _AssertRaisesContext(_AssertRaisesBaseContext):
 
         expected_regex = self.expected_regex
         if not expected_regex.search(str(exc_value)):
-            self._raiseFailure(
-                f'"{expected_regex.pattern}" does not match "{exc_value!s}"'
-            )
+            self._raiseFailure(f'"{expected_regex.pattern}" does not match "{exc_value!s}"')
         return True
 
     __class_getitem__ = classmethod(types.GenericAlias)
@@ -337,9 +332,7 @@ class _AssertWarnsContext(_AssertRaisesBaseContext):
                 continue
             if first_matching is None:
                 first_matching = w
-            if self.expected_regex is not None and not self.expected_regex.search(
-                str(w)
-            ):
+            if self.expected_regex is not None and not self.expected_regex.search(str(w)):
                 continue
             # store warning for later retrieval
             self.warning = w
@@ -430,9 +423,7 @@ class TestCase:
             if methodName != "runTest":
                 # we allow instantiation with no explicit method name
                 # but not an *incorrect* or missing method name
-                raise ValueError(
-                    f"no such test method in {self.__class__}: {methodName}"
-                )
+                raise ValueError(f"no such test method in {self.__class__}: {methodName}")
         else:
             self._testMethodDoc = testMethod.__doc__
         self._cleanups = []
@@ -613,8 +604,7 @@ class TestCase:
     def _callTestMethod(self, method):
         if method() is not None:
             warnings.warn(
-                f"It is deprecated to return a value that is not None from a "
-                f"test case ({method})",
+                f"It is deprecated to return a value that is not None from a test case ({method})",
                 DeprecationWarning,
                 stacklevel=3,
             )
@@ -642,15 +632,15 @@ class TestCase:
                 testMethod, "__unittest_skip__", False
             ):
                 # If the class or method was skipped.
-                skip_why = getattr(
-                    self.__class__, "__unittest_skip_why__", ""
-                ) or getattr(testMethod, "__unittest_skip_why__", "")
+                skip_why = getattr(self.__class__, "__unittest_skip_why__", "") or getattr(
+                    testMethod, "__unittest_skip_why__", ""
+                )
                 _addSkip(result, self, skip_why)
                 return result
 
-            expecting_failure = getattr(
-                self, "__unittest_expecting_failure__", False
-            ) or getattr(testMethod, "__unittest_expecting_failure__", False)
+            expecting_failure = getattr(self, "__unittest_expecting_failure__", False) or getattr(
+                testMethod, "__unittest_expecting_failure__", False
+            )
             outcome = _Outcome(result)
             start_time = time.perf_counter()
             try:
@@ -985,9 +975,7 @@ class TestCase:
                 places = 7
             if first != second and round(diff, places) != 0:
                 return
-            standardMsg = (
-                f"{safe_repr(first)} == {safe_repr(second)} within {places!r} places"
-            )
+            standardMsg = f"{safe_repr(first)} == {safe_repr(second)} within {places!r} places"
 
         msg = self._formatMessage(msg, standardMsg)
         raise self.failureException(msg)
@@ -1100,9 +1088,7 @@ class TestCase:
                     )
         standardMsg = differing
         diffMsg = "\n" + "\n".join(
-            difflib.ndiff(
-                pprint.pformat(seq1).splitlines(), pprint.pformat(seq2).splitlines()
-            )
+            difflib.ndiff(pprint.pformat(seq1).splitlines(), pprint.pformat(seq2).splitlines())
         )
 
         standardMsg = self._truncateMessage(standardMsg, diffMsg)
@@ -1190,9 +1176,7 @@ class TestCase:
     def assertNotIn(self, member, container, msg=None):
         """Just like self.assertTrue(a not in b), but with a nicer default message."""
         if member in container:
-            standardMsg = (
-                f"{safe_repr(member)} unexpectedly found in {safe_repr(container)}"
-            )
+            standardMsg = f"{safe_repr(member)} unexpectedly found in {safe_repr(container)}"
             self.fail(self._formatMessage(msg, standardMsg))
 
     def assertIs(self, expr1, expr2, msg=None):
@@ -1214,9 +1198,7 @@ class TestCase:
         if d1 != d2:
             standardMsg = "{} != {}".format(*_common_shorten_repr(d1, d2))
             diff = "\n" + "\n".join(
-                difflib.ndiff(
-                    pprint.pformat(d1).splitlines(), pprint.pformat(d2).splitlines()
-                )
+                difflib.ndiff(pprint.pformat(d1).splitlines(), pprint.pformat(d2).splitlines())
             )
             standardMsg = self._truncateMessage(standardMsg, diff)
             self.fail(self._formatMessage(msg, standardMsg))
@@ -1375,9 +1357,7 @@ class TestCase:
             assert expected_regex, "expected_regex must not be empty."
             expected_regex = re.compile(expected_regex)
         if not expected_regex.search(text):
-            standardMsg = (
-                f"Regex didn't match: {expected_regex.pattern!r} not found in {text!r}"
-            )
+            standardMsg = f"Regex didn't match: {expected_regex.pattern!r} not found in {text!r}"
             # _formatMessage ensures the longMessage option is respected
             msg = self._formatMessage(msg, standardMsg)
             raise self.failureException(msg)

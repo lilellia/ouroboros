@@ -51,9 +51,7 @@ WRAPPER_ASSIGNMENTS = (
 WRAPPER_UPDATES = ("__dict__",)
 
 
-def update_wrapper(
-    wrapper, wrapped, assigned=WRAPPER_ASSIGNMENTS, updated=WRAPPER_UPDATES
-):
+def update_wrapper(wrapper, wrapped, assigned=WRAPPER_ASSIGNMENTS, updated=WRAPPER_UPDATES):
     """Update a wrapper function to look like the wrapped function
 
     wrapper is the function to be updated
@@ -226,9 +224,7 @@ _convert = {
 def total_ordering(cls):
     """Class decorator that fills in missing ordering methods"""
     # Find user-defined comparisons (not those inherited from object).
-    roots = {
-        op for op in _convert if getattr(cls, op, None) is not getattr(object, op, None)
-    }
+    roots = {op for op in _convert if getattr(cls, op, None) is not getattr(object, op, None)}
     if not roots:
         raise ValueError("must define at least one ordering operation: < > <= >=")
     root = max(roots)  # prefer __lt__ to __le__ to __gt__ to __ge__
@@ -306,9 +302,7 @@ def reduce(function, sequence, initial=_initial_missing):
         try:
             value = next(it)
         except StopIteration:
-            raise TypeError(
-                "reduce() of empty iterable with no initial value"
-            ) from None
+            raise TypeError("reduce() of empty iterable with no initial value") from None
     else:
         value = initial
 
@@ -793,9 +787,7 @@ def _c3_mro(cls, abcs=None):
     abstract_bases = []
     other_bases = list(cls.__bases__[boundary:])
     for base in abcs:
-        if issubclass(cls, base) and not any(
-            issubclass(b, base) for b in cls.__bases__
-        ):
+        if issubclass(cls, base) and not any(issubclass(b, base) for b in cls.__bases__):
             # If *cls* is the class that introduces behaviour described by
             # an ABC *base*, insert said ABC to its MRO.
             abstract_bases.append(base)
@@ -946,9 +938,7 @@ def singledispatch(func):
             return True
         from typing import get_args
 
-        return _is_union_type(cls) and all(
-            isinstance(arg, type) for arg in get_args(cls)
-        )
+        return _is_union_type(cls) and all(isinstance(arg, type) for arg in get_args(cls))
 
     def register(cls, func=None):
         """generic_func.register(cls, func) -> func
@@ -963,8 +953,7 @@ def singledispatch(func):
         else:
             if func is not None:
                 raise TypeError(
-                    f"Invalid first argument to `register()`. "
-                    f"{cls!r} is not a class or union type."
+                    f"Invalid first argument to `register()`. {cls!r} is not a class or union type."
                 )
             ann = getattr(cls, "__annotations__", {})
             if not ann:
@@ -986,9 +975,7 @@ def singledispatch(func):
                         f"{cls!r} not all arguments are classes."
                     )
                 else:
-                    raise TypeError(
-                        f"Invalid annotation for {argname!r}. {cls!r} is not a class."
-                    )
+                    raise TypeError(f"Invalid annotation for {argname!r}. {cls!r} is not a class.")
 
         if _is_union_type(cls):
             from typing import get_args
@@ -1086,9 +1073,7 @@ class cached_property:
             )
         try:
             cache = instance.__dict__
-        except (
-            AttributeError
-        ):  # not all objects have __dict__ (e.g. class defines slots)
+        except AttributeError:  # not all objects have __dict__ (e.g. class defines slots)
             msg = (
                 f"No '__dict__' attribute on {type(instance).__name__!r} "
                 f"instance to cache {self.attrname!r} property."

@@ -16,9 +16,7 @@ def diff_texts(a, b, filename):
     """Return a unified diff of two strings."""
     a = a.splitlines()
     b = b.splitlines()
-    return difflib.unified_diff(
-        a, b, filename, filename, "(original)", "(refactored)", lineterm=""
-    )
+    return difflib.unified_diff(a, b, filename, filename, "(original)", "(refactored)", lineterm="")
 
 
 class StdoutRefactoringTool(refactor.MultiprocessRefactoringTool):
@@ -77,9 +75,7 @@ class StdoutRefactoringTool(refactor.MultiprocessRefactoringTool):
         orig_filename = filename
         if self._output_dir:
             if filename.startswith(self._input_base_dir):
-                filename = os.path.join(
-                    self._output_dir, filename[len(self._input_base_dir) :]
-                )
+                filename = os.path.join(self._output_dir, filename[len(self._input_base_dir) :])
             else:
                 raise ValueError(
                     f"filename {filename} does not start with the "
@@ -150,9 +146,7 @@ def main(fixer_pkg, args=None):
     """
     # Set up option parser
     parser = optparse.OptionParser(usage="2to3 [options] file|dir ...")
-    parser.add_option(
-        "-d", "--doctests_only", action="store_true", help="Fix up doctests only"
-    )
+    parser.add_option("-d", "--doctests_only", action="store_true", help="Fix up doctests only")
     parser.add_option(
         "-f",
         "--fix",
@@ -190,15 +184,9 @@ def main(fixer_pkg, args=None):
         action="store_true",
         help="Modify the grammar so that exec() is a function",
     )
-    parser.add_option(
-        "-v", "--verbose", action="store_true", help="More verbose logging"
-    )
-    parser.add_option(
-        "--no-diffs", action="store_true", help="Don't show diffs of the refactoring"
-    )
-    parser.add_option(
-        "-w", "--write", action="store_true", help="Write back modified files"
-    )
+    parser.add_option("-v", "--verbose", action="store_true", help="More verbose logging")
+    parser.add_option("--no-diffs", action="store_true", help="Don't show diffs of the refactoring")
+    parser.add_option("-w", "--write", action="store_true", help="Write back modified files")
     parser.add_option(
         "-n",
         "--nobackups",
@@ -294,11 +282,7 @@ def main(fixer_pkg, args=None):
         requested = avail_fixes.union(explicit)
     fixer_names = requested.difference(unwanted_fixes)
     input_base_dir = os.path.commonprefix(args)
-    if (
-        input_base_dir
-        and not input_base_dir.endswith(os.sep)
-        and not os.path.isdir(input_base_dir)
-    ):
+    if input_base_dir and not input_base_dir.endswith(os.sep) and not os.path.isdir(input_base_dir):
         # One or more similar names were passed, their directory is the base.
         # os.path.commonprefix() is ignorant of path elements, this corrects
         # for that weird API.
@@ -327,9 +311,7 @@ def main(fixer_pkg, args=None):
             rt.refactor_stdin()
         else:
             try:
-                rt.refactor(
-                    args, options.write, options.doctests_only, options.processes
-                )
+                rt.refactor(args, options.write, options.doctests_only, options.processes)
             except refactor.MultiprocessingUnsupported:
                 assert options.processes > 1
                 print("Sorry, -j isn't supported on this platform.", file=sys.stderr)

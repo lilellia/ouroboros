@@ -308,9 +308,7 @@ class ModuleFinder:
             self.msgout(3, "import_module -> None")
             return None
         try:
-            fp, pathname, stuff = self.find_module(
-                partname, parent and parent.__path__, parent
-            )
+            fp, pathname, stuff = self.find_module(partname, parent and parent.__path__, parent)
         except ImportError:
             self.msgout(3, "import_module ->", None)
             return None

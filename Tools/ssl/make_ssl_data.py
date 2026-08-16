@@ -19,9 +19,7 @@ import sys
 
 parser = argparse.ArgumentParser(description="Generate ssl_data.h from OpenSSL sources")
 parser.add_argument("srcdir", help="OpenSSL source directory")
-parser.add_argument(
-    "output", nargs="?", type=argparse.FileType("w"), default=sys.stdout
-)
+parser.add_argument("output", nargs="?", type=argparse.FileType("w"), default=sys.stdout)
 
 
 def _file_search(fname, pat):

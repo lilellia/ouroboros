@@ -1,7 +1,7 @@
 import os.path
 
-import c_common.tables as _tables
 from c_common import fsutil
+import c_common.tables as _tables
 
 import c_parser.info as _info
 
@@ -94,9 +94,7 @@ def iter_decls_tsv(infile, extracolumns=None, relroot=fsutil.USE_CWD):
         yield decl, extra
 
 
-def write_decls_tsv(
-    decls, outfile, extracolumns=None, *, relroot=fsutil.USE_CWD, **kwargs
-):
+def write_decls_tsv(decls, outfile, extracolumns=None, *, relroot=fsutil.USE_CWD, **kwargs):
     if relroot and relroot is not fsutil.USE_CWD:
         relroot = os.path.abspath(relroot)
     decls = (d.fix_filename(relroot, fixroot=False) for d in decls)

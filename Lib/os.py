@@ -22,10 +22,10 @@ and opendir), and leave all pathname manipulation to os.path
 """
 
 #'
+from _collections_abc import _check_methods
 import abc
 import stat as st
 import sys
-from _collections_abc import _check_methods
 
 GenericAlias = type(list[int])
 
@@ -413,10 +413,7 @@ def walk(top, topdown=True, onerror=None, followlinks=False):
 
                 try:
                     if followlinks is _walk_symlinks_as_files:
-                        is_dir = (
-                            entry.is_dir(follow_symlinks=False)
-                            and not entry.is_junction()
-                        )
+                        is_dir = entry.is_dir(follow_symlinks=False) and not entry.is_junction()
                     else:
                         is_dir = entry.is_dir()
                 except OSError:
@@ -473,9 +470,7 @@ __all__.append("walk")
 
 if {open, stat} <= supports_dir_fd and {scandir, stat} <= supports_fd:
 
-    def fwalk(
-        top=".", topdown=True, onerror=None, *, follow_symlinks=False, dir_fd=None
-    ):
+    def fwalk(top=".", topdown=True, onerror=None, *, follow_symlinks=False, dir_fd=None):
         """Directory tree generator.
 
         This behaves exactly like walk(), except that it yields a 4-tuple
@@ -594,8 +589,7 @@ if {open, stat} <= supports_dir_fd and {scandir, stat} <= supports_fd:
         toppath = path.join(toppath, toppath[:0])  # Add trailing slash.
         if entries is None:
             stack.extend(
-                (_fwalk_walk, (False, topfd, toppath + name, name, None))
-                for name in dirs[::-1]
+                (_fwalk_walk, (False, topfd, toppath + name, name, None)) for name in dirs[::-1]
             )
         else:
             stack.extend(
@@ -1142,9 +1136,7 @@ def _fspath(path):
         if hasattr(path_type, "__fspath__"):
             raise
         else:
-            raise TypeError(
-                "expected str, bytes or os.PathLike object, not " + path_type.__name__
-            )
+            raise TypeError("expected str, bytes or os.PathLike object, not " + path_type.__name__)
     if isinstance(path_repr, (str, bytes)):
         return path_repr
     else:

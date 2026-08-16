@@ -1,12 +1,12 @@
 """Loading unittests."""
 
+from fnmatch import fnmatch, fnmatchcase
 import functools
 import os
 import re
 import sys
 import traceback
 import types
-from fnmatch import fnmatch, fnmatchcase
 
 from . import case, suite, util
 
@@ -161,10 +161,7 @@ class TestLoader:
                 parent, obj = obj, getattr(obj, part)
             except AttributeError as e:
                 # We can't traverse some part of the name.
-                if (
-                    getattr(obj, "__path__", None) is not None
-                    and error_case is not None
-                ):
+                if getattr(obj, "__path__", None) is not None and error_case is not None:
                     # This is a package (no __path__ per importlib docs), and we
                     # encountered an error importing something. We cannot tell
                     # the difference between package.WrongNameTestClass and
@@ -230,9 +227,7 @@ class TestLoader:
             testFunc = getattr(testCaseClass, attrname)
             if not callable(testFunc):
                 return False
-            fullName = (
-                f"{testCaseClass.__module__}.{testCaseClass.__qualname__}.{attrname}"
-            )
+            fullName = f"{testCaseClass.__module__}.{testCaseClass.__qualname__}.{attrname}"
             return self.testNamePatterns is None or any(
                 fnmatchcase(fullName, pattern) for pattern in self.testNamePatterns
             )
@@ -293,9 +288,7 @@ class TestLoader:
         if os.path.isdir(os.path.abspath(start_dir)):
             start_dir = os.path.abspath(start_dir)
             if start_dir != top_level_dir:
-                is_not_importable = not os.path.isfile(
-                    os.path.join(start_dir, "__init__.py")
-                )
+                is_not_importable = not os.path.isfile(os.path.join(start_dir, "__init__.py"))
         else:
             # support for discovery from dotted module names
             try:
@@ -314,14 +307,10 @@ class TestLoader:
                             "Can not use builtin modules as dotted module names"
                         ) from None
                     else:
-                        raise TypeError(
-                            f"don't know how to discover from {the_module!r}"
-                        ) from None
+                        raise TypeError(f"don't know how to discover from {the_module!r}") from None
 
                 if set_implicit_top:
-                    self._top_level_dir = self._get_directory_containing_module(
-                        top_part
-                    )
+                    self._top_level_dir = self._get_directory_containing_module(top_part)
                     sys.path.remove(top_level_dir)
 
         if is_not_importable:
@@ -417,9 +406,7 @@ class TestLoader:
             except case.SkipTest as e:
                 return _make_skipped_test(name, e, self.suiteClass), False
             except:  # noqa: E722
-                error_case, error_message = _make_failed_import_test(
-                    name, self.suiteClass
-                )
+                error_case, error_message = _make_failed_import_test(name, self.suiteClass)
                 self.errors.append(error_message)
                 return error_case, False
             else:
@@ -448,9 +435,7 @@ class TestLoader:
             except case.SkipTest as e:
                 return _make_skipped_test(name, e, self.suiteClass), False
             except:  # noqa: E722
-                error_case, error_message = _make_failed_import_test(
-                    name, self.suiteClass
-                )
+                error_case, error_message = _make_failed_import_test(name, self.suiteClass)
                 self.errors.append(error_message)
                 return error_case, False
             else:
@@ -486,9 +471,7 @@ def _makeLoader(prefix, sortUsing, suiteClass=None, testNamePatterns=None):
     return loader
 
 
-def getTestCaseNames(
-    testCaseClass, prefix, sortUsing=util.three_way_cmp, testNamePatterns=None
-):
+def getTestCaseNames(testCaseClass, prefix, sortUsing=util.three_way_cmp, testNamePatterns=None):
     import warnings
 
     warnings.warn(
@@ -497,9 +480,9 @@ def getTestCaseNames(
         DeprecationWarning,
         stacklevel=2,
     )
-    return _makeLoader(
-        prefix, sortUsing, testNamePatterns=testNamePatterns
-    ).getTestCaseNames(testCaseClass)
+    return _makeLoader(prefix, sortUsing, testNamePatterns=testNamePatterns).getTestCaseNames(
+        testCaseClass
+    )
 
 
 def makeSuite(
@@ -516,14 +499,10 @@ def makeSuite(
         DeprecationWarning,
         stacklevel=2,
     )
-    return _makeLoader(prefix, sortUsing, suiteClass).loadTestsFromTestCase(
-        testCaseClass
-    )
+    return _makeLoader(prefix, sortUsing, suiteClass).loadTestsFromTestCase(testCaseClass)
 
 
-def findTestCases(
-    module, prefix="test", sortUsing=util.three_way_cmp, suiteClass=suite.TestSuite
-):
+def findTestCases(module, prefix="test", sortUsing=util.three_way_cmp, suiteClass=suite.TestSuite):
     import warnings
 
     warnings.warn(

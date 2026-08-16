@@ -17,6 +17,7 @@ import re
 import subprocess
 import sys
 import winreg
+
 from distutils import log
 from distutils.ccompiler import CCompiler
 from distutils.errors import DistutilsPlatformError
@@ -352,9 +353,7 @@ class MSVCCompiler(CCompiler):
         # (currently at http://msdn2.microsoft.com/en-us/library/ms235591(VS.80).aspx)
         # Ask the linker to generate the manifest in the temp dir, so
         # we can check it, and possibly embed it, later.
-        temp_manifest = os.path.join(
-            build_temp, os.path.basename(output_filename) + ".manifest"
-        )
+        temp_manifest = os.path.join(build_temp, os.path.basename(output_filename) + ".manifest")
         ld_args.append("/MANIFESTFILE:" + temp_manifest)
 
     def manifest_get_embed_info(self, target_desc, ld_args):

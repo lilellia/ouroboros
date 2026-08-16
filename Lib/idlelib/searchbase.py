@@ -194,8 +194,8 @@ class _searchbase(SearchDialogBase):  # htest #
     "Create auto-opening dialog with no text connection."
 
     def __init__(self, parent):
-        import re
         from idlelib import searchengine
+        import re
 
         self.root = parent
         self.engine = searchengine.get(parent)

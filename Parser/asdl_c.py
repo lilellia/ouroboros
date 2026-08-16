@@ -1,12 +1,12 @@
 #! /usr/bin/env python
 """Generate C code from an ASDL description."""
 
-import sys
-import textwrap
-import types
 from argparse import ArgumentParser
 from contextlib import contextmanager
 from pathlib import Path
+import sys
+import textwrap
+import types
 
 import asdl
 
@@ -82,9 +82,7 @@ def is_simple(sum_type):
     unaryop = Invert | Not | UAdd | USub
     """
 
-    return not (
-        sum_type.attributes or any(constructor.fields for constructor in sum_type.types)
-    )
+    return not (sum_type.attributes or any(constructor.fields for constructor in sum_type.types))
 
 
 def asdl_of(name, obj):
@@ -124,9 +122,7 @@ class EmitVisitor(asdl.VisitorBase):
     @property
     def metadata(self):
         if self._metadata is None:
-            raise ValueError(
-                f"{type(self).__name__} was expecting to be annnotated with metadata"
-            )
+            raise ValueError(f"{type(self).__name__} was expecting to be annnotated with metadata")
         return self._metadata
 
     @metadata.setter
@@ -685,9 +681,7 @@ class Obj2ModVisitor(PickleVisitor):
                 elif not self.isSimpleType(field):
                     self.emit(f"{field.name} = NULL;", depth + 1)
                 else:
-                    raise TypeError(
-                        f"could not determine the default value for {field.name}"
-                    )
+                    raise TypeError(f"could not determine the default value for {field.name}")
             self.emit("}", depth)
             self.emit("else {", depth)
 
@@ -706,9 +700,7 @@ class Obj2ModVisitor(PickleVisitor):
             self.emit("}", depth + 1)
             self.emit("len = PyList_GET_SIZE(tmp);", depth + 1)
             if self.isSimpleType(field):
-                self.emit(
-                    f"{field.name} = _Py_asdl_int_seq_new(len, arena);", depth + 1
-                )
+                self.emit(f"{field.name} = _Py_asdl_int_seq_new(len, arena);", depth + 1)
             else:
                 self.emit(
                     f"{field.name} = _Py_asdl_{field.type}_seq_new(len, arena);",
@@ -1770,9 +1762,7 @@ def write_source(mod, metadata, f, internal_h_file):
     v.visit(mod)
 
 
-def main(
-    input_filename, c_filename, h_filename, internal_h_filename, dump_module=False
-):
+def main(input_filename, c_filename, h_filename, internal_h_filename, dump_module=False):
     auto_gen_msg = AUTOGEN_MESSAGE.format("/".join(Path(__file__).parts[-2:]))
     mod = asdl.parse(input_filename)
     if dump_module:

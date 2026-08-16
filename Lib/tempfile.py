@@ -47,12 +47,12 @@ import errno as _errno
 import functools as _functools
 import io as _io
 import os as _os
+from random import Random as _Random
 import shutil as _shutil
 import sys as _sys
 import types as _types
 import warnings as _warnings
 import weakref as _weakref
-from random import Random as _Random
 
 _allocate_lock = _thread.allocate_lock
 
@@ -229,18 +229,12 @@ def _get_default_tempdir():
             except PermissionError:
                 # This exception is thrown when a directory with the chosen name
                 # already exists on windows.
-                if (
-                    _os.name == "nt"
-                    and _os.path.isdir(dir)
-                    and _os.access(dir, _os.W_OK)
-                ):
+                if _os.name == "nt" and _os.path.isdir(dir) and _os.access(dir, _os.W_OK):
                     continue
                 break  # no point trying more names in this directory
             except OSError:
                 break  # no point trying more names in this directory
-    raise FileNotFoundError(
-        _errno.ENOENT, f"No usable temporary directory found in {dirlist}"
-    )
+    raise FileNotFoundError(_errno.ENOENT, f"No usable temporary directory found in {dirlist}")
 
 
 _name_sequence = None
@@ -1019,9 +1013,7 @@ class TemporaryDirectory:
                             if ignore_errors:
                                 return
                             raise
-                        cls._rmtree(
-                            path, ignore_errors=ignore_errors, repeated=(path == name)
-                        )
+                        cls._rmtree(path, ignore_errors=ignore_errors, repeated=(path == name))
                 except FileNotFoundError:
                     pass
             elif isinstance(exc, FileNotFoundError):

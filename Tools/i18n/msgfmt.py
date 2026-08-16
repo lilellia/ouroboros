@@ -27,11 +27,11 @@ Options:
 
 import array
 import ast
+from email.parser import HeaderParser
 import getopt
 import os
 import struct
 import sys
-from email.parser import HeaderParser
 
 __version__ = "1.2"
 
@@ -234,9 +234,7 @@ def make(filename, outfile):
 
 def main():
     try:
-        opts, args = getopt.getopt(
-            sys.argv[1:], "hVo:", ["help", "version", "output-file="]
-        )
+        opts, args = getopt.getopt(sys.argv[1:], "hVo:", ["help", "version", "output-file="])
     except getopt.error as msg:
         usage(1, msg)
 

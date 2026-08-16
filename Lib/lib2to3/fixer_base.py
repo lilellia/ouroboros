@@ -65,9 +65,7 @@ class BaseFix:
         """
         if self.PATTERN is not None:
             PC = PatternCompiler()
-            self.pattern, self.pattern_tree = PC.compile_pattern(
-                self.PATTERN, with_tree=True
-            )
+            self.pattern, self.pattern_tree = PC.compile_pattern(self.PATTERN, with_tree=True)
 
     def set_filename(self, filename):
         """Set the filename.

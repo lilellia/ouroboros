@@ -199,9 +199,7 @@ class WeakSet:
         if self is other:
             self.data.clear()
         else:
-            self.data.symmetric_difference_update(
-                ref(item, self._remove) for item in other
-            )
+            self.data.symmetric_difference_update(ref(item, self._remove) for item in other)
         return self
 
     def union(self, other):

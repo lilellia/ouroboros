@@ -243,9 +243,7 @@ def python_tabledef_code(varname, map, comments=1, key_precision=2):
                 mapchar = chr(mapvalue)
         maxchar = max(maxchar, ord(mapchar))
         if mapcomment and comments:
-            append(
-                f"    {mapchar!a} \t#  {hexrepr(key, key_precision)} -> {mapcomment}"
-            )
+            append(f"    {mapchar!a} \t#  {hexrepr(key, key_precision)} -> {mapcomment}")
         else:
             append(f"    {mapchar!a}")
 
@@ -389,9 +387,7 @@ def convertdir(dir, dirprefix="", nameprefix="", comments=1):
         name = nameprefix + name
         codefile = name + ".py"
         marshalfile = name + ".mapping"
-        print(
-            f"converting {mapname} to {dirprefix + codefile} and {dirprefix + marshalfile}"
-        )
+        print(f"converting {mapname} to {dirprefix + codefile} and {dirprefix + marshalfile}")
         try:
             map = readmap(os.path.join(dir, mapname))
             if not map:

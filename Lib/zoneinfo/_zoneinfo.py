@@ -1,10 +1,10 @@
 import bisect
 import calendar
 import collections
+from datetime import datetime, timedelta, tzinfo
 import functools
 import re
 import weakref
-from datetime import datetime, timedelta, tzinfo
 
 from . import _common, _tzpath
 
@@ -182,12 +182,7 @@ class ZoneInfo(tzinfo):
             return self._ttinfos[idx]
 
     def _get_local_timestamp(self, dt):
-        return (
-            (dt.toordinal() - EPOCHORDINAL) * 86400
-            + dt.hour * 3600
-            + dt.minute * 60
-            + dt.second
-        )
+        return (dt.toordinal() - EPOCHORDINAL) * 86400 + dt.hour * 3600 + dt.minute * 60 + dt.second
 
     def __str__(self):
         if self._key is not None:
@@ -207,9 +202,7 @@ class ZoneInfo(tzinfo):
     def _file_reduce(self):
         import pickle
 
-        raise pickle.PicklingError(
-            "Cannot pickle a ZoneInfo file created from a file stream."
-        )
+        raise pickle.PicklingError("Cannot pickle a ZoneInfo file created from a file stream.")
 
     @classmethod
     def _unpickle(cls, key, from_cache, /):
@@ -404,10 +397,7 @@ class _ttinfo:
         )
 
     def __repr__(self):  # pragma: nocover
-        return (
-            f"{self.__class__.__name__}"
-            + f"({self.utcoff}, {self.dstoff}, {self.tzname})"
-        )
+        return f"{self.__class__.__name__}" + f"({self.utcoff}, {self.dstoff}, {self.tzname})"
 
 
 _NO_TTINFO = _ttinfo(None, None, None)
@@ -424,14 +414,10 @@ class _TZStr:
         "std",
     )
 
-    def __init__(
-        self, std_abbr, std_offset, dst_abbr, dst_offset, start=None, end=None
-    ):
+    def __init__(self, std_abbr, std_offset, dst_abbr, dst_offset, start=None, end=None):
         self.dst_diff = dst_offset - std_offset
         std_offset = _load_timedelta(std_offset)
-        self.std = _ttinfo(
-            utcoff=std_offset, dstoff=_load_timedelta(0), tzname=std_abbr
-        )
+        self.std = _ttinfo(utcoff=std_offset, dstoff=_load_timedelta(0), tzname=std_abbr)
 
         self.start = start
         self.end = end

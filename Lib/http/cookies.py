@@ -163,9 +163,7 @@ class CookieError(Exception):
 _LegalChars = string.ascii_letters + string.digits + "!#$%&'*+-.^_`|~:"
 _UnescapedChars = _LegalChars + " ()/<=>?@[]{}"
 
-_Translator = {
-    n: f"\\{n:03o}" for n in set(range(256)) - set(map(ord, _UnescapedChars))
-}
+_Translator = {n: f"\\{n:03o}" for n in set(range(256)) - set(map(ord, _UnescapedChars))}
 _Translator.update(
     {
         ord('"'): '\\"',
@@ -331,9 +329,7 @@ class Morsel(dict):
         if not K in self._reserved:
             raise CookieError(f"Invalid attribute {K!r}")
         if _has_control_character(K, V):
-            raise CookieError(
-                f"Control characters are not allowed in cookies {K!r} {V!r}"
-            )
+            raise CookieError(f"Control characters are not allowed in cookies {K!r} {V!r}")
         dict.__setitem__(self, K, V)
 
     def setdefault(self, key, val=None):
@@ -341,9 +337,7 @@ class Morsel(dict):
         if key not in self._reserved:
             raise CookieError(f"Invalid attribute {key!r}")
         if _has_control_character(key, val):
-            raise CookieError(
-                f"Control characters are not allowed in cookies {key!r} {val!r}"
-            )
+            raise CookieError(f"Control characters are not allowed in cookies {key!r} {val!r}")
         return dict.setdefault(self, key, val)
 
     def __eq__(self, morsel):
@@ -371,9 +365,7 @@ class Morsel(dict):
             if key not in self._reserved:
                 raise CookieError(f"Invalid attribute {key!r}")
             if _has_control_character(key, val):
-                raise CookieError(
-                    f"Control characters are not allowed in cookies {key!r} {val!r}"
-                )
+                raise CookieError(f"Control characters are not allowed in cookies {key!r} {val!r}")
             data[key] = val
         dict.update(self, data)
 
@@ -412,8 +404,7 @@ class Morsel(dict):
         coded_value = state["coded_value"]
         if _has_control_character(key, value, coded_value):
             raise CookieError(
-                "Control characters are not allowed in cookies "
-                f"{key!r} {value!r} {coded_value!r}"
+                f"Control characters are not allowed in cookies {key!r} {value!r} {coded_value!r}"
             )
         self._key = key
         self._value = value

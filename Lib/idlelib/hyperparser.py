@@ -5,9 +5,9 @@ proper indentation of code.  HyperParser gives additional information on
 the structure of code.
 """
 
-import string
 from idlelib import pyparse
 from keyword import iskeyword
+import string
 
 # all ASCII chars that may be in an identifier
 _ASCII_ID_CHARS = frozenset(string.ascii_letters + string.digits + "_")
@@ -45,9 +45,7 @@ class HyperParser:
                 # of line, so that its status will be the same as the
                 # char before it, if should.
                 parser.set_code(text.get(startatindex, stopatindex) + " \n")
-                bod = parser.find_good_parse_start(
-                    editwin._build_char_in_string_func(startatindex)
-                )
+                bod = parser.find_good_parse_start(editwin._build_char_in_string_func(startatindex))
                 if bod is not None or startat == 1:
                     break
             parser.set_lo(bod or 0)
@@ -141,19 +139,14 @@ class HyperParser:
                 return None
             bracketinglevel = min(bracketinglevel, self.bracketing[before][1])
         after = self.indexbracket + 1
-        while (
-            after < len(self.bracketing)
-            and self.bracketing[after][1] >= bracketinglevel
-        ):
+        while after < len(self.bracketing) and self.bracketing[after][1] >= bracketinglevel:
             after += 1
 
         beforeindex = self.text.index(
             "%s-%dc"  # noqa: UP031
             % (self.stopatindex, len(self.rawtext) - self.bracketing[before][0])
         )
-        if after >= len(self.bracketing) or self.bracketing[after][0] > len(
-            self.rawtext
-        ):
+        if after >= len(self.bracketing) or self.bracketing[after][0] > len(self.rawtext):
             if mustclose:
                 return None
             afterindex = self.stopatindex
@@ -190,9 +183,7 @@ class HyperParser:
         # identifier characters. This is an optimization, since it
         # is faster in the common case where most of the characters
         # are ASCII.
-        while i > limit and (
-            ord(str[i - 1]) < 128 and is_ascii_id_char[ord(str[i - 1])]
-        ):
+        while i > limit and (ord(str[i - 1]) < 128 and is_ascii_id_char[ord(str[i - 1])]):
             i -= 1
 
         # If the above loop ended due to reaching a non-ASCII
@@ -235,9 +226,7 @@ class HyperParser:
         given index, which is empty if there is no real one.
         """
         if not self.is_in_code():
-            raise ValueError(
-                "get_expression should only be called if index is inside a code."
-            )
+            raise ValueError("get_expression should only be called if index is inside a code.")
 
         rawtext = self.rawtext
         bracketing = self.bracketing

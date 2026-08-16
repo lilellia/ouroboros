@@ -8,8 +8,8 @@
 # and CDATA (character data -- only end tags are special).
 
 import _markupbase
-import re
 from html import unescape
+import re
 
 __all__ = ["HTMLParser"]
 
@@ -242,9 +242,7 @@ class HTMLParser(_markupbase.ParserBase):
                     # this is the case before proceeding by looking for an
                     # & near the end and see if it's followed by a space or ;.
                     amppos = rawdata.rfind("&", max(i, n - 34))
-                    if amppos >= 0 and not re.compile(r"[\t\n\r\f ;]").search(
-                        rawdata, amppos
-                    ):
+                    if amppos >= 0 and not re.compile(r"[\t\n\r\f ;]").search(rawdata, amppos):
                         break  # wait till we get all the text
                     j = n
             else:
@@ -463,10 +461,7 @@ class HTMLParser(_markupbase.ParserBase):
             attrname, rest, attrvalue = m.group(1, 2, 3)
             if not rest:
                 attrvalue = None
-            elif (
-                attrvalue[:1] == "'" == attrvalue[-1:]
-                or attrvalue[:1] == '"' == attrvalue[-1:]
-            ):
+            elif attrvalue[:1] == "'" == attrvalue[-1:] or attrvalue[:1] == '"' == attrvalue[-1:]:
                 attrvalue = attrvalue[1:-1]
             if attrvalue:
                 attrvalue = unescape(attrvalue)

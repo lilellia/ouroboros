@@ -37,12 +37,7 @@ MOVE_KEYS = (
     "Down Arrow",
 )
 AVAILABLE_KEYS = (
-    ALPHANUM_KEYS
-    + PUNCTUATION_KEYS
-    + FUNCTION_KEYS
-    + WHITESPACE_KEYS
-    + EDIT_KEYS
-    + MOVE_KEYS
+    ALPHANUM_KEYS + PUNCTUATION_KEYS + FUNCTION_KEYS + WHITESPACE_KEYS + EDIT_KEYS + MOVE_KEYS
 )
 
 
@@ -130,9 +125,7 @@ class GetKeysFrame(Frame):
         # Basic entry key sequence.
         self.frame_keyseq_basic = Frame(self, name="keyseq_basic")
         self.frame_keyseq_basic.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
-        basic_title = Label(
-            self.frame_keyseq_basic, text=f"New keys for '{self.action}' :"
-        )
+        basic_title = Label(self.frame_keyseq_basic, text=f"New keys for '{self.action}' :")
         basic_title.pack(anchor="w")
 
         basic_keys = Label(
@@ -207,9 +200,7 @@ class GetKeysFrame(Frame):
             + "(These bindings will not be checked for validity!)",
         )
         advanced_title.pack(anchor="w")
-        self.advanced_keys = Entry(
-            self.frame_keyseq_advanced, textvariable=self.key_string
-        )
+        self.advanced_keys = Entry(self.frame_keyseq_advanced, textvariable=self.key_string)
         self.advanced_keys.pack(fill="x")
 
         # Advanced entry help text.
@@ -297,9 +288,7 @@ class GetKeysFrame(Frame):
         self.result = ""
         keys = self.key_string.get().strip()
         if not keys:
-            self.showerror(
-                title=self.keyerror_title, parent=self, message="No key specified."
-            )
+            self.showerror(title=self.keyerror_title, parent=self, message="No key specified.")
             return
         if (self.advanced or self.keys_ok(keys)) and self.bind_ok(keys):
             self.result = keys
@@ -314,15 +303,11 @@ class GetKeysFrame(Frame):
         final_key = self.list_keys_final.get("anchor")
         modifiers = self.get_modifiers()
         title = self.keyerror_title
-        key_sequences = [
-            key for keylist in self.current_key_sequences for key in keylist
-        ]
+        key_sequences = [key for keylist in self.current_key_sequences for key in keylist]
         if not keys.endswith(">"):
             self.showerror(title, parent=self, message="Missing the final Key")
         elif not modifiers and final_key not in FUNCTION_KEYS + MOVE_KEYS:
-            self.showerror(
-                title=title, parent=self, message="No modifier key(s) specified."
-            )
+            self.showerror(title=title, parent=self, message="No modifier key(s) specified.")
         elif (modifiers == ["Shift"]) and (
             final_key not in FUNCTION_KEYS + MOVE_KEYS + ("Tab", "Space")
         ):
@@ -379,13 +364,9 @@ class GetKeysWindow(Toplevel):
         # Needed for winfo_reqwidth().
         self.update_idletasks()
         # Center dialog over parent (or below htest box).
-        x = parent.winfo_rootx() + (
-            parent.winfo_width() // 2 - self.winfo_reqwidth() // 2
-        )
+        x = parent.winfo_rootx() + (parent.winfo_width() // 2 - self.winfo_reqwidth() // 2)
         y = parent.winfo_rooty() + (
-            (parent.winfo_height() // 2 - self.winfo_reqheight() // 2)
-            if not _htest
-            else 150
+            (parent.winfo_height() // 2 - self.winfo_reqheight() // 2) if not _htest else 150
         )
         self.geometry(f"+{x}+{y}")
 
@@ -394,9 +375,7 @@ class GetKeysWindow(Toplevel):
         self.protocol("WM_DELETE_WINDOW", self.cancel)
         frame_buttons = Frame(self)
         self.button_ok = Button(frame_buttons, text="OK", width=8, command=self.ok)
-        self.button_cancel = Button(
-            frame_buttons, text="Cancel", width=8, command=self.cancel
-        )
+        self.button_cancel = Button(frame_buttons, text="Cancel", width=8, command=self.cancel)
         self.button_ok.grid(row=0, column=0, padx=5, pady=5)
         self.button_cancel.grid(row=0, column=1, padx=5, pady=5)
         frame.pack(side="top", expand=True, fill="both")

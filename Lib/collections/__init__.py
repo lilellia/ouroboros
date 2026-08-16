@@ -27,15 +27,19 @@ __all__ = [
 ]
 
 import _collections_abc
-import sys as _sys
 from _weakref import proxy as _proxy
-from itertools import chain as _chain
-from itertools import repeat as _repeat
-from itertools import starmap as _starmap
+from itertools import (
+    chain as _chain,
+    repeat as _repeat,
+    starmap as _starmap,
+)
 from keyword import iskeyword as _iskeyword
-from operator import eq as _eq
-from operator import itemgetter as _itemgetter
+from operator import (
+    eq as _eq,
+    itemgetter as _itemgetter,
+)
 from reprlib import recursive_repr as _recursive_repr
+import sys as _sys
 
 try:
     from _collections import deque
@@ -112,9 +116,7 @@ class OrderedDict(dict):
         """
         self.__update(other, **kwds)
 
-    def __setitem__(
-        self, key, value, dict_setitem=dict.__setitem__, proxy=_proxy, Link=_Link
-    ):
+    def __setitem__(self, key, value, dict_setitem=dict.__setitem__, proxy=_proxy, Link=_Link):
         "od.__setitem__(i, y) <==> od[i]=y"
         # Setting a new item creates a new link at the end of the linked list,
         # and the inherited dictionary is updated with the new key/value pair.
@@ -389,12 +391,7 @@ def namedtuple(typename, field_names, *, rename=False, defaults=None, module=Non
     if rename:
         seen = set()
         for index, name in enumerate(field_names):
-            if (
-                not name.isidentifier()
-                or _iskeyword(name)
-                or name.startswith("_")
-                or name in seen
-            ):
+            if not name.isidentifier() or _iskeyword(name) or name.startswith("_") or name in seen:
                 field_names[index] = f"_{index}"
             seen.add(name)
 
@@ -402,13 +399,9 @@ def namedtuple(typename, field_names, *, rename=False, defaults=None, module=Non
         if type(name) is not str:
             raise TypeError("Type names and field names must be strings")
         if not name.isidentifier():
-            raise ValueError(
-                f"Type names and field names must be valid identifiers: {name!r}"
-            )
+            raise ValueError(f"Type names and field names must be valid identifiers: {name!r}")
         if _iskeyword(name):
-            raise ValueError(
-                f"Type names and field names cannot be a keyword: {name!r}"
-            )
+            raise ValueError(f"Type names and field names cannot be a keyword: {name!r}")
 
     seen = set()
     for name in field_names:
@@ -423,9 +416,7 @@ def namedtuple(typename, field_names, *, rename=False, defaults=None, module=Non
         defaults = tuple(defaults)
         if len(defaults) > len(field_names):
             raise TypeError("Got more default values than field names")
-        field_defaults = dict(
-            reversed(list(zip(reversed(field_names), reversed(defaults))))
-        )
+        field_defaults = dict(reversed(list(zip(reversed(field_names), reversed(defaults)))))
 
     # Variables used in the methods and docstrings
     field_names = tuple(map(_sys.intern, field_names))
@@ -466,9 +457,7 @@ def namedtuple(typename, field_names, *, rename=False, defaults=None, module=Non
             raise ValueError(f"Got unexpected field names: {list(kwds)!r}")
         return result
 
-    _replace.__doc__ = (
-        f"Return a new {typename} object replacing specified fields with new values"
-    )
+    _replace.__doc__ = f"Return a new {typename} object replacing specified fields with new values"
 
     def __repr__(self):
         "Return a nicely formatted representation string"

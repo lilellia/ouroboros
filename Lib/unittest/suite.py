@@ -46,8 +46,7 @@ class BaseTestSuite:
             raise TypeError(f"{test!r} is not callable")
         if isinstance(test, type) and issubclass(test, (case.TestCase, TestSuite)):
             raise TypeError(
-                "TestCases and TestSuites must be instantiated "
-                "before passing them to addTest()"
+                "TestCases and TestSuites must be instantiated before passing them to addTest()"
             )
         self._tests.append(test)
 
@@ -174,9 +173,7 @@ class TestSuite(BaseTestSuite):
                     except TypeError:
                         pass
                     className = util.strclass(currentClass)
-                    self._createClassOrModuleLevelException(
-                        result, e, "setUpClass", className
-                    )
+                    self._createClassOrModuleLevelException(result, e, "setUpClass", className)
                 if failed and doClassCleanups is not None:
                     doClassCleanups()
                     for exc_info in currentClass.tearDown_exceptions:
@@ -216,9 +213,7 @@ class TestSuite(BaseTestSuite):
                     if isinstance(result, _DebugResult):
                         raise
                     result._moduleSetUpFailed = True
-                    self._createClassOrModuleLevelException(
-                        result, e, "setUpModule", currentModule
-                    )
+                    self._createClassOrModuleLevelException(result, e, "setUpModule", currentModule)
                 if result._moduleSetUpFailed:
                     try:
                         case.doModuleCleanups()
@@ -229,9 +224,7 @@ class TestSuite(BaseTestSuite):
             finally:
                 _call_if_exists(result, "_restoreStdout")
 
-    def _createClassOrModuleLevelException(
-        self, result, exc, method_name, parent, info=None
-    ):
+    def _createClassOrModuleLevelException(self, result, exc, method_name, parent, info=None):
         errorName = f"{method_name} ({parent})"
         self._addClassOrModuleLevelException(result, exc, errorName, info)
 
@@ -275,9 +268,7 @@ class TestSuite(BaseTestSuite):
             except Exception as e:
                 if isinstance(result, _DebugResult):
                     raise
-                self._createClassOrModuleLevelException(
-                    result, e, "tearDownModule", previousModule
-                )
+                self._createClassOrModuleLevelException(result, e, "tearDownModule", previousModule)
         finally:
             _call_if_exists(result, "_restoreStdout")
 
@@ -307,9 +298,7 @@ class TestSuite(BaseTestSuite):
                     if isinstance(result, _DebugResult):
                         raise
                     className = util.strclass(previousClass)
-                    self._createClassOrModuleLevelException(
-                        result, e, "tearDownClass", className
-                    )
+                    self._createClassOrModuleLevelException(result, e, "tearDownClass", className)
             if doClassCleanups is not None:
                 doClassCleanups()
                 for exc_info in previousClass.tearDown_exceptions:

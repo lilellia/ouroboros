@@ -1,11 +1,11 @@
 "Test calltip, coverage 76%"
 
+from idlelib import calltip
+from idlelib.idle_test.mock_tk import Text
 import re
 import textwrap
 import types
 import unittest
-from idlelib import calltip
-from idlelib.idle_test.mock_tk import Text
 from unittest.mock import Mock
 
 from test.support import MISSING_C_DOCSTRINGS
@@ -83,9 +83,7 @@ class Get_argspecTest(unittest.TestCase):
     # but a red buildbot is better than a user crash (as has happened).
     # For a simple mismatch, change the expected output to the actual.
 
-    @unittest.skipIf(
-        MISSING_C_DOCSTRINGS, "Signature information for builtins requires docstrings"
-    )
+    @unittest.skipIf(MISSING_C_DOCSTRINGS, "Signature information for builtins requires docstrings")
     def test_builtins(self):
 
         def tiptest(obj, out):
@@ -201,9 +199,7 @@ you\'ll probably have to override _wrap_chunks().""",
         f.__doc__ = "a" * 300
         self.assertEqual(get_spec(f), f"()\n{'a' * (calltip._MAX_COLS - 3) + '...'}")
 
-    @unittest.skipIf(
-        MISSING_C_DOCSTRINGS, "Signature information for builtins requires docstrings"
-    )
+    @unittest.skipIf(MISSING_C_DOCSTRINGS, "Signature information for builtins requires docstrings")
     def test_multiline_docstring(self):
         # Test fewer lines than max.
         self.assertEqual(

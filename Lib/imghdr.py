@@ -1,7 +1,7 @@
 """Recognize image file formats based on their first few bytes."""
 
-import warnings
 from os import PathLike
+import warnings
 
 __all__ = ["what"]
 

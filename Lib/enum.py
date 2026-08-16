@@ -1,7 +1,7 @@
 import builtins as bltns
-import sys
 from functools import reduce
 from operator import or_ as _or_
+import sys
 from types import DynamicClassAttribute, MappingProxyType
 
 __all__ = [
@@ -65,33 +65,21 @@ def _is_descriptor(obj):
     """
     Returns True if obj is a descriptor, False otherwise.
     """
-    return (
-        hasattr(obj, "__get__") or hasattr(obj, "__set__") or hasattr(obj, "__delete__")
-    )
+    return hasattr(obj, "__get__") or hasattr(obj, "__set__") or hasattr(obj, "__delete__")
 
 
 def _is_dunder(name):
     """
     Returns True if a __dunder__ name, False otherwise.
     """
-    return (
-        len(name) > 4
-        and name[:2] == name[-2:] == "__"
-        and name[2] != "_"
-        and name[-3] != "_"
-    )
+    return len(name) > 4 and name[:2] == name[-2:] == "__" and name[2] != "_" and name[-3] != "_"
 
 
 def _is_sunder(name):
     """
     Returns True if a _sunder_ name, False otherwise.
     """
-    return (
-        len(name) > 2
-        and name[0] == name[-1] == "_"
-        and name[1:2] != "_"
-        and name[-2:-1] != "_"
-    )
+    return len(name) > 2 and name[0] == name[-1] == "_" and name[1:2] != "_" and name[-2:-1] != "_"
 
 
 def _is_internal_class(cls_name, obj):
@@ -258,23 +246,17 @@ class property(DynamicClassAttribute):
         try:
             return ownerclass._member_map_[self.name]
         except KeyError:
-            raise AttributeError(
-                f"{ownerclass!r} has no attribute {self.name!r}"
-            ) from None
+            raise AttributeError(f"{ownerclass!r} has no attribute {self.name!r}") from None
 
     def __set__(self, instance, value):
         if self.fset is not None:
             return self.fset(instance, value)
-        raise AttributeError(
-            f"<enum {self.clsname!r}> cannot set attribute {self.name!r}"
-        )
+        raise AttributeError(f"<enum {self.clsname!r}> cannot set attribute {self.name!r}")
 
     def __delete__(self, instance):
         if self.fdel is not None:
             return self.fdel(instance)
-        raise AttributeError(
-            f"<enum {self.clsname!r}> cannot delete attribute {self.name!r}"
-        )
+        raise AttributeError(f"<enum {self.clsname!r}> cannot delete attribute {self.name!r}")
 
     def __set_name__(self, ownerclass, name):
         self.name = name
@@ -314,9 +296,7 @@ class _proto_member:
                 try:
                     enum_member._value_ = enum_class._member_type_(*args)
                 except Exception as exc:  # noqa: BLE001
-                    new_exc = TypeError(
-                        "_value_ not set in __new__, unable to create it"
-                    )
+                    new_exc = TypeError("_value_ not set in __new__, unable to create it")
                     new_exc.__cause__ = exc
                     raise new_exc
         value = enum_member._value_
@@ -462,9 +442,7 @@ class _EnumDict(dict):
             if key == "_generate_next_value_":
                 # check if members already defined as auto()
                 if self._auto_called:
-                    raise TypeError(
-                        "_generate_next_value_ must be defined before members"
-                    )
+                    raise TypeError("_generate_next_value_ must be defined before members")
                 _gnv = value.__func__ if isinstance(value, staticmethod) else value
                 self._generate_next_value = _gnv
             elif key == "_ignore_":
@@ -475,9 +453,7 @@ class _EnumDict(dict):
                 self._ignore = value
                 already = set(value) & set(self._member_names)
                 if already:
-                    raise ValueError(
-                        f"_ignore_ cannot specify already set names: {already!r}"
-                    )
+                    raise ValueError(f"_ignore_ cannot specify already set names: {already!r}")
         elif _is_dunder(key):
             if key == "__order__":
                 key = "_order_"
@@ -573,9 +549,7 @@ class EnumType(type):
             )
         return enum_dict
 
-    def __new__(
-        metacls, cls, bases, classdict, *, boundary=None, _simple=False, **kwds
-    ):
+    def __new__(metacls, cls, bases, classdict, *, boundary=None, _simple=False, **kwds):
         # an Enum class is final once enumeration items have been defined; it
         # cannot be mixed with other types (int, float, etc.) if it has an
         # inherited __new__ unless a new __new__ is defined (or the resulting
@@ -597,9 +571,7 @@ class EnumType(type):
         invalid_names = set(member_names) & {"mro", ""}
         if invalid_names:
             raise ValueError(
-                "invalid enum member name(s) {}".format(
-                    ",".join(repr(n) for n in invalid_names)
-                )
+                "invalid enum member name(s) {}".format(",".join(repr(n) for n in invalid_names))
             )
         #
         # adjust the sunders
@@ -724,12 +696,7 @@ class EnumType(type):
             _order_ = _order_.replace(",", " ").split()
         #
         # remove Flag structures if final class is not a Flag
-        if (
-            Flag is None
-            and cls != "Flag"
-            or Flag is not None
-            and not issubclass(enum_class, Flag)
-        ):
+        if Flag is None and cls != "Flag" or Flag is not None and not issubclass(enum_class, Flag):
             delattr(enum_class, "_boundary_")
             delattr(enum_class, "_flag_mask_")
             delattr(enum_class, "_singles_mask_")
@@ -745,8 +712,7 @@ class EnumType(type):
                 _order_ = [
                     o
                     for o in _order_
-                    if o not in enum_class._member_map_
-                    or _is_single_bit(enum_class[o]._value_)
+                    if o not in enum_class._member_map_ or _is_single_bit(enum_class[o]._value_)
                 ]
         if _order_:
             # _order_ step 3: remove aliases from _order_
@@ -965,9 +931,7 @@ class EnumType(type):
             original_names, names = names, []
             last_values = []
             for count, name in enumerate(original_names):
-                value = first_enum._generate_next_value_(
-                    name, start, count, last_values[:]
-                )
+                value = first_enum._generate_next_value_(name, start, count, last_values[:])
                 last_values.append(value)
                 names.append((name, value))
         if names is None:
@@ -999,9 +963,7 @@ class EnumType(type):
 
         return metacls.__new__(metacls, class_name, bases, classdict, boundary=boundary)
 
-    def _convert_(
-        cls, name, module, filter, source=None, *, boundary=None, as_global=False
-    ):
+    def _convert_(cls, name, module, filter, source=None, *, boundary=None, as_global=False):
         """
         Create a new Enum subclass that replaces a collection of global constants
         """
@@ -1101,10 +1063,7 @@ class EnumType(type):
                     if base._member_type_ is not object:
                         data_types.add(base._member_type_)
                         break
-                elif (
-                    "__new__" in base.__dict__
-                    or "__dataclass_fields__" in base.__dict__
-                ):
+                elif "__new__" in base.__dict__ or "__dataclass_fields__" in base.__dict__:
                     data_types.add(candidate or base)
                     break
                 else:
@@ -1341,9 +1300,7 @@ class Enum(metaclass=EnumType):  # noqa: F811
                         interesting.discard(name)
                 elif name not in self._member_map_:
                     interesting.add(name)
-        names = sorted(
-            {"__class__", "__doc__", "__eq__", "__hash__", "__module__"} | interesting
-        )
+        names = sorted({"__class__", "__doc__", "__eq__", "__hash__", "__module__"} | interesting)
         return names
 
     def __format__(self, format_spec):
@@ -1563,11 +1520,7 @@ class Flag(Enum, boundary=STRICT):  # noqa: F811
             if aliases:
                 value = member_value | aliases
                 for pm in cls._member_map_.values():
-                    if (
-                        pm not in members
-                        and pm._value_
-                        and pm._value_ & value == pm._value_
-                    ):
+                    if pm not in members and pm._value_ and pm._value_ & value == pm._value_:
                         members.append(pm)
                         combined_value |= pm._value_
             unknown = value ^ combined_value
@@ -1703,9 +1656,7 @@ def unique(enumeration):
         if name != member.name:
             duplicates.append((name, member.name))
     if duplicates:
-        alias_details = ", ".join(
-            [f"{alias} -> {name}" for (alias, name) in duplicates]
-        )
+        alias_details = ", ".join([f"{alias} -> {name}" for (alias, name) in duplicates])
         raise ValueError(f"duplicate values found in {enumeration!r}: {alias_details}")
     return enumeration
 
@@ -1996,9 +1947,7 @@ class verify:
                     alias_details = ", ".join(
                         [f"{alias} -> {name}" for (alias, name) in duplicates]
                     )
-                    raise ValueError(
-                        f"aliases found in {enumeration!r}: {alias_details}"
-                    )
+                    raise ValueError(f"aliases found in {enumeration!r}: {alias_details}")
             elif check is CONTINUOUS:
                 values = {e.value for e in enumeration}
                 if len(values) < 2:
@@ -2090,8 +2039,7 @@ def _test_simple_enum(checked_enum, simple_enum):
         simple_dict = simple_enum.__dict__
         simple_keys = list(simple_dict.keys())
         member_names = set(
-            list(checked_enum._member_map_.keys())
-            + list(simple_enum._member_map_.keys())
+            list(checked_enum._member_map_.keys()) + list(simple_enum._member_map_.keys())
         )
         for key in set(checked_keys + simple_keys):
             if key in ("__module__", "_member_map_", "_value2member_map_", "__doc__"):
@@ -2111,12 +2059,8 @@ def _test_simple_enum(checked_enum, simple_enum):
                     continue
                 if key == "__doc__":
                     # remove all spaces/tabs
-                    compressed_checked_value = checked_value.replace(" ", "").replace(
-                        "\t", ""
-                    )
-                    compressed_simple_value = simple_value.replace(" ", "").replace(
-                        "\t", ""
-                    )
+                    compressed_checked_value = checked_value.replace(" ", "").replace("\t", "")
+                    compressed_simple_value = simple_value.replace(" ", "").replace("\t", "")
                     if compressed_checked_value != compressed_simple_value:
                         failed.append(
                             "{!r}:\n         {}\n         {}".format(
@@ -2154,9 +2098,7 @@ def _test_simple_enum(checked_enum, simple_enum):
                             f"missing key {key!r} not in the simple enum member {name!r}"
                         )
                     elif key not in checked_member_keys:
-                        failed_member.append(
-                            f"extra key {key!r} in simple enum member {name!r}"
-                        )
+                        failed_member.append(f"extra key {key!r} in simple enum member {name!r}")
                     else:
                         checked_value = checked_member_dict[key]
                         simple_value = simple_member_dict[key]

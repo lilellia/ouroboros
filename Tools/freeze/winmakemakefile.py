@@ -74,13 +74,9 @@ def realwork(vars, moddefns, target):
     print("!ENDIF")
     print()
 
-    print(
-        "# The following line assumes you have built Python using the standard instructions"
-    )
+    print("# The following line assumes you have built Python using the standard instructions")
     print("# Otherwise fix the following line to point to the library.")
-    print(
-        f'pythonlib = "$(pythonhome)/pcbuild/python{version_suffix}$(debug_suffix).lib"'
-    )
+    print(f'pythonlib = "$(pythonhome)/pcbuild/python{version_suffix}$(debug_suffix).lib"')
     print()
 
     # We only ever write one "entry point" symbol - either
@@ -94,9 +90,7 @@ def realwork(vars, moddefns, target):
         target_link_flags = "-dll"
         target_ext = ".dll"
 
-    print(
-        f"# As the target uses Python{version_suffix}.dll, we must use this compiler option!"
-    )
+    print(f"# As the target uses Python{version_suffix}.dll, we must use this compiler option!")
     print("cdl = /MD")
     print()
     print(f"all: $(target)$(debug_suffix){target_ext}")
@@ -115,9 +109,7 @@ def realwork(vars, moddefns, target):
             base, _ext = os.path.splitext(base)
             objects.append(base + ".obj")
             print(rf'$(temp_dir)\{base}.obj: "{file}"')
-            print(
-                "\t@$(CC) -c -nologo /Fo$* $(cdl) $(c_debug) /D BUILD_FREEZE", end=" "
-            )
+            print("\t@$(CC) -c -nologo /Fo$* $(cdl) $(c_debug) /D BUILD_FREEZE", end=" ")
             print('"-I$(pythonhome)/Include"  "-I$(pythonhome)/PC" \\')
             print("\t\t$(cflags) $(cdebug) $(cinclude) \\")
             extra = moddefn.GetCompilerOptions()

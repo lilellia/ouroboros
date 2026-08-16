@@ -85,9 +85,7 @@ def xpath_tokenizer(pattern, namespaces=None):
                         raise KeyError
                     yield ttype, f"{{{namespaces[prefix]}}}{uri}"
                 except KeyError:
-                    raise SyntaxError(
-                        f"prefix {prefix!r} not found in prefix map"
-                    ) from None
+                    raise SyntaxError(f"prefix {prefix!r} not found in prefix map") from None
             elif default_namespace and not parsing_attribute:
                 yield ttype, f"{{{default_namespace}}}{tag}"
             else:
@@ -138,11 +136,7 @@ def _prepare_tag(tag):
         def select(context, result):
             for elem in result:
                 el_tag = elem.tag
-                if (
-                    el_tag == tag
-                    or _isinstance(el_tag, _str)
-                    and el_tag[no_ns] == suffix
-                ):
+                if el_tag == tag or _isinstance(el_tag, _str) and el_tag[no_ns] == suffix:
                     yield elem
     elif tag[-2:] == "}*":
         # Any tag in the given namespace.
@@ -309,10 +303,7 @@ def prepare_predicate(next, token):
     if (
         signature == ".='"
         or signature == ".!='"
-        or (
-            (signature == "-='" or signature == "-!='")
-            and not re.match(r"\-?\d+$", predicate[0])
-        )
+        or ((signature == "-='" or signature == "-!='") and not re.match(r"\-?\d+$", predicate[0]))
     ):
         # [.='value'] or [tag='value'] or [.!='value'] or [tag!='value']
         tag = predicate[0]

@@ -56,9 +56,7 @@ def ast_dump(
                     allsimple = allsimple and simple
                     args.append(f"{name}={value}")
             if allsimple and len(args) <= 3:
-                return "{}({})".format(
-                    node.__class__.__name__, ", ".join(args)
-                ), not args
+                return "{}({})".format(node.__class__.__name__, ", ".join(args)), not args
             return f"{node.__class__.__name__}({prefix}{sep.join(args)})", False
         elif isinstance(node, list):
             if not node:

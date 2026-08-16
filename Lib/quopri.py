@@ -148,9 +148,7 @@ def decode(input, output, header=False):
             elif i + 1 < n and line[i + 1 : i + 2] == ESCAPE:
                 new = new + ESCAPE
                 i = i + 2
-            elif (
-                i + 2 < n and ishex(line[i + 1 : i + 2]) and ishex(line[i + 2 : i + 3])
-            ):
+            elif i + 2 < n and ishex(line[i + 1 : i + 2]) and ishex(line[i + 2 : i + 3]):
                 new = new + bytes((unhex(line[i + 1 : i + 3]),))
                 i = i + 3
             else:  # Bad escape sequence -- leave it in

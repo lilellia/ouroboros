@@ -1,5 +1,5 @@
-import sys
 from ctypes import *
+import sys
 
 _array_type = type(Array)
 

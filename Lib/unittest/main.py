@@ -298,9 +298,7 @@ class TestProgram:
             help="Top level directory of project (defaults to start directory)",
         )
         for arg in ("start", "pattern", "top"):
-            parser.add_argument(
-                arg, nargs="?", default=argparse.SUPPRESS, help=argparse.SUPPRESS
-            )
+            parser.add_argument(arg, nargs="?", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
 
         return parser
 

@@ -169,9 +169,7 @@ def get_temp_dir():
         info("created temp directory %s", tempdir)
         # keep a strong reference to shutil.rmtree(), since the finalizer
         # can be called late during Python shutdown
-        Finalize(
-            None, _remove_temp_dir, args=(shutil.rmtree, tempdir), exitpriority=-100
-        )
+        Finalize(None, _remove_temp_dir, args=(shutil.rmtree, tempdir), exitpriority=-100)
         process.current_process()._config["tempdir"] = tempdir
     return tempdir
 
@@ -258,9 +256,7 @@ class Finalize:
                     self._kwargs,
                 )
                 res = self._callback(*self._args, **self._kwargs)
-            self._weakref = self._callback = self._args = self._kwargs = self._key = (
-                None
-            )
+            self._weakref = self._callback = self._args = self._kwargs = self._key = None
             return res
 
     def cancel(self):
@@ -272,9 +268,7 @@ class Finalize:
         except KeyError:
             pass
         else:
-            self._weakref = self._callback = self._args = self._kwargs = self._key = (
-                None
-            )
+            self._weakref = self._callback = self._args = self._kwargs = self._key = None
 
     def still_active(self):
         """

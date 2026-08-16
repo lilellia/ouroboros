@@ -3,11 +3,11 @@
 Try to make tests pass with draft bdbx, which may replace bdb in 3.13+.
 """
 
-import unittest
 from collections import namedtuple
 from idlelib import debugger
 from textwrap import dedent
 from tkinter import Tk
+import unittest
 from unittest import mock
 from unittest.mock import Mock, patch
 
@@ -78,9 +78,7 @@ class FunctionTest(unittest.TestCase):
         code_frame = MockFrame(code_obj, 1)
         code_frame.f_back = None
         self.assertFalse(debugger._in_rpc_code(code_frame))
-        self.assertEqual(
-            debugger._frame2message(code_frame), "debugger.py:1: <module>()"
-        )
+        self.assertEqual(debugger._frame2message(code_frame), "debugger.py:1: <module>()")
 
         code_frame.f_back = code_frame
         self.assertFalse(debugger._in_rpc_code(code_frame))

@@ -10,8 +10,8 @@ from test.support import requires
 
 requires("gui")
 
-import unittest
 from tkinter import Text, Tk
+import unittest
 from unittest.mock import Mock
 
 
@@ -67,9 +67,7 @@ class ParenMatchTest(unittest.TestCase):
                 pm.flash_paren_event("event")
                 self.assertIn("<<parenmatch-check-restore>>", text.event_info())
                 if style == "parens":
-                    self.assertTupleEqual(
-                        text.tag_nextrange("paren", "1.0"), ("1.10", "1.11")
-                    )
+                    self.assertTupleEqual(text.tag_nextrange("paren", "1.0"), ("1.10", "1.11"))
                 self.assertTupleEqual(text.tag_prevrange("paren", "end"), range1)
 
                 text.insert("insert", ")")

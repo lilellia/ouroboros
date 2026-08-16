@@ -2,8 +2,8 @@
 
 __all__ = ["Repr", "recursive_repr", "repr"]
 
-import builtins
 from _thread import get_ident
+import builtins
 from itertools import islice
 
 

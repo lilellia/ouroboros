@@ -2,10 +2,8 @@ import re
 
 from ._regexes import (
     STRING_LITERAL,
-    _ind,
-)
-from ._regexes import (
     VAR_DECL as _VAR_DECL,
+    _ind,
 )
 
 

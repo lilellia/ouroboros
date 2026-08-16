@@ -70,9 +70,7 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
         self._make_self_pipe()
         self._transports = weakref.WeakValueDictionary()
 
-    def _make_socket_transport(
-        self, sock, protocol, waiter=None, *, extra=None, server=None
-    ):
+    def _make_socket_transport(self, sock, protocol, waiter=None, *, extra=None, server=None):
         self._ensure_fd_no_transport(sock)
         return _SelectorSocketTransport(self, sock, protocol, waiter, extra, server)
 
@@ -101,14 +99,10 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
             ssl_handshake_timeout=ssl_handshake_timeout,
             ssl_shutdown_timeout=ssl_shutdown_timeout,
         )
-        _SelectorSocketTransport(
-            self, rawsock, ssl_protocol, extra=extra, server=server
-        )
+        _SelectorSocketTransport(self, rawsock, ssl_protocol, extra=extra, server=server)
         return ssl_protocol._app_transport
 
-    def _make_datagram_transport(
-        self, sock, protocol, address=None, waiter=None, extra=None
-    ):
+    def _make_datagram_transport(self, sock, protocol, address=None, waiter=None, extra=None):
         self._ensure_fd_no_transport(sock)
         return _SelectorDatagramTransport(self, sock, protocol, address, waiter, extra)
 
@@ -168,9 +162,7 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
             csock.send(b"\0")
         except OSError:
             if self._debug:
-                logger.debug(
-                    "Fail to write a null byte into the self-pipe socket", exc_info=True
-                )
+                logger.debug("Fail to write a null byte into the self-pipe socket", exc_info=True)
 
     def _start_serving(
         self,
@@ -212,9 +204,7 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
             try:
                 conn, addr = sock.accept()
                 if self._debug:
-                    logger.debug(
-                        "%r got a new connection from %r: %r", server, addr, conn
-                    )
+                    logger.debug("%r got a new connection from %r: %r", server, addr, conn)
                 conn.setblocking(False)
             except (BlockingIOError, InterruptedError, ConnectionAbortedError):
                 # Early exit because the socket accept buffer is empty.
@@ -335,9 +325,7 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
             pass
         else:
             if not transport.is_closing():
-                raise RuntimeError(
-                    f"File descriptor {fd!r} is used by transport {transport!r}"
-                )
+                raise RuntimeError(f"File descriptor {fd!r} is used by transport {transport!r}")
 
     def _add_reader(self, fd, callback, *args):
         self._check_closed()
@@ -449,9 +437,7 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
         fd = sock.fileno()
         self._ensure_fd_no_transport(fd)
         handle = self._add_reader(fd, self._sock_recv, fut, sock, n)
-        fut.add_done_callback(
-            functools.partial(self._sock_read_done, fd, handle=handle)
-        )
+        fut.add_done_callback(functools.partial(self._sock_read_done, fd, handle=handle))
         return await fut
 
     def _sock_read_done(self, fd, fut, handle=None):
@@ -491,9 +477,7 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
         fd = sock.fileno()
         self._ensure_fd_no_transport(fd)
         handle = self._add_reader(fd, self._sock_recv_into, fut, sock, buf)
-        fut.add_done_callback(
-            functools.partial(self._sock_read_done, fd, handle=handle)
-        )
+        fut.add_done_callback(functools.partial(self._sock_read_done, fd, handle=handle))
         return await fut
 
     def _sock_recv_into(self, fut, sock, buf):
@@ -532,9 +516,7 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
         fd = sock.fileno()
         self._ensure_fd_no_transport(fd)
         handle = self._add_reader(fd, self._sock_recvfrom, fut, sock, bufsize)
-        fut.add_done_callback(
-            functools.partial(self._sock_read_done, fd, handle=handle)
-        )
+        fut.add_done_callback(functools.partial(self._sock_read_done, fd, handle=handle))
         return await fut
 
     def _sock_recvfrom(self, fut, sock, bufsize):
@@ -574,9 +556,7 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
         fd = sock.fileno()
         self._ensure_fd_no_transport(fd)
         handle = self._add_reader(fd, self._sock_recvfrom_into, fut, sock, buf, nbytes)
-        fut.add_done_callback(
-            functools.partial(self._sock_read_done, fd, handle=handle)
-        )
+        fut.add_done_callback(functools.partial(self._sock_read_done, fd, handle=handle))
         return await fut
 
     def _sock_recvfrom_into(self, fut, sock, buf, bufsize):
@@ -621,12 +601,8 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
         fd = sock.fileno()
         self._ensure_fd_no_transport(fd)
         # use a trick with a list in closure to store a mutable state
-        handle = self._add_writer(
-            fd, self._sock_sendall, fut, sock, memoryview(data), [n]
-        )
-        fut.add_done_callback(
-            functools.partial(self._sock_write_done, fd, handle=handle)
-        )
+        handle = self._add_writer(fd, self._sock_sendall, fut, sock, memoryview(data), [n])
+        fut.add_done_callback(functools.partial(self._sock_write_done, fd, handle=handle))
         return await fut
 
     def _sock_sendall(self, fut, sock, view, pos):
@@ -673,9 +649,7 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
         self._ensure_fd_no_transport(fd)
         # use a trick with a list in closure to store a mutable state
         handle = self._add_writer(fd, self._sock_sendto, fut, sock, data, address)
-        fut.add_done_callback(
-            functools.partial(self._sock_write_done, fd, handle=handle)
-        )
+        fut.add_done_callback(functools.partial(self._sock_write_done, fd, handle=handle))
         return await fut
 
     def _sock_sendto(self, fut, sock, data, address):
@@ -733,9 +707,7 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
             # fails.
             self._ensure_fd_no_transport(fd)
             handle = self._add_writer(fd, self._sock_connect_cb, fut, sock, address)
-            fut.add_done_callback(
-                functools.partial(self._sock_write_done, fd, handle=handle)
-            )
+            fut.add_done_callback(functools.partial(self._sock_write_done, fd, handle=handle))
         except (SystemExit, KeyboardInterrupt):
             raise
         except BaseException as exc:  # noqa: BLE001
@@ -793,9 +765,7 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
         except (BlockingIOError, InterruptedError):
             self._ensure_fd_no_transport(fd)
             handle = self._add_reader(fd, self._sock_accept, fut, sock)
-            fut.add_done_callback(
-                functools.partial(self._sock_read_done, fd, handle=handle)
-            )
+            fut.add_done_callback(functools.partial(self._sock_read_done, fd, handle=handle))
         except (SystemExit, KeyboardInterrupt):
             raise
         except BaseException as exc:  # noqa: BLE001
@@ -809,9 +779,7 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
         transp.pause_reading()
         await transp._make_empty_waiter()
         try:
-            return await self.sock_sendfile(
-                transp._sock, file, offset, count, fallback=False
-            )
+            return await self.sock_sendfile(transp._sock, file, offset, count, fallback=False)
         finally:
             transp._reset_empty_waiter()
             if resume_reading:
@@ -1070,9 +1038,7 @@ class _SelectorSocketTransport(_SelectorTransport):
         except (SystemExit, KeyboardInterrupt):
             raise
         except BaseException as exc:  # noqa: BLE001
-            self._fatal_error(
-                exc, "Fatal error: protocol.buffer_updated() call failed."
-            )
+            self._fatal_error(exc, "Fatal error: protocol.buffer_updated() call failed.")
 
     def _read_ready__data_received(self):
         if self._conn_lost:
@@ -1121,8 +1087,7 @@ class _SelectorSocketTransport(_SelectorTransport):
     def write(self, data):
         if not isinstance(data, (bytes, bytearray, memoryview)):
             raise TypeError(
-                f"data argument must be a bytes-like object, "
-                f"not {type(data).__name__!r}"
+                f"data argument must be a bytes-like object, not {type(data).__name__!r}"
             )
         if self._eof:
             raise RuntimeError("Cannot call write() after write_eof()")
@@ -1262,9 +1227,7 @@ class _SelectorSocketTransport(_SelectorTransport):
         finally:
             self._write_ready = None
             if self._empty_waiter is not None:
-                self._empty_waiter.set_exception(
-                    ConnectionError("Connection is closed by peer")
-                )
+                self._empty_waiter.set_exception(ConnectionError("Connection is closed by peer"))
 
     def _make_empty_waiter(self):
         if self._empty_waiter is not None:
@@ -1318,8 +1281,7 @@ class _SelectorDatagramTransport(_SelectorTransport, transports.DatagramTranspor
     def sendto(self, data, addr=None):
         if not isinstance(data, (bytes, bytearray, memoryview)):
             raise TypeError(
-                f"data argument must be a bytes-like object, "
-                f"not {type(data).__name__!r}"
+                f"data argument must be a bytes-like object, not {type(data).__name__!r}"
             )
         if not data:
             return

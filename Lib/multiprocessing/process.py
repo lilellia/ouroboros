@@ -13,12 +13,12 @@ __all__ = ["BaseProcess", "active_children", "current_process", "parent_process"
 # Imports
 #
 
+from _weakrefset import WeakSet
 import itertools
 import os
 import signal
 import sys
 import threading
-from _weakrefset import WeakSet
 
 try:
     ORIGINAL_DIR = os.path.abspath(os.getcwd())
@@ -74,9 +74,7 @@ class BaseProcess:
     def _Popen(self):
         raise NotImplementedError
 
-    def __init__(
-        self, group=None, target=None, name=None, args=(), kwargs=None, *, daemon=None
-    ):
+    def __init__(self, group=None, target=None, name=None, args=(), kwargs=None, *, daemon=None):
         if kwargs is None:
             kwargs = {}
         assert group is None, "group argument must be None for now"
@@ -90,9 +88,7 @@ class BaseProcess:
         self._target = target
         self._args = tuple(args)
         self._kwargs = dict(kwargs)
-        self._name = name or type(self).__name__ + "-" + ":".join(
-            str(i) for i in self._identity
-        )
+        self._name = name or type(self).__name__ + "-" + ":".join(str(i) for i in self._identity)
         if daemon is not None:
             self.daemon = daemon
         _dangling.add(self)
@@ -305,9 +301,7 @@ class BaseProcess:
             util._close_stdin()
             old_process = _current_process
             _current_process = self
-            _parent_process = _ParentProcess(
-                self._parent_name, self._parent_pid, parent_sentinel
-            )
+            _parent_process = _ParentProcess(self._parent_name, self._parent_pid, parent_sentinel)
             if threading._HAVE_THREAD_NATIVE_ID:
                 threading.main_thread()._set_native_id()
             try:
@@ -362,8 +356,7 @@ class AuthenticationString(bytes):
 
         if get_spawning_popen() is None:
             raise TypeError(
-                "Pickling an AuthenticationString object is "
-                "disallowed for security reasons"
+                "Pickling an AuthenticationString object is disallowed for security reasons"
             )
         return AuthenticationString, (bytes(self),)
 

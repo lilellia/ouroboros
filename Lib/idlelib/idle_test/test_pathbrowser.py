@@ -1,14 +1,14 @@
 "Test pathbrowser, coverage 95%."
 
 import idlelib  # for __file__
-import os.path
-import pyclbr  # for _modules
-import sys  # for sys.path
-import unittest
 from idlelib import browser, pathbrowser
 from idlelib.idle_test.mock_idle import Func
 from idlelib.tree import TreeNode
+import os.path
+import pyclbr  # for _modules
+import sys  # for sys.path
 from tkinter import Tk
+import unittest
 
 from test.support import requires
 

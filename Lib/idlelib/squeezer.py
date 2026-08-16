@@ -15,12 +15,12 @@ output written to the standard error stream ("stderr"), such as exception
 messages and their tracebacks.
 """
 
-import re
-import tkinter as tk
 from idlelib import macosx
 from idlelib.config import idleConf
 from idlelib.textview import view_text
 from idlelib.tooltip import Hovertip
+import re
+import tkinter as tk
 from tkinter import messagebox
 
 
@@ -237,9 +237,7 @@ class Squeezer:
 
         # Twice the text widget's border width and internal padding;
         # pre-calculated here for the get_line_width() method.
-        self.window_width_delta = 2 * (
-            int(text.cget("border")) + int(text.cget("padx"))
-        )
+        self.window_width_delta = 2 * (int(text.cget("border")) + int(text.cget("padx")))
 
         self.expandingbuttons = []
 
@@ -328,9 +326,7 @@ class Squeezer:
         # while keeping the list ordered according to the position of
         # the buttons in the Text widget.
         i = len(self.expandingbuttons)
-        while i > 0 and self.text.compare(
-            self.expandingbuttons[i - 1], ">", expandingbutton
-        ):
+        while i > 0 and self.text.compare(self.expandingbuttons[i - 1], ">", expandingbutton):
             i -= 1
         self.expandingbuttons.insert(i, expandingbutton)
 

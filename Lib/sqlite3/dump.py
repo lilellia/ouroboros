@@ -37,8 +37,7 @@ def _iterdump(connection):
             rows = cu.execute('SELECT * FROM "sqlite_sequence";').fetchall()
             sqlite_sequence = ['DELETE FROM "sqlite_sequence"']
             sqlite_sequence += [
-                f"INSERT INTO \"sqlite_sequence\" VALUES('{row[0]}',{row[1]})"
-                for row in rows
+                f"INSERT INTO \"sqlite_sequence\" VALUES('{row[0]}',{row[1]})" for row in rows
             ]
             continue
         elif table_name == "sqlite_stat1":
@@ -66,8 +65,7 @@ def _iterdump(connection):
         q = """SELECT 'INSERT INTO "{0}" VALUES({1})' FROM "{0}";""".format(
             table_name_ident,
             ",".join(
-                """'||quote("{}")||'""".format(col.replace('"', '""'))
-                for col in column_names
+                """'||quote("{}")||'""".format(col.replace('"', '""')) for col in column_names
             ),
         )
         query_res = cu.execute(q)

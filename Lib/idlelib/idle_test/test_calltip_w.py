@@ -1,8 +1,8 @@
 "Test calltip_w, coverage 18%."
 
-import unittest
 from idlelib import calltip_w
 from tkinter import Text, Tk
+import unittest
 
 from test.support import requires
 

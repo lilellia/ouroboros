@@ -11,10 +11,10 @@ from test.support import requires
 
 requires("gui")
 
-import time
-import unittest
 from functools import wraps
+import time
 from tkinter import Button, Tk, Toplevel
+import unittest
 
 
 def setUpModule():

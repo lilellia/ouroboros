@@ -251,9 +251,7 @@ def _samefile(src, dst):
             return False
 
     # All other platforms: check for same pathname.
-    return os.path.normcase(os.path.abspath(src)) == os.path.normcase(
-        os.path.abspath(dst)
-    )
+    return os.path.normcase(os.path.abspath(src)) == os.path.normcase(os.path.abspath(dst))
 
 
 def _stat(fn):
@@ -713,9 +711,7 @@ def _rmtree_unsafe(path, onexc):
     def onerror(err):
         onexc(os.scandir, err.filename, err)
 
-    results = os.walk(
-        path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files
-    )
+    results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
     for dirpath, dirnames, filenames in results:
         for name in dirnames:
             fullname = os.path.join(dirpath, name)
@@ -960,9 +956,7 @@ def move(src, dst, copy_function=copy2):
             if _destinsrc(src, dst):
                 raise Error(f"Cannot move a directory '{src}' into itself '{dst}'.")
             if _is_immutable(src) or (
-                not os.access(src, os.W_OK)
-                and os.listdir(src)
-                and sys.platform == "darwin"
+                not os.access(src, os.W_OK) and os.listdir(src) and sys.platform == "darwin"
             ):
                 raise PermissionError(
                     "Cannot move the non-empty directory "
@@ -1065,8 +1059,7 @@ def _make_tarball(
         tar_compression = "xz"
     else:
         raise ValueError(
-            "bad value for 'compress', or compression format not "
-            f"supported : {compress}"
+            f"bad value for 'compress', or compression format not supported : {compress}"
         )
 
     import tarfile  # late import for breaking circular dependency
@@ -1620,9 +1613,7 @@ def _win_path_needs_curdir(cmd, mode):
     if we should add the cwd to PATH when searching for executables if
     the mode is executable.
     """
-    return (not (mode & os.X_OK)) or _winapi.NeedCurrentDirectoryForExePath(
-        os.fsdecode(cmd)
-    )
+    return (not (mode & os.X_OK)) or _winapi.NeedCurrentDirectoryForExePath(os.fsdecode(cmd))
 
 
 def which(cmd, mode=os.F_OK | os.X_OK, path=None):
@@ -1689,9 +1680,7 @@ def which(cmd, mode=os.F_OK | os.X_OK, path=None):
         # If X_OK not in mode, simulate the first result of where.exe:
         # always look at direct match before a PATHEXT match.
         normcmd = cmd.upper()
-        if not (mode & os.X_OK) or any(
-            normcmd.endswith(ext.upper()) for ext in pathext
-        ):
+        if not (mode & os.X_OK) or any(normcmd.endswith(ext.upper()) for ext in pathext):
             files.insert(0, cmd)
     else:
         # On other platforms you don't have things like PATHEXT to tell you

@@ -18,10 +18,10 @@ defpath = ".;C:\\bin"
 devnull = "nul"
 
 import genericpath
+from genericpath import *
 import os
 import stat
 import sys
-from genericpath import *
 
 __all__ = [
     "ALLOW_MISSING",
@@ -82,11 +82,7 @@ def _get_bothseps(path):
 try:
     from _winapi import (
         LCMAP_LOWERCASE as _LCMAP_LOWERCASE,
-    )
-    from _winapi import (
         LOCALE_NAME_INVARIANT as _LOCALE_NAME_INVARIANT,
-    )
-    from _winapi import (
         LCMapStringEx as _LCMapStringEx,
     )
 
@@ -104,9 +100,7 @@ try:
             s = _LCMapStringEx(_LOCALE_NAME_INVARIANT, _LCMAP_LOWERCASE, s)
             return s.encode(encoding, "surrogateescape")
         else:
-            return _LCMapStringEx(
-                _LOCALE_NAME_INVARIANT, _LCMAP_LOWERCASE, s.replace("/", "\\")
-            )
+            return _LCMapStringEx(_LOCALE_NAME_INVARIANT, _LCMAP_LOWERCASE, s.replace("/", "\\"))
 except ImportError:
 
     def normcase(s):
@@ -627,8 +621,10 @@ else:  # use native Windows method on Windows
 
 
 try:
-    from nt import _getfinalpathname
-    from nt import readlink as _nt_readlink
+    from nt import (
+        _getfinalpathname,
+        readlink as _nt_readlink,
+    )
 except ImportError:
     # realpath is a no-op on systems without _getfinalpathname support.
     def realpath(path, *, strict=False):
@@ -825,9 +821,7 @@ def relpath(path, start=None):
         start_drive, _, start_rest = splitroot(start_abs)
         path_drive, _, path_rest = splitroot(path_abs)
         if normcase(start_drive) != normcase(path_drive):
-            raise ValueError(
-                f"path is on mount {path_drive!r}, start on mount {start_drive!r}"
-            )
+            raise ValueError(f"path is on mount {path_drive!r}, start on mount {start_drive!r}")
 
         start_list = [x for x in start_rest.split(sep) if x]
         path_list = [x for x in path_rest.split(sep) if x]
@@ -911,10 +905,12 @@ try:
     # The isdir(), isfile(), islink() and exists() implementations in
     # genericpath use os.stat(). This is overkill on Windows. Use simpler
     # builtin functions if they are available.
-    from nt import _path_exists as exists
-    from nt import _path_isdir as isdir
-    from nt import _path_isfile as isfile
-    from nt import _path_islink as islink
+    from nt import (
+        _path_exists as exists,
+        _path_isdir as isdir,
+        _path_isfile as isfile,
+        _path_islink as islink,
+    )
 except ImportError:
     # Use genericpath.* as imported above
     pass

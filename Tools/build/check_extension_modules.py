@@ -20,7 +20,11 @@ See --help for more information
 
 import argparse
 import collections
+from collections.abc import Iterable
 import enum
+from importlib._bootstrap import _load as bootstrap_load
+from importlib.machinery import BuiltinImporter, ExtensionFileLoader, ModuleSpec
+from importlib.util import spec_from_file_location, spec_from_loader
 import logging
 import os
 import pathlib
@@ -28,10 +32,6 @@ import re
 import sys
 import sysconfig
 import warnings
-from collections.abc import Iterable
-from importlib._bootstrap import _load as bootstrap_load
-from importlib.machinery import BuiltinImporter, ExtensionFileLoader, ModuleSpec
-from importlib.util import spec_from_file_location, spec_from_loader
 
 SRC_DIR = pathlib.Path(__file__).parent.parent.parent
 
@@ -95,10 +95,7 @@ parser.add_argument(
 parser.add_argument(
     "--cross-compiling",
     action=argparse.BooleanOptionalAction,
-    help=(
-        "Use cross-compiling checks "
-        "(default: no, unless env var _PYTHON_HOST_PLATFORM is set)."
-    ),
+    help=("Use cross-compiling checks (default: no, unless env var _PYTHON_HOST_PLATFORM is set)."),
     default="_PYTHON_HOST_PLATFORM" in os.environ,
 )
 
@@ -214,9 +211,7 @@ class ModuleChecker:
             print()
 
         if verbose and self.notavailable:
-            print(
-                f"The following modules are not available on platform '{self.platform}':"
-            )
+            print(f"The following modules are not available on platform '{self.platform}':")
             print_three_column(self.notavailable)
             print()
 
@@ -234,9 +229,7 @@ class ModuleChecker:
             print_three_column(self.failed_on_import)
             print()
 
-        if any(
-            modinfo.name == "_ssl" for modinfo in self.missing + self.failed_on_import
-        ):
+        if any(modinfo.name == "_ssl" for modinfo in self.missing + self.failed_on_import):
             print("Could not build the ssl module!")
             print("Python requires a OpenSSL 1.1.1 or newer")
             if sysconfig.get_config_var("OPENSSL_LDFLAGS"):

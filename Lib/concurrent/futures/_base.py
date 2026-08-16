@@ -160,9 +160,7 @@ def _create_and_install_waiters(fs, return_when):
     elif return_when == FIRST_COMPLETED:
         waiter = _FirstCompletedWaiter()
     else:
-        pending_count = sum(
-            f._state not in [CANCELLED_AND_NOTIFIED, FINISHED] for f in fs
-        )
+        pending_count = sum(f._state not in [CANCELLED_AND_NOTIFIED, FINISHED] for f in fs)
 
         if return_when == FIRST_EXCEPTION:
             waiter = _AllCompletedWaiter(pending_count, stop_on_exception=True)
@@ -249,9 +247,7 @@ def as_completed(fs, timeout=None):
 
             # reverse to keep finishing order
             finished.reverse()
-            yield from _yield_finished_futures(
-                finished, waiter, ref_collect=(fs, pending)
-            )
+            yield from _yield_finished_futures(finished, waiter, ref_collect=(fs, pending))
 
     finally:
         # Remove waiter from unfinished futures
@@ -519,9 +515,7 @@ class Future:
                 self._state = RUNNING
                 return True
             else:
-                LOGGER.critical(
-                    "Future %s in unexpected state: %s", id(self), self._state
-                )
+                LOGGER.critical("Future %s in unexpected state: %s", id(self), self._state)
                 raise RuntimeError("Future in unexpected state")
 
     def set_result(self, result):

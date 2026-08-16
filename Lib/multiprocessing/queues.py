@@ -12,12 +12,12 @@ __all__ = ["JoinableQueue", "Queue", "SimpleQueue"]
 import collections
 import errno
 import os
+from queue import Empty, Full
 import sys
 import threading
 import time
 import types
 import weakref
-from queue import Empty, Full
 
 from . import connection, context
 

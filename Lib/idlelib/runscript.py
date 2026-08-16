@@ -10,14 +10,14 @@ sys.modules, and is also added to the __main__ namespace.
 TODO: Specify command line arguments in a dialog box.
 """
 
-import os
-import tabnanny
-import time
-import tokenize
 from idlelib import macosx, outwin, pyshell
 from idlelib.config import idleConf
 from idlelib.query import CustomRun
+import os
+import tabnanny
+import time
 from tkinter import messagebox
+import tokenize
 
 indent_message = """Error: Inconsistent indentation detected!
 

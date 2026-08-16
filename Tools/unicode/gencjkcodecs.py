@@ -72,9 +72,7 @@ def getregentry():
 def gencodecs(prefix):
     for loc, encodings in codecs.items():
         for enc in encodings:
-            code = TEMPLATE.substitute(
-                ENCODING=enc.upper(), encoding=enc.lower(), owner=loc
-            )
+            code = TEMPLATE.substitute(ENCODING=enc.upper(), encoding=enc.lower(), owner=loc)
             codecpath = os.path.join(prefix, enc + ".py")
             with open(codecpath, "w") as f:
                 f.write(code)

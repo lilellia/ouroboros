@@ -10,8 +10,8 @@ https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-
 import hashlib
 import json
 import os
-import re
 from pathlib import Path
+import re
 from urllib.request import urlopen
 
 PACKAGE_NAMES = ("pip",)
@@ -84,9 +84,7 @@ def verify_wheel(package_name: str) -> bool:
     print(f"Actual digest:   {actual_digest}")
 
     if actual_digest != expected_digest:
-        print_error(
-            package_path, f"Failed to verify the checksum of the {package_name} wheel."
-        )
+        print_error(package_path, f"Failed to verify the checksum of the {package_name} wheel.")
         return False
 
     print_notice(

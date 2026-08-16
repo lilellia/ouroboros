@@ -139,6 +139,8 @@ ConfigParser -- responsible for parsing a list of
         between keys and values are surrounded by spaces.
 """
 
+from collections import ChainMap as _ChainMap
+from collections.abc import MutableMapping
 import functools
 import io
 import itertools
@@ -146,8 +148,6 @@ import os
 import re
 import sys
 import warnings
-from collections import ChainMap as _ChainMap
-from collections.abc import MutableMapping
 
 __all__ = (
     "DEFAULTSECT",
@@ -421,13 +421,9 @@ class BasicInterpolation(Interpolation):
                 try:
                     v = map[var]
                 except KeyError:
-                    raise InterpolationMissingOptionError(
-                        option, section, rawval, var
-                    ) from None
+                    raise InterpolationMissingOptionError(option, section, rawval, var) from None
                 if "%" in v:
-                    self._interpolate_some(
-                        parser, option, accum, v, section, map, depth + 1
-                    )
+                    self._interpolate_some(parser, option, accum, v, section, map, depth + 1)
                 else:
                     accum.append(v)
             else:
@@ -832,9 +828,7 @@ class RawConfigParser(MutableMapping):
     def _get(self, section, conv, option, **kwargs):
         return conv(self.get(section, option, **kwargs))
 
-    def _get_conv(
-        self, section, option, conv, *, raw=False, vars=None, fallback=_UNSET, **kwargs
-    ):
+    def _get_conv(self, section, option, conv, *, raw=False, vars=None, fallback=_UNSET, **kwargs):
         try:
             return self._get(section, conv, option, raw=raw, vars=vars, **kwargs)
         except (NoSectionError, NoOptionError):
@@ -843,23 +837,15 @@ class RawConfigParser(MutableMapping):
             return fallback
 
     # getint, getfloat and getboolean provided directly for backwards compat
-    def getint(
-        self, section, option, *, raw=False, vars=None, fallback=_UNSET, **kwargs
-    ):
-        return self._get_conv(
-            section, option, int, raw=raw, vars=vars, fallback=fallback, **kwargs
-        )
+    def getint(self, section, option, *, raw=False, vars=None, fallback=_UNSET, **kwargs):
+        return self._get_conv(section, option, int, raw=raw, vars=vars, fallback=fallback, **kwargs)
 
-    def getfloat(
-        self, section, option, *, raw=False, vars=None, fallback=_UNSET, **kwargs
-    ):
+    def getfloat(self, section, option, *, raw=False, vars=None, fallback=_UNSET, **kwargs):
         return self._get_conv(
             section, option, float, raw=raw, vars=vars, fallback=fallback, **kwargs
         )
 
-    def getboolean(
-        self, section, option, *, raw=False, vars=None, fallback=_UNSET, **kwargs
-    ):
+    def getboolean(self, section, option, *, raw=False, vars=None, fallback=_UNSET, **kwargs):
         return self._get_conv(
             section,
             option,
@@ -968,9 +954,9 @@ class RawConfigParser(MutableMapping):
             value = self._interpolation.before_write(self, section_name, key, value)
             if value is not None or not self._allow_no_value:
                 # Convert all possible line-endings into '\n\t'
-                value = delimiter + str(value).replace("\r\n", "\n").replace(
-                    "\r", "\n"
-                ).replace("\n", "\n\t")
+                value = delimiter + str(value).replace("\r\n", "\n").replace("\r", "\n").replace(
+                    "\n", "\n\t"
+                )
             else:
                 value = ""
             fp.write(f"{key}{value}\n")
@@ -1134,9 +1120,7 @@ class RawConfigParser(MutableMapping):
                                 e = self._handle_error(e, fpname, lineno, line)
                             optname = self.optionxform(optname.rstrip())
                             if self._strict and (sectname, optname) in elements_added:
-                                raise DuplicateOptionError(
-                                    sectname, optname, fpname, lineno
-                                )
+                                raise DuplicateOptionError(sectname, optname, fpname, lineno)
                             elements_added.add((sectname, optname))
                             # This check is fine because the OPTCRE cannot
                             # match if it would set optval to None
@@ -1165,9 +1149,7 @@ class RawConfigParser(MutableMapping):
             for name, val in options.items():
                 if isinstance(val, list):
                     val = "\n".join(val).rstrip()
-                options[name] = self._interpolation.before_read(
-                    self, section, name, val
-                )
+                options[name] = self._interpolation.before_read(self, section, name, val)
 
     def _read_defaults(self, defaults):
         """Read the defaults passed in the initializer.
@@ -1290,8 +1272,7 @@ class SectionProxy(MutableMapping):
 
     def __delitem__(self, key):
         if not (
-            self._parser.has_option(self._name, key)
-            and self._parser.remove_option(self._name, key)
+            self._parser.has_option(self._name, key) and self._parser.remove_option(self._name, key)
         ):
             raise KeyError(key)
 
@@ -1331,9 +1312,7 @@ class SectionProxy(MutableMapping):
         # object that provides the desired type conversion.
         if not _impl:
             _impl = self._parser.get
-        return _impl(
-            self._name, option, raw=raw, vars=vars, fallback=fallback, **kwargs
-        )
+        return _impl(self._name, option, raw=raw, vars=vars, fallback=fallback, **kwargs)
 
 
 class ConverterMapping(MutableMapping):

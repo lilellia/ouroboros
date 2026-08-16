@@ -12,12 +12,12 @@ from test.support import requires
 
 requires("gui")
 
-import os
-import unittest
 from idlelib.idle_test.mock_idle import Func
 from idlelib.idle_test.mock_tk import Mbox_func
+import os
 from tkinter import CHAR, NONE, WORD, TclError, Tk
 from tkinter.ttk import Button
+import unittest
 
 
 def setUpModule():
@@ -212,16 +212,12 @@ class ButtonClickTest(unittest.TestCase):
 
         self.assertEqual(self.called, True)
         self.assertEqual(self.view.title(), "TITLE_TEXT")
-        self.assertEqual(
-            self.view.viewframe.textframe.text.get("1.0", "1.end"), "COMMAND"
-        )
+        self.assertEqual(self.view.viewframe.textframe.text.get("1.0", "1.end"), "COMMAND")
 
     def test_view_file_bind_with_button(self):
         def _command():
             self.called = True
-            self.view = tv.view_file(
-                root, "TITLE_FILE", __file__, encoding="ascii", _utest=True
-            )
+            self.view = tv.view_file(root, "TITLE_FILE", __file__, encoding="ascii", _utest=True)
 
         button = Button(root, text="BUTTON", command=_command)
         button.invoke()

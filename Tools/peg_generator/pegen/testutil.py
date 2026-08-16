@@ -35,9 +35,7 @@ def generate_parser(grammar: Grammar) -> type[Parser]:
     return ns["GeneratedParser"]
 
 
-def run_parser(
-    file: IO[bytes], parser_class: type[Parser], *, verbose: bool = False
-) -> Any:
+def run_parser(file: IO[bytes], parser_class: type[Parser], *, verbose: bool = False) -> Any:
     # Run a parser on a file (stream).
     tokenizer = Tokenizer(tokenize.generate_tokens(file.readline))  # type: ignore # typeshed issue #3515
     parser = parser_class(tokenizer, verbose=verbose)

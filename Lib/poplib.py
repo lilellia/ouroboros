@@ -300,10 +300,7 @@ class POP3:
                     # The server might already have closed the connection.
                     # On Windows, this may result in WSAEINVAL (error 10022):
                     # An invalid operation was attempted.
-                    if (
-                        exc.errno != errno.ENOTCONN
-                        and getattr(exc, "winerror", 0) != 10022
-                    ):
+                    if exc.errno != errno.ENOTCONN and getattr(exc, "winerror", 0) != 10022:
                         raise
                 finally:
                     sock.close()

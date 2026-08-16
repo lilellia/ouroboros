@@ -131,9 +131,7 @@ else:
 
     def _path_join(*path_parts):
         """Replacement for os.path.join()."""
-        return path_sep.join(
-            [part.rstrip(path_separators) for part in path_parts if part]
-        )
+        return path_sep.join([part.rstrip(path_separators) for part in path_parts if part])
 
 
 def _path_split(path):
@@ -593,14 +591,10 @@ def source_from_cache(path):
     elif dot_count == 3:
         optimization = pycache_filename.rsplit(".", 2)[-2]
         if not optimization.startswith(_OPT):
-            raise ValueError(
-                f"optimization portion of filename does not start with {_OPT!r}"
-            )
+            raise ValueError(f"optimization portion of filename does not start with {_OPT!r}")
         opt_level = optimization[len(_OPT) :]
         if not opt_level.isalnum():
-            raise ValueError(
-                f"optimization level {optimization!r} is not an alphanumeric value"
-            )
+            raise ValueError(f"optimization level {optimization!r} is not an alphanumeric value")
     base_filename = pycache_filename.partition(".")[0]
     return _path_join(head, base_filename + SOURCE_SUFFIXES[0])
 
@@ -735,9 +729,7 @@ def _validate_timestamp_pyc(data, source_mtime, source_size, name, exc_details):
         message = f"bytecode is stale for {name!r}"
         _bootstrap._verbose_message("{}", message)
         raise ImportError(message, **exc_details)
-    if source_size is not None and _unpack_uint32(data[12:16]) != (
-        source_size & 0xFFFFFFFF
-    ):
+    if source_size is not None and _unpack_uint32(data[12:16]) != (source_size & 0xFFFFFFFF):
         raise ImportError(f"bytecode is stale for {name!r}", **exc_details)
 
 
@@ -921,16 +913,12 @@ def _bless_my_loader(module_globals):
         if loader is None:
             exc = AttributeError if spec_loader is missing else ValueError
             raise exc("Module globals is missing a __spec__.loader")
-        _warnings.warn(
-            "Module globals is missing a __spec__.loader", DeprecationWarning
-        )
+        _warnings.warn("Module globals is missing a __spec__.loader", DeprecationWarning)
         spec_loader = loader
 
     assert spec_loader is not None
     if loader is not None and loader != spec_loader:
-        _warnings.warn(
-            "Module globals; __loader__ != __spec__.loader", DeprecationWarning
-        )
+        _warnings.warn("Module globals; __loader__ != __spec__.loader", DeprecationWarning)
         return loader
 
     return spec_loader
@@ -943,9 +931,7 @@ class WindowsRegistryFinder:
     """Meta path finder for modules declared in the Windows registry."""
 
     REGISTRY_KEY = "Software\\Python\\PythonCore\\{sys_version}\\Modules\\{fullname}"
-    REGISTRY_KEY_DEBUG = (
-        "Software\\Python\\PythonCore\\{sys_version}\\Modules\\{fullname}\\Debug"
-    )
+    REGISTRY_KEY_DEBUG = "Software\\Python\\PythonCore\\{sys_version}\\Modules\\{fullname}\\Debug"
     DEBUG_BUILD = _MS_WINDOWS and "_d.pyd" in EXTENSION_SUFFIXES
 
     @staticmethod
@@ -962,7 +948,8 @@ class WindowsRegistryFinder:
         else:
             registry_key = cls.REGISTRY_KEY
         key = registry_key.format(
-            fullname=fullname, sys_version="%d.%d" % sys.version_info[:2]  # noqa: UP031
+            fullname=fullname,
+            sys_version="%d.%d" % sys.version_info[:2],  # noqa: UP031
         )
         try:
             with cls._open_registry(key) as hkey:
@@ -1063,9 +1050,7 @@ class SourceLoader(_LoaderBasics):
         try:
             source_bytes = self.get_data(path)
         except OSError as exc:
-            raise ImportError(
-                "source not available through get_data()", name=fullname
-            ) from exc
+            raise ImportError("source not available through get_data()", name=fullname) from exc
         return decode_source(source_bytes)
 
     def source_to_code(self, data, path, *, _optimize=-1):
@@ -1124,9 +1109,7 @@ class SourceLoader(_LoaderBasics):
                                     _RAW_MAGIC_NUMBER,
                                     source_bytes,
                                 )
-                                _validate_hash_pyc(
-                                    data, source_hash, fullname, exc_details
-                                )
+                                _validate_hash_pyc(data, source_hash, fullname, exc_details)
                         else:
                             _validate_timestamp_pyc(
                                 data,
@@ -1138,9 +1121,7 @@ class SourceLoader(_LoaderBasics):
                     except (ImportError, EOFError):
                         pass
                     else:
-                        _bootstrap._verbose_message(
-                            "{} matches {}", bytecode_path, source_path
-                        )
+                        _bootstrap._verbose_message("{} matches {}", bytecode_path, source_path)
                         return _compile_bytecode(
                             bytes_data,
                             name=fullname,
@@ -1151,19 +1132,13 @@ class SourceLoader(_LoaderBasics):
             source_bytes = self.get_data(source_path)
         code_object = self.source_to_code(source_bytes, source_path)
         _bootstrap._verbose_message("code object from {}", source_path)
-        if (
-            not sys.dont_write_bytecode
-            and bytecode_path is not None
-            and source_mtime is not None
-        ):
+        if not sys.dont_write_bytecode and bytecode_path is not None and source_mtime is not None:
             if hash_based:
                 if source_hash is None:
                     source_hash = _imp.source_hash(_RAW_MAGIC_NUMBER, source_bytes)
                 data = _code_to_hash_pyc(code_object, source_hash, check_source)
             else:
-                data = _code_to_timestamp_pyc(
-                    code_object, source_mtime, len(source_bytes)
-                )
+                data = _code_to_timestamp_pyc(code_object, source_mtime, len(source_bytes))
             try:
                 self._cache_bytecode(source_path, bytecode_path, data)
             except NotImplementedError:
@@ -1306,9 +1281,7 @@ class ExtensionFileLoader(FileLoader, _LoaderBasics):
     def create_module(self, spec):
         """Create an uninitialized extension module"""
         module = _bootstrap._call_with_frames_removed(_imp.create_dynamic, spec)
-        _bootstrap._verbose_message(
-            "extension module {!r} loaded from {!r}", spec.name, self.path
-        )
+        _bootstrap._verbose_message("extension module {!r} loaded from {!r}", spec.name, self.path)
         return module
 
     def exec_module(self, module):
@@ -1434,9 +1407,7 @@ class NamespaceLoader:
 
         """
         # The import system never calls this method.
-        _bootstrap._verbose_message(
-            "namespace module loaded with path {!r}", self._path
-        )
+        _bootstrap._verbose_message("namespace module loaded with path {!r}", self._path)
         # Warning implemented in _load_module_shim().
         return _bootstrap._load_module_shim(self, fullname)
 
@@ -1641,9 +1612,7 @@ class FileFinder:
                 init_filename = "__init__" + suffix
                 full_path = _path_join(base_path, init_filename)
                 if _path_isfile(full_path):
-                    return self._get_spec(
-                        loader_class, fullname, full_path, [base_path], target
-                    )
+                    return self._get_spec(loader_class, fullname, full_path, [base_path], target)
             # If a namespace package, return the path if we don't
             #  find a module in the next section.
             is_namespace = _path_isdir(base_path)

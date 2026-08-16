@@ -194,9 +194,7 @@ def _format_layoutlist(layout, indent=0, indent_size=2):
         if "children" in opts:
             script.append(head + " -children {")
             indent += indent_size
-            newscript, indent = _format_layoutlist(
-                opts["children"], indent, indent_size
-            )
+            newscript, indent = _format_layoutlist(opts["children"], indent, indent_size)
             script.append(newscript)
             indent -= indent_size
             script.append("%s}" % (" " * indent))
@@ -459,9 +457,7 @@ class Style:
             lspec = "null"  # could be any other word, but this may make sense
             # when calling layout(style) later
 
-        return _list_from_layouttuple(
-            self.tk, self.tk.call(self._name, "layout", style, lspec)
-        )
+        return _list_from_layouttuple(self.tk, self.tk.call(self._name, "layout", style, lspec))
 
     def element_create(self, elementname, etype, *args, **kw):
         """Create a new element in the current theme of given etype."""
@@ -471,17 +467,14 @@ class Style:
     def element_names(self):
         """Returns the list of elements defined in the current theme."""
         return tuple(
-            n.lstrip("-")
-            for n in self.tk.splitlist(self.tk.call(self._name, "element", "names"))
+            n.lstrip("-") for n in self.tk.splitlist(self.tk.call(self._name, "element", "names"))
         )
 
     def element_options(self, elementname):
         """Return the list of elementname's options."""
         return tuple(
             o.lstrip("-")
-            for o in self.tk.splitlist(
-                self.tk.call(self._name, "element", "options", elementname)
-            )
+            for o in self.tk.splitlist(self.tk.call(self._name, "element", "options", elementname))
         )
 
     def theme_create(self, themename, parent=None, settings=None):
@@ -1442,9 +1435,7 @@ class Treeview(Widget, tkinter.XView, tkinter.YView):
         if item is None:
             return self.tk.splitlist(self.tk.call(self._w, "tag", "has", tagname))
         else:
-            return self.tk.getboolean(
-                self.tk.call(self._w, "tag", "has", tagname, item)
-            )
+            return self.tk.getboolean(self.tk.call(self._w, "tag", "has", tagname, item))
 
 
 # Extensions
@@ -1593,11 +1584,7 @@ class OptionMenu(Menubutton):
         for val in values:
             menu.add_radiobutton(
                 label=val,
-                command=(
-                    None
-                    if self._callback is None
-                    else lambda val=val: self._callback(val)
-                ),
+                command=(None if self._callback is None else lambda val=val: self._callback(val)),
                 variable=self._variable,
             )
 

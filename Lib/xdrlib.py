@@ -4,10 +4,10 @@ See: RFC 1014
 
 """
 
-import struct
-import warnings
 from functools import wraps
 from io import BytesIO
+import struct
+import warnings
 
 warnings._deprecated(__name__, remove=(3, 13))
 

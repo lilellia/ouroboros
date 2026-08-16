@@ -1,6 +1,5 @@
 "Test squeezer, coverage 95%"
 
-import unittest
 from idlelib import macosx
 from idlelib.config import idleConf
 from idlelib.percolator import Percolator
@@ -9,6 +8,7 @@ from idlelib.textview import view_text
 from idlelib.tooltip import Hovertip
 from textwrap import dedent
 from tkinter import Text, Tk
+import unittest
 from unittest.mock import ANY, Mock, NonCallableMagicMock, patch, sentinel
 
 from test.support import requires
@@ -129,9 +129,7 @@ class SqueezerTest(unittest.TestCase):
             (r"'aa\t' * 21", 80, 3),
             (r"'aa\t' * 20", 40, 4),
         ]:
-            with self.subTest(
-                text_code=text_code, line_width=line_width, expected=expected
-            ):
+            with self.subTest(text_code=text_code, line_width=line_width, expected=expected):
                 text = eval(text_code)
                 with patch.object(editwin, "width", line_width):
                     self.assertEqual(squeezer.count_lines(text), expected)
@@ -367,9 +365,7 @@ class ExpandingButtonTest(unittest.TestCase):
         # Check that the 'TAGS' tag was set on the inserted text.
         text_end_index = text_widget.index("end-1c")
         self.assertEqual(text_widget.get("1.0", text_end_index), "TEXT")
-        self.assertEqual(
-            text_widget.tag_nextrange("TAGS", "1.0"), ("1.0", text_end_index)
-        )
+        self.assertEqual(text_widget.tag_nextrange("TAGS", "1.0"), ("1.0", text_end_index))
 
         # Check that the button removed itself from squeezer.expandingbuttons.
         self.assertEqual(squeezer.expandingbuttons.remove.call_count, 1)
@@ -457,9 +453,7 @@ class ExpandingButtonTest(unittest.TestCase):
             mock_event.x = 10
             mock_event.y = 10
             expandingbutton.context_menu_event(event=mock_event)
-            self.assertEqual(
-                mock_menu.add_command.call_count, len(expandingbutton.rmenu_specs)
-            )
+            self.assertEqual(mock_menu.add_command.call_count, len(expandingbutton.rmenu_specs))
             for label, *data in expandingbutton.rmenu_specs:
                 mock_menu.add_command.assert_any_call(label=label, command=ANY)
 

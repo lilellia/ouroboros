@@ -227,9 +227,7 @@ def read_uint1(f):
     raise ValueError("not enough data in stream to read uint1")
 
 
-uint1 = ArgumentDescriptor(
-    name="uint1", n=1, reader=read_uint1, doc="One-byte unsigned integer."
-)
+uint1 = ArgumentDescriptor(name="uint1", n=1, reader=read_uint1, doc="One-byte unsigned integer.")
 
 
 def read_uint2(f):
@@ -360,9 +358,7 @@ def read_stringnl(f, decode=True, stripquotes=True, *, encoding="latin-1"):
         for q in (b'"', b"'"):
             if data.startswith(q):
                 if not data.endswith(q):
-                    raise ValueError(
-                        f"strinq quote {q!r} not found at both ends of {data!r}"
-                    )
+                    raise ValueError(f"strinq quote {q!r} not found at both ends of {data!r}")
                 data = data[1:-1]
                 break
         else:
@@ -1055,9 +1051,7 @@ pybytes_or_str = pystring = StackObject(
 
 pybytes = StackObject(name="bytes", obtype=bytes, doc="A Python bytes object.")
 
-pybytearray = StackObject(
-    name="bytearray", obtype=bytearray, doc="A Python bytearray object."
-)
+pybytearray = StackObject(name="bytearray", obtype=bytearray, doc="A Python bytearray object.")
 
 pyunicode = StackObject(name="str", obtype=str, doc="A Python (Unicode) string object.")
 
@@ -1071,9 +1065,7 @@ pydict = StackObject(name="dict", obtype=dict, doc="A Python dict object.")
 
 pyset = StackObject(name="set", obtype=set, doc="A Python set object.")
 
-pyfrozenset = StackObject(
-    name="frozenset", obtype=set, doc="A Python frozenset object."
-)
+pyfrozenset = StackObject(name="frozenset", obtype=set, doc="A Python frozenset object.")
 
 pybuffer = StackObject(name="buffer", obtype=object, doc="A Python buffer-like object.")
 
@@ -2301,10 +2293,7 @@ def assure_pickle_consistency(verbose=False):
         picklecode = getattr(pickle, name)
         if not isinstance(picklecode, bytes) or len(picklecode) != 1:
             if verbose:
-                print(
-                    f"skipping {name!r}: value {picklecode!r} doesn't look like a pickle "
-                    "code"
-                )
+                print(f"skipping {name!r}: value {picklecode!r} doesn't look like a pickle code")
             continue
         picklecode = picklecode.decode("latin-1")
         if picklecode in copy:
@@ -2527,10 +2516,13 @@ def dis(pickle, out=None, memo=None, indentlevel=4, annotate=0):
         if pos is not None:
             print("%5d:" % pos, end=" ", file=out)  # noqa: UP031
 
-        line = "%-4s %s%s" % (  # noqa: UP031
-            repr(opcode.code)[1:-1],
-            indentchunk * len(markstack),
-            opcode.name,
+        line = (
+            "%-4s %s%s"  # noqa: UP031
+            % (
+                repr(opcode.code)[1:-1],
+                indentchunk * len(markstack),
+                opcode.name,
+            )
         )
 
         maxproto = max(maxproto, opcode.proto)
@@ -2540,9 +2532,7 @@ def dis(pickle, out=None, memo=None, indentlevel=4, annotate=0):
 
         # See whether a MARK should be popped.
         markmsg = None
-        if markobject in before or (
-            opcode.name == "POP" and stack and stack[-1] is markobject
-        ):
+        if markobject in before or (opcode.name == "POP" and stack and stack[-1] is markobject):
             assert markobject not in after
             if __debug__ and markobject in before:
                 assert before[-1] is stackslice
@@ -2938,9 +2928,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="disassemble one or more pickle files")
     parser.add_argument("pickle_file", nargs="*", help="the pickle file")
-    parser.add_argument(
-        "-o", "--output", help="the file where the output should be written"
-    )
+    parser.add_argument("-o", "--output", help="the file where the output should be written")
     parser.add_argument(
         "-m", "--memo", action="store_true", help="preserve memo between disassemblies"
     )
@@ -2961,13 +2949,10 @@ if __name__ == "__main__":
         "-p",
         "--preamble",
         default="==> {name} <==",
-        help="if more than one pickle file is specified, print this before"
-        " each disassembly",
+        help="if more than one pickle file is specified, print this before each disassembly",
     )
     parser.add_argument("-t", "--test", action="store_true", help="run self-test suite")
-    parser.add_argument(
-        "-v", action="store_true", help="run verbosely; only affects self-test run"
-    )
+    parser.add_argument("-v", action="store_true", help="run verbosely; only affects self-test run")
     args = parser.parse_args()
     if args.test:
         _test()

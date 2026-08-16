@@ -57,9 +57,7 @@ class IncrementalDecoder(codecs.BufferedIncrementalDecoder):
 
     def _buffer_decode(self, input, errors, final):
         if self.decoder is None:
-            (output, consumed, byteorder) = codecs.utf_32_ex_decode(
-                input, errors, 0, final
-            )
+            (output, consumed, byteorder) = codecs.utf_32_ex_decode(input, errors, 0, final)
             if byteorder == -1:
                 self.decoder = codecs.utf_32_le_decode
             elif byteorder == 1:
@@ -83,9 +81,7 @@ class IncrementalDecoder(codecs.BufferedIncrementalDecoder):
         # 2: endianness hasn't been determined yet
         if self.decoder is None:
             return (state, 2)
-        addstate = int(
-            (sys.byteorder == "big") != (self.decoder is codecs.utf_32_be_decode)
-        )
+        addstate = int((sys.byteorder == "big") != (self.decoder is codecs.utf_32_be_decode))
         return (state, addstate)
 
     def setstate(self, state):
@@ -94,15 +90,11 @@ class IncrementalDecoder(codecs.BufferedIncrementalDecoder):
         state = state[1]
         if state == 0:
             self.decoder = (
-                codecs.utf_32_be_decode
-                if sys.byteorder == "big"
-                else codecs.utf_32_le_decode
+                codecs.utf_32_be_decode if sys.byteorder == "big" else codecs.utf_32_le_decode
             )
         elif state == 1:
             self.decoder = (
-                codecs.utf_32_le_decode
-                if sys.byteorder == "big"
-                else codecs.utf_32_be_decode
+                codecs.utf_32_le_decode if sys.byteorder == "big" else codecs.utf_32_be_decode
             )
         else:
             self.decoder = None

@@ -1,15 +1,15 @@
 """Utilities to support packages."""
 
+from collections import namedtuple
+from functools import singledispatch as simplegeneric
 import importlib
 import importlib.machinery
 import importlib.util
 import os
 import os.path
 import sys
-import warnings
-from collections import namedtuple
-from functools import singledispatch as simplegeneric
 from types import ModuleType
+import warnings
 
 __all__ = [
     "ModuleInfo",
@@ -176,9 +176,7 @@ def _iter_file_finder_modules(importer, prefix=""):
             yield prefix + modname, ispkg
 
 
-iter_importer_modules.register(
-    importlib.machinery.FileFinder, _iter_file_finder_modules
-)
+iter_importer_modules.register(importlib.machinery.FileFinder, _iter_file_finder_modules)
 
 
 try:

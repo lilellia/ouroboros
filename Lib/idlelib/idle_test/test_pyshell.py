@@ -1,9 +1,9 @@
 "Test pyshell, coverage 12%."
 # Plus coverage of test_warning.  Was 20% with test_openshell.
 
-import unittest
 from idlelib import pyshell
 from tkinter import Tk
+import unittest
 
 from test.support import requires
 

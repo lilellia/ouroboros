@@ -32,21 +32,15 @@ def test_effect_sizes():
     assert generate_cases.list_effect_size(other_effects) == (2, "(oparg<<1)")
 
     assert (
-        generate_cases.string_effect_size(
-            generate_cases.list_effect_size(input_effects)
-        )
+        generate_cases.string_effect_size(generate_cases.list_effect_size(input_effects))
         == "1 + oparg + oparg*2"
     )
     assert (
-        generate_cases.string_effect_size(
-            generate_cases.list_effect_size(output_effects)
-        )
+        generate_cases.string_effect_size(generate_cases.list_effect_size(output_effects))
         == "2 + oparg*4"
     )
     assert (
-        generate_cases.string_effect_size(
-            generate_cases.list_effect_size(other_effects)
-        )
+        generate_cases.string_effect_size(generate_cases.list_effect_size(other_effects))
         == "2 + (oparg<<1)"
     )
 

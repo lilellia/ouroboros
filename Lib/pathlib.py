@@ -5,6 +5,8 @@ paths with operations that have semantics appropriate for different
 operating systems.
 """
 
+from _collections_abc import Sequence
+from errno import EBADF, ELOOP, ENOENT, ENOTDIR
 import fnmatch
 import functools
 import io
@@ -12,12 +14,10 @@ import ntpath
 import os
 import posixpath
 import re
-import sys
-import warnings
-from _collections_abc import Sequence
-from errno import EBADF, ELOOP, ENOENT, ENOTDIR
 from stat import S_ISBLK, S_ISCHR, S_ISDIR, S_ISFIFO, S_ISLNK, S_ISREG, S_ISSOCK
+import sys
 from urllib.parse import quote_from_bytes as urlquote_from_bytes
+import warnings
 
 __all__ = [
     "Path",
@@ -93,10 +93,7 @@ def _make_selector(pattern_parts, flavour, case_sensitive):
         return _TerminatingSelector()
     if pat == "**":
         child_parts_idx = 1
-        while (
-            child_parts_idx < len(pattern_parts)
-            and pattern_parts[child_parts_idx] == "**"
-        ):
+        while child_parts_idx < len(pattern_parts) and pattern_parts[child_parts_idx] == "**":
             child_parts_idx += 1
         child_parts = pattern_parts[child_parts_idx:]
         if "**" in child_parts:
@@ -108,9 +105,7 @@ def _make_selector(pattern_parts, flavour, case_sensitive):
         if pat == "..":
             cls = _ParentSelector
         elif "**" in pat:
-            raise ValueError(
-                "Invalid pattern: '**' can only be an entire path component"
-            )
+            raise ValueError("Invalid pattern: '**' can only be an entire path component")
         else:
             cls = _WildcardSelector
     return cls(pat, child_parts, flavour, case_sensitive)
@@ -290,9 +285,7 @@ class _PathParents(Sequence):
             raise IndexError(idx)
         if idx < 0:
             idx += len(self)
-        return self._path._from_parsed_parts(
-            self._drv, self._root, self._tail[: -idx - 1]
-        )
+        return self._path._from_parsed_parts(self._drv, self._root, self._tail[: -idx - 1])
 
     def __repr__(self):
         return f"<{type(self._path).__name__}.parents>"
@@ -446,9 +439,7 @@ class PurePath:
         try:
             return self._str
         except AttributeError:
-            self._str = (
-                self._format_parsed_parts(self.drive, self.root, self._tail) or "."
-            )
+            self._str = self._format_parsed_parts(self.drive, self.root, self._tail) or "."
             return self._str
 
     def __fspath__(self):
@@ -526,10 +517,7 @@ class PurePath:
     def __eq__(self, other):
         if not isinstance(other, PurePath):
             return NotImplemented
-        return (
-            self._str_normcase == other._str_normcase
-            and self._flavour is other._flavour
-        )
+        return self._str_normcase == other._str_normcase and self._flavour is other._flavour
 
     def __hash__(self):
         try:
@@ -682,17 +670,13 @@ class PurePath:
                 "to pathlib.PurePath.relative_to() is deprecated and "
                 "scheduled for removal in Python {remove}"
             )
-            warnings._deprecated(
-                "pathlib.PurePath.relative_to(*args)", msg, remove=(3, 14)
-            )
+            warnings._deprecated("pathlib.PurePath.relative_to(*args)", msg, remove=(3, 14))
         other = self.with_segments(other, *_deprecated)
         for step, path in enumerate([other] + list(other.parents)):
             if self.is_relative_to(path):
                 break
             elif not walk_up:
-                raise ValueError(
-                    f"{str(self)!r} is not in the subpath of {str(other)!r}"
-                )
+                raise ValueError(f"{str(self)!r} is not in the subpath of {str(other)!r}")
             elif path.name == "..":
                 raise ValueError(f"'..' segment in {str(other)!r} cannot be walked")
         else:
@@ -708,9 +692,7 @@ class PurePath:
                 "pathlib.PurePath.is_relative_to() is deprecated and "
                 "scheduled for removal in Python {remove}"
             )
-            warnings._deprecated(
-                "pathlib.PurePath.is_relative_to(*args)", msg, remove=(3, 14)
-            )
+            warnings._deprecated("pathlib.PurePath.is_relative_to(*args)", msg, remove=(3, 14))
         other = self.with_segments(other, *_deprecated)
         return other == self or other in self.parents
 
@@ -1059,9 +1041,7 @@ class Path(PurePath):
         if not isinstance(data, str):
             raise TypeError(f"data must be str, not {data.__class__.__name__}")
         encoding = io.text_encoding(encoding)
-        with self.open(
-            mode="w", encoding=encoding, errors=errors, newline=newline
-        ) as f:
+        with self.open(mode="w", encoding=encoding, errors=errors, newline=newline) as f:
             return f.write(data)
 
     def iterdir(self):
@@ -1121,9 +1101,7 @@ class Path(PurePath):
             raise NotImplementedError("Non-relative patterns are unsupported")
         if pattern and pattern[-1] in (self._flavour.sep, self._flavour.altsep):
             pattern_parts.append("")
-        selector = _make_selector(
-            ("**",) + tuple(pattern_parts), self._flavour, case_sensitive
-        )
+        selector = _make_selector(("**",) + tuple(pattern_parts), self._flavour, case_sensitive)
         yield from selector.select_from(self)
 
     def walk(self, top_down=True, on_error=None, follow_symlinks=False):
@@ -1444,9 +1422,7 @@ class PosixPath(Path, PurePosixPath):
     if os.name == "nt":
 
         def __new__(cls, *args, **kwargs):
-            raise NotImplementedError(
-                f"cannot instantiate {cls.__name__!r} on your system"
-            )
+            raise NotImplementedError(f"cannot instantiate {cls.__name__!r} on your system")
 
 
 class WindowsPath(Path, PureWindowsPath):
@@ -1460,6 +1436,4 @@ class WindowsPath(Path, PureWindowsPath):
     if os.name != "nt":
 
         def __new__(cls, *args, **kwargs):
-            raise NotImplementedError(
-                f"cannot instantiate {cls.__name__!r} on your system"
-            )
+            raise NotImplementedError(f"cannot instantiate {cls.__name__!r} on your system")

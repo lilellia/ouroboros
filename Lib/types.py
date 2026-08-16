@@ -196,9 +196,7 @@ def get_original_bases(cls, /):
     try:
         return cls.__dict__.get("__orig_bases__", cls.__bases__)
     except AttributeError:
-        raise TypeError(
-            f"Expected an instance of type, not {type(cls).__name__!r}"
-        ) from None
+        raise TypeError(f"Expected an instance of type, not {type(cls).__name__!r}") from None
 
 
 class DynamicClassAttribute:
@@ -320,10 +318,7 @@ def coroutine(func):
     if not callable(func):
         raise TypeError("types.coroutine() expects a callable")
 
-    if (
-        func.__class__ is FunctionType
-        and getattr(func, "__code__", None).__class__ is CodeType
-    ):
+    if func.__class__ is FunctionType and getattr(func, "__code__", None).__class__ is CodeType:
         co_flags = func.__code__.co_flags
 
         # Check if 'func' is a coroutine function.

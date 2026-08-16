@@ -23,11 +23,11 @@ The action function may be an instance method so it
 has another way to reference private data (besides global variables).
 """
 
+from collections import namedtuple
 import heapq
+from itertools import count
 import threading
 import time
-from collections import namedtuple
-from itertools import count
 from time import monotonic as _time
 
 __all__ = ["scheduler"]
@@ -70,9 +70,7 @@ class scheduler:
             kwargs = {}
 
         with self._lock:
-            event = Event(
-                time, priority, next(self._sequence_generator), action, argument, kwargs
-            )
+            event = Event(time, priority, next(self._sequence_generator), action, argument, kwargs)
             heapq.heappush(self._queue, event)
         return event  # The ID
 

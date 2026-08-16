@@ -131,9 +131,7 @@ class _ResourceSharer:
 
         assert self._listener is None, "Already have Listener"
         util.debug("starting listener and thread for sending handles")
-        self._listener = Listener(
-            authkey=process.current_process().authkey, backlog=128
-        )
+        self._listener = Listener(authkey=process.current_process().authkey, backlog=128)
         self._address = self._listener.address
         t = threading.Thread(target=self._serve)
         t.daemon = True

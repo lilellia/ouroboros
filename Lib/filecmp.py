@@ -10,9 +10,9 @@ Functions:
 
 """
 
+from itertools import filterfalse
 import os
 import stat
-from itertools import filterfalse
 from types import GenericAlias
 
 __all__ = ["DEFAULT_IGNORES", "clear_cache", "cmp", "cmpfiles", "dircmp"]

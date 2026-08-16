@@ -1,6 +1,6 @@
+from collections.abc import Sequence
 import os.path
 import token
-from collections.abc import Sequence
 from typing import IO, Any
 
 from pegen import grammar
@@ -205,9 +205,7 @@ class PythonParserGenerator(ParserGenerator, GrammarVisitor):
         super().__init__(grammar, tokens, file)
         self.callmakervisitor: PythonCallMakerVisitor = PythonCallMakerVisitor(self)
         self.invalidvisitor: InvalidNodeVisitor = InvalidNodeVisitor()
-        self.unreachable_formatting = (
-            unreachable_formatting or "None  # pragma: no cover"
-        )
+        self.unreachable_formatting = unreachable_formatting or "None  # pragma: no cover"
         self.location_formatting = (
             location_formatting
             or "lineno=start_lineno, col_offset=start_col_offset, "
@@ -224,9 +222,7 @@ class PythonParserGenerator(ParserGenerator, GrammarVisitor):
         if subheader:
             self.print(subheader)
         cls_name = self.grammar.metas.get("class", "GeneratedParser")
-        self.print(
-            "# Keywords and soft keywords are listed at the end of the parser definition."
-        )
+        self.print("# Keywords and soft keywords are listed at the end of the parser definition.")
         self.print(f"class {cls_name}(Parser):")
         for rule in self.all_rules.values():
             self.print()
@@ -238,9 +234,7 @@ class PythonParserGenerator(ParserGenerator, GrammarVisitor):
             self.print(f"KEYWORDS = {tuple(self.keywords)}")
             self.print(f"SOFT_KEYWORDS = {tuple(self.soft_keywords)}")
 
-        trailer = self.grammar.metas.get(
-            "trailer", MODULE_SUFFIX.format(class_name=cls_name)
-        )
+        trailer = self.grammar.metas.get("trailer", MODULE_SUFFIX.format(class_name=cls_name))
         if trailer is not None:
             self.print(trailer.rstrip("\n"))
 
@@ -249,9 +243,7 @@ class PythonParserGenerator(ParserGenerator, GrammarVisitor):
             if alt.action and "LOCATIONS" in alt.action:
                 return True
             for n in alt.items:
-                if isinstance(n.item, Group) and self.alts_uses_locations(
-                    n.item.rhs.alts
-                ):
+                if isinstance(n.item, Group) and self.alts_uses_locations(n.item.rhs.alts):
                     return True
         return False
 
@@ -295,9 +287,7 @@ class PythonParserGenerator(ParserGenerator, GrammarVisitor):
                 name = self.dedupe(name)
             self.print(f"({name} := {call})")
 
-    def visit_Rhs(
-        self, node: Rhs, is_loop: bool = False, is_gather: bool = False
-    ) -> None:
+    def visit_Rhs(self, node: Rhs, is_loop: bool = False, is_gather: bool = False) -> None:
         if is_loop:
             assert len(node.alts) == 1
         for alt in node.alts:
@@ -329,7 +319,9 @@ class PythonParserGenerator(ParserGenerator, GrammarVisitor):
                 if not action:
                     if is_gather:
                         assert len(self.local_variable_names) == 2
-                        action = f"[{self.local_variable_names[0]}] + {self.local_variable_names[1]}"
+                        action = (
+                            f"[{self.local_variable_names[0]}] + {self.local_variable_names[1]}"
+                        )
                     else:
                         if self.invalidvisitor.visit(node):
                             action = "UNREACHABLE"
@@ -347,9 +339,7 @@ class PythonParserGenerator(ParserGenerator, GrammarVisitor):
                     self.print("mark = self._mark()")
                 else:
                     if "UNREACHABLE" in action:
-                        action = action.replace(
-                            "UNREACHABLE", self.unreachable_formatting
-                        )
+                        action = action.replace("UNREACHABLE", self.unreachable_formatting)
                     self.print(f"return {action}")
 
             self.print("self._reset(mark)")

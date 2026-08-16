@@ -1,11 +1,11 @@
 "Test run, coverage 54%."
 
 import idlelib
+from idlelib import run
+from idlelib.idle_test.mock_idle import Func
 import io
 import sys
 import unittest
-from idlelib import run
-from idlelib.idle_test.mock_idle import Func
 from unittest import mock
 
 from test.support import captured_output, captured_stderr

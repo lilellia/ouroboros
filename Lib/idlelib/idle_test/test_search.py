@@ -1,7 +1,7 @@
 "Test search, coverage 69%."
 
-import unittest
 from idlelib import search
+import unittest
 
 from test.support import requires
 

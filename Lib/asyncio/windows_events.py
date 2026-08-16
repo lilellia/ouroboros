@@ -8,13 +8,13 @@ if sys.platform != "win32":  # pragma: no cover
 import _overlapped
 import _winapi
 import errno
+from functools import partial
 import math
 import msvcrt
 import socket
 import struct
 import time
 import weakref
-from functools import partial
 
 from . import (
     base_subprocess,
@@ -243,9 +243,7 @@ class _WaitHandleFuture(_BaseWaitHandleFuture):
                 return
             # ERROR_IO_PENDING is not an error, the wait was unregistered
 
-        self._event_fut = self._proactor._wait_cancel(
-            self._event, self._unregister_wait_cb
-        )
+        self._event_fut = self._proactor._wait_cancel(self._event, self._unregister_wait_cb)
 
 
 class PipeServer:
@@ -282,9 +280,7 @@ class PipeServer:
         h = _winapi.CreateNamedPipe(
             self._address,
             flags,
-            _winapi.PIPE_TYPE_MESSAGE
-            | _winapi.PIPE_READMODE_MESSAGE
-            | _winapi.PIPE_WAIT,
+            _winapi.PIPE_TYPE_MESSAGE | _winapi.PIPE_READMODE_MESSAGE | _winapi.PIPE_WAIT,
             _winapi.PIPE_UNLIMITED_INSTANCES,
             windows_utils.BUFSIZE,
             windows_utils.BUFSIZE,
@@ -348,9 +344,7 @@ class ProactorEventLoop(proactor_events.BaseProactorEventLoop):
         f = self._proactor.connect_pipe(address)
         pipe = await f
         protocol = protocol_factory()
-        trans = self._make_duplex_pipe_transport(
-            pipe, protocol, extra={"addr": address}
-        )
+        trans = self._make_duplex_pipe_transport(pipe, protocol, extra={"addr": address})
         return trans, protocol
 
     async def start_serving_pipe(self, protocol_factory, address):
@@ -370,9 +364,7 @@ class ProactorEventLoop(proactor_events.BaseProactorEventLoop):
                         return
 
                     protocol = protocol_factory()
-                    self._make_duplex_pipe_transport(
-                        pipe, protocol, extra={"addr": address}
-                    )
+                    self._make_duplex_pipe_transport(pipe, protocol, extra={"addr": address})
 
                 pipe = server._get_unconnected_pipe()
                 if pipe is None:
@@ -546,9 +538,7 @@ class IocpProactor:
         except BrokenPipeError:
             return self._result((b"", None))
 
-        return self._register(
-            ov, conn, partial(self._finish_recvfrom, empty_result=b"")
-        )
+        return self._register(ov, conn, partial(self._finish_recvfrom, empty_result=b""))
 
     def recvfrom_into(self, conn, buf, flags=0):
         self._register_with_iocp(conn)
@@ -588,9 +578,7 @@ class IocpProactor:
             ov.getresult()
             # Use SO_UPDATE_ACCEPT_CONTEXT so getsockname() etc work.
             buf = struct.pack("@P", listener.fileno())
-            conn.setsockopt(
-                socket.SOL_SOCKET, _overlapped.SO_UPDATE_ACCEPT_CONTEXT, buf
-            )
+            conn.setsockopt(socket.SOL_SOCKET, _overlapped.SO_UPDATE_ACCEPT_CONTEXT, buf)
             conn.settimeout(listener.gettimeout())
             return conn, conn.getpeername()
 
@@ -717,9 +705,7 @@ class IocpProactor:
 
         # We only create ov so we can use ov.address as a key for the cache.
         ov = _overlapped.Overlapped(NULL)
-        wait_handle = _overlapped.RegisterWaitWithQueue(
-            handle, self._iocp, ov.address, ms
-        )
+        wait_handle = _overlapped.RegisterWaitWithQueue(handle, self._iocp, ov.address, ms)
         if _is_cancel:
             f = _WaitCancelFuture(ov, handle, wait_handle, loop=self._loop)
         else:
@@ -821,10 +807,7 @@ class IocpProactor:
                 if self._loop.get_debug():
                     self._loop.call_exception_handler(
                         {
-                            "message": (
-                                "GetQueuedCompletionStatus() returned an "
-                                "unexpected event"
-                            ),
+                            "message": ("GetQueuedCompletionStatus() returned an unexpected event"),
                             "status": (
                                 f"err={err} transferred={transferred} key={key:#x} address={address:#x}"
                             ),

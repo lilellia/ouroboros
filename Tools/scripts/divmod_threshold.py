@@ -3,10 +3,9 @@
 # Determine threshold for switching from longobject.c divmod to
 # _pylong.int_divmod().
 
+from _pylong import int_divmod as divmod_fast
 from random import randrange
 from time import perf_counter as now
-
-from _pylong import int_divmod as divmod_fast
 
 BITS_PER_DIGIT = 30
 

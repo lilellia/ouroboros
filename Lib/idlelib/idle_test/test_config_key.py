@@ -5,11 +5,11 @@ may be skipped, and dummy function in bind test should not be called.
 Not tested: exit with 'self.advanced or self.keys_ok(keys) ...' False.
 """
 
-import unittest
 from idlelib import config_key
 from idlelib.idle_test.mock_idle import Func
 from idlelib.idle_test.mock_tk import Mbox_func
 from tkinter import TclError, Tk
+import unittest
 from unittest import mock
 
 from test.support import requires
@@ -256,9 +256,7 @@ class CancelWindowTest(unittest.TestCase):
         requires("gui")
         cls.root = Tk()
         cls.root.withdraw()
-        cls.dialog = config_key.GetKeysWindow(
-            cls.root, "Title", "<<Test>>", [], _utest=True
-        )
+        cls.dialog = config_key.GetKeysWindow(cls.root, "Title", "<<Test>>", [], _utest=True)
 
     @classmethod
     def tearDownClass(cls):
@@ -286,9 +284,7 @@ class OKWindowTest(unittest.TestCase):
         requires("gui")
         cls.root = Tk()
         cls.root.withdraw()
-        cls.dialog = config_key.GetKeysWindow(
-            cls.root, "Title", "<<Test>>", [], _utest=True
-        )
+        cls.dialog = config_key.GetKeysWindow(cls.root, "Title", "<<Test>>", [], _utest=True)
 
     @classmethod
     def tearDownClass(cls):
@@ -315,9 +311,7 @@ class WindowResultTest(unittest.TestCase):
         requires("gui")
         cls.root = Tk()
         cls.root.withdraw()
-        cls.dialog = config_key.GetKeysWindow(
-            cls.root, "Title", "<<Test>>", [], _utest=True
-        )
+        cls.dialog = config_key.GetKeysWindow(cls.root, "Title", "<<Test>>", [], _utest=True)
 
     @classmethod
     def tearDownClass(cls):

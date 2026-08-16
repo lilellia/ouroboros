@@ -138,8 +138,7 @@ def _splitdict(tk, v, cut_minus=True, conv=None):
     t = tk.splitlist(v)
     if len(t) % 2:
         raise RuntimeError(
-            "Tcl list representing a dict is expected "
-            "to contain an even number of elements"
+            "Tcl list representing a dict is expected to contain an even number of elements"
         )
     it = iter(t)
     dict = {}
@@ -941,9 +940,7 @@ class Misc:
         given as first parameter.
         """
         if not id:
-            raise ValueError(
-                "id must be a valid identifier returned from after or after_idle"
-            )
+            raise ValueError("id must be a valid identifier returned from after or after_idle")
         try:
             data = self.tk.call("after", "info", id)
             script = self.tk.splitlist(data)[0]
@@ -1563,9 +1560,7 @@ class Misc:
         try:
             return self._root()._windowingsystem_cached
         except AttributeError:
-            ws = self._root()._windowingsystem_cached = self.tk.call(
-                "tk", "windowingsystem"
-            )
+            ws = self._root()._windowingsystem_cached = self.tk.call("tk", "windowingsystem")
             return ws
 
     def _options(self, cnf, kw=None):
@@ -1790,9 +1785,7 @@ class Misc:
     def keys(self):
         """Return a list of all resource names of this widget."""
         splitlist = self.tk.splitlist
-        return [
-            splitlist(x)[0][1:] for x in splitlist(self.tk.call(self._w, "configure"))
-        ]
+        return [splitlist(x)[0][1:] for x in splitlist(self.tk.call(self._w, "configure"))]
 
     def __str__(self):
         """Return the window path name of this widget."""
@@ -2076,9 +2069,7 @@ class Wm:
         of this widget to be between MINNUMER/MINDENOM and MAXNUMER/MAXDENOM. Return a tuple
         of the actual values if no argument is given."""
         return self._getints(
-            self.tk.call(
-                "wm", "aspect", self._w, minNumer, minDenom, maxNumer, maxDenom
-            )
+            self.tk.call("wm", "aspect", self._w, minNumer, minDenom, maxNumer, maxDenom)
         )
 
     aspect = wm_aspect
@@ -2123,9 +2114,7 @@ class Wm:
         if wlist:
             self.tk.call(args)
         else:
-            return [
-                self._nametowidget(x) for x in self.tk.splitlist(self.tk.call(args))
-            ]
+            return [self._nametowidget(x) for x in self.tk.splitlist(self.tk.call(args))]
 
     colormapwindows = wm_colormapwindows
 
@@ -2181,9 +2170,7 @@ class Wm:
         height of a grid unit in pixels. BASEWIDTH and BASEHEIGHT are the
         number of grid units requested in Tk_GeometryRequest."""
         return self._getints(
-            self.tk.call(
-                "wm", "grid", self._w, baseWidth, baseHeight, widthInc, heightInc
-            )
+            self.tk.call("wm", "grid", self._w, baseWidth, baseHeight, widthInc, heightInc)
         )
 
     grid = wm_grid
@@ -2300,9 +2287,7 @@ class Wm:
         """Instruct the window manager to ignore this widget
         if BOOLEAN is given with 1. Return the current value if None
         is given."""
-        return self._getboolean(
-            self.tk.call("wm", "overrideredirect", self._w, boolean)
-        )
+        return self._getboolean(self.tk.call("wm", "overrideredirect", self._w, boolean))
 
     overrideredirect = wm_overrideredirect
 
@@ -4112,17 +4097,13 @@ class Text(Widget, XView, YView):
         """Return a list of start and end index for the first sequence of
         characters between INDEX1 and INDEX2 which all have tag TAGNAME.
         The text is searched forward from INDEX1."""
-        return self.tk.splitlist(
-            self.tk.call(self._w, "tag", "nextrange", tagName, index1, index2)
-        )
+        return self.tk.splitlist(self.tk.call(self._w, "tag", "nextrange", tagName, index1, index2))
 
     def tag_prevrange(self, tagName, index1, index2=None):
         """Return a list of start and end index for the first sequence of
         characters between INDEX1 and INDEX2 which all have tag TAGNAME.
         The text is searched backwards from INDEX1."""
-        return self.tk.splitlist(
-            self.tk.call(self._w, "tag", "prevrange", tagName, index1, index2)
-        )
+        return self.tk.splitlist(self.tk.call(self._w, "tag", "prevrange", tagName, index1, index2))
 
     def tag_raise(self, tagName, aboveThis=None):
         """Change the priority of tag TAGNAME such that it is higher
@@ -4809,9 +4790,7 @@ def _test():
     test = Button(
         root,
         text="Click me!",
-        command=lambda root=root: root.test.configure(
-            text="[{}]".format(root.test["text"])
-        ),
+        command=lambda root=root: root.test.configure(text="[{}]".format(root.test["text"])),
     )
     test.pack()
     root.test = test

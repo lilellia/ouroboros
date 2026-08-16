@@ -1,8 +1,8 @@
 "Test autoexpand, coverage 100%."
 
-import unittest
 from idlelib.autoexpand import AutoExpand
 from tkinter import Text, Tk
+import unittest
 
 from test.support import requires
 

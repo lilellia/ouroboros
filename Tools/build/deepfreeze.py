@@ -17,8 +17,8 @@ import time
 import types
 from typing import TextIO
 
-import umarshal
 from generate_global_objects import get_identifiers_and_strings
+import umarshal
 
 verbose = False
 identifiers, strings = get_identifiers_and_strings()
@@ -245,9 +245,7 @@ class Printer:
         co_name = self.generate(name + "_name", code.co_name)
         co_qualname = self.generate(name + "_qualname", code.co_qualname)
         co_linetable = self.generate(name + "_linetable", code.co_linetable)
-        co_exceptiontable = self.generate(
-            name + "_exceptiontable", code.co_exceptiontable
-        )
+        co_exceptiontable = self.generate(name + "_exceptiontable", code.co_exceptiontable)
         # These fields are not directly accessible
         localsplusnames, localspluskinds = get_localsplus(code)
         co_localsplusnames = self.generate(name + "_localsplusnames", localsplusnames)
@@ -480,9 +478,7 @@ def generate(args: list[str], output: TextIO) -> None:
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument(
-    "-o", "--output", help="Defaults to deepfreeze.c", default="deepfreeze.c"
-)
+parser.add_argument("-o", "--output", help="Defaults to deepfreeze.c", default="deepfreeze.c")
 parser.add_argument("-v", "--verbose", action="store_true", help="Print diagnostics")
 parser.add_argument(
     "args",

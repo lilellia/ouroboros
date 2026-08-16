@@ -61,8 +61,8 @@ def capwords(s, sep=None):
 
 
 ####################################################################
-import re as _re
 from collections import ChainMap as _ChainMap
+import re as _re
 
 _sentinel_dict = {}
 
@@ -178,11 +178,7 @@ class Template:
             if named is not None and named not in ids:
                 # add a named group only the first time it appears
                 ids.append(named)
-            elif (
-                named is None
-                and mo.group("invalid") is None
-                and mo.group("escaped") is None
-            ):
+            elif named is None and mo.group("invalid") is None and mo.group("escaped") is None:
                 # If all the groups are None, there must be
                 # another group we're not expecting
                 raise ValueError("Unrecognized named group in pattern", self.pattern)
@@ -215,15 +211,11 @@ class Formatter:
         self.check_unused_args(used_args, args, kwargs)
         return result
 
-    def _vformat(
-        self, format_string, args, kwargs, used_args, recursion_depth, auto_arg_index=0
-    ):
+    def _vformat(self, format_string, args, kwargs, used_args, recursion_depth, auto_arg_index=0):
         if recursion_depth < 0:
             raise ValueError("Max string recursion exceeded")
         result = []
-        for literal_text, field_name, format_spec, conversion in self.parse(
-            format_string
-        ):
+        for literal_text, field_name, format_spec, conversion in self.parse(format_string):
             # output the literal text
             if literal_text:
                 result.append(literal_text)

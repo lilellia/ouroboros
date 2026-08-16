@@ -14,8 +14,10 @@ parallel.
 Followed by a complete undo().
 """
 
-from time import perf_counter as clock
-from time import sleep
+from time import (
+    perf_counter as clock,
+    sleep,
+)
 from turtle import Screen, Turtle, mainloop
 
 

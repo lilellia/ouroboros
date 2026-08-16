@@ -70,7 +70,6 @@ __all__ = [
 
 
 import _io
-import abc
 from _io import (
     DEFAULT_BUFFER_SIZE,
     BlockingIOError,
@@ -88,6 +87,7 @@ from _io import (
     open_code,
     text_encoding,
 )
+import abc
 
 # Pretend this exception was created here.
 UnsupportedOperation.__module__ = "io"

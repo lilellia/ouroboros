@@ -1,8 +1,8 @@
 "Test multicall, coverage 33%."
 
-import unittest
 from idlelib import multicall
 from tkinter import Text, Tk
+import unittest
 
 from test.support import requires
 from test.support.testcase import ExtraAssertions

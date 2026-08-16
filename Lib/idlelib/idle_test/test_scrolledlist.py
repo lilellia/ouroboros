@@ -1,7 +1,7 @@
 "Test scrolledlist, coverage 38%."
 
-import unittest
 from idlelib.scrolledlist import ScrolledList
+import unittest
 
 from test.support import requires
 

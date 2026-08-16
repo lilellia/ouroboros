@@ -128,9 +128,7 @@ class BaseContext:
 
         return SimpleQueue(ctx=self.get_context())
 
-    def Pool(
-        self, processes=None, initializer=None, initargs=(), maxtasksperchild=None
-    ):
+    def Pool(self, processes=None, initializer=None, initargs=(), maxtasksperchild=None):
         """Returns a process pool object"""
         from .pool import Pool
 
@@ -164,9 +162,7 @@ class BaseContext:
         """Returns a synchronized shared array"""
         from .sharedctypes import Array
 
-        return Array(
-            typecode_or_type, size_or_initializer, lock=lock, ctx=self.get_context()
-        )
+        return Array(typecode_or_type, size_or_initializer, lock=lock, ctx=self.get_context())
 
     def freeze_support(self):
         """Check whether this is a fake forked process in a frozen executable.
@@ -297,9 +293,7 @@ class DefaultContext(BaseContext):
         if sys.platform == "win32":
             return ["spawn"]
         else:
-            methods = (
-                ["spawn", "fork"] if sys.platform == "darwin" else ["fork", "spawn"]
-            )
+            methods = ["spawn", "fork"] if sys.platform == "darwin" else ["fork", "spawn"]
             if reduction.HAVE_SEND_HANDLE:
                 methods.append("forkserver")
             return methods

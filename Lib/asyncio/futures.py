@@ -266,9 +266,7 @@ class Future:
             exception = exception()
         if isinstance(exception, StopIteration):
             new_exc = RuntimeError(
-                "StopIteration interacts badly with "
-                "generators and cannot be raised into a "
-                "Future"
+                "StopIteration interacts badly with generators and cannot be raised into a Future"
             )
             new_exc.__cause__ = exception
             new_exc.__context__ = exception
@@ -369,9 +367,7 @@ def _chain_future(source, destination):
     """
     if not isfuture(source) and not isinstance(source, concurrent.futures.Future):
         raise TypeError("A future is required for source argument")
-    if not isfuture(destination) and not isinstance(
-        destination, concurrent.futures.Future
-    ):
+    if not isfuture(destination) and not isinstance(destination, concurrent.futures.Future):
         raise TypeError("A future is required for destination argument")
     source_loop = _get_loop(source) if isfuture(source) else None
     dest_loop = _get_loop(destination) if isfuture(destination) else None

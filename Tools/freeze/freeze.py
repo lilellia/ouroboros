@@ -351,8 +351,8 @@ def main():
         import winmakemakefile
 
         try:
-            custom_entry_point, python_entry_is_main = (
-                winmakemakefile.get_custom_entry_point(subsystem)
+            custom_entry_point, python_entry_is_main = winmakemakefile.get_custom_entry_point(
+                subsystem
             )
         except ValueError as why:
             usage(why)
@@ -419,9 +419,7 @@ def main():
     frozen_extensions = []  # Windows list of modules.
     if unknown or (not win and builtins):
         if not win:
-            addfiles, addmods = checkextensions.checkextensions(
-                unknown + builtins, extensions
-            )
+            addfiles, addmods = checkextensions.checkextensions(unknown + builtins, extensions)
             for mod in addmods:
                 if mod in unknown:
                     unknown.remove(mod)
@@ -432,17 +430,13 @@ def main():
 
             # Get a list of CExtension instances, each describing a module
             # (including its source files)
-            frozen_extensions = checkextensions_win32.checkextensions(
-                unknown, extensions, prefix
-            )
+            frozen_extensions = checkextensions_win32.checkextensions(unknown, extensions, prefix)
             for mod in frozen_extensions:
                 unknown.remove(mod.name)
 
     # report unknown modules
     if unknown:
-        sys.stderr.write(
-            "Warning: unknown modules remain: {}\n".format(" ".join(unknown))
-        )
+        sys.stderr.write("Warning: unknown modules remain: {}\n".format(" ".join(unknown)))
 
     # windows gets different treatment
     if win:

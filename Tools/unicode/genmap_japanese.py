@@ -21,18 +21,10 @@ CP932P1_C2 = (0x40, 0x9C)
 CP932P2_C1 = (0xED, 0xFC)  # CP932 P2
 CP932P2_C2 = (0x40, 0xFC)
 
-MAPPINGS_JIS0208 = (
-    "http://www.unicode.org/Public/MAPPINGS/OBSOLETE/EASTASIA/JIS/JIS0208.TXT"
-)
-MAPPINGS_JIS0212 = (
-    "http://www.unicode.org/Public/MAPPINGS/OBSOLETE/EASTASIA/JIS/JIS0212.TXT"
-)
-MAPPINGS_CP932 = (
-    "http://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WINDOWS/CP932.TXT"
-)
-MAPPINGS_JISX0213_2004 = (
-    "http://wakaba-web.hp.infoseek.co.jp/table/jisx0213-2004-std.txt"
-)
+MAPPINGS_JIS0208 = "http://www.unicode.org/Public/MAPPINGS/OBSOLETE/EASTASIA/JIS/JIS0208.TXT"
+MAPPINGS_JIS0212 = "http://www.unicode.org/Public/MAPPINGS/OBSOLETE/EASTASIA/JIS/JIS0212.TXT"
+MAPPINGS_CP932 = "http://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WINDOWS/CP932.TXT"
+MAPPINGS_JISX0213_2004 = "http://wakaba-web.hp.infoseek.co.jp/table/jisx0213-2004-std.txt"
 
 
 def loadmap_jisx0213(fo):
@@ -94,14 +86,12 @@ def main():
     jisx0208decmap = loadmap(jisx0208file, natcol=1, unicol=2)
     jisx0212decmap = loadmap(jisx0212file)
     cp932decmap = loadmap(cp932file)
-    jis3decmap, jis4decmap, jis3_2_decmap, jis4_2_decmap, jis3_pairdecmap = (
-        loadmap_jisx0213(jisx0213file)
+    jis3decmap, jis4decmap, jis3_2_decmap, jis4_2_decmap, jis3_pairdecmap = loadmap_jisx0213(
+        jisx0213file
     )
 
     if jis3decmap[0x21][0x24] != 0xFF0C:
-        raise SystemExit(
-            "Please adjust your JIS X 0213 map using jisx0213-2000-std.txt.diff"
-        )
+        raise SystemExit("Please adjust your JIS X 0213 map using jisx0213-2000-std.txt.diff")
 
     sjisencmap, cp932encmap = {}, {}
     jisx0208_0212encmap = {}
@@ -253,9 +243,7 @@ static const struct pair_encodemap *jisx0213_pair_encmap;
 
         print("Generating JIS X 0213 unicode-pair encode map...")
         jisx0213pairencmap.sort()
-        fp.write(
-            "static const struct pair_encodemap jisx0213_pair_encmap[JISX0213_ENCPAIRS] = {\n"
-        )
+        fp.write("static const struct pair_encodemap jisx0213_pair_encmap[JISX0213_ENCPAIRS] = {\n")
         filler = BufferedFiller()
         for body, modifier, jis in jisx0213pairencmap:
             filler.write("{", f"0x{body:04x}{modifier:04x},", f"0x{jis:04x}", "},")

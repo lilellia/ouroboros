@@ -420,8 +420,7 @@ def loads(
     else:
         if not isinstance(s, (bytes, bytearray)):
             raise TypeError(
-                f"the JSON object must be str, bytes or bytearray, "
-                f"not {s.__class__.__name__}"
+                f"the JSON object must be str, bytes or bytearray, not {s.__class__.__name__}"
             )
         s = s.decode(detect_encoding(s), "surrogatepass")
 

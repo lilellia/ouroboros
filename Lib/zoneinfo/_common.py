@@ -58,9 +58,7 @@ def load_data(fobj):
 
     # The data portion starts with timecnt transitions and indices
     if timecnt:
-        trans_list_utc = struct.unpack(
-            f">{timecnt}{time_type}", fobj.read(timecnt * time_size)
-        )
+        trans_list_utc = struct.unpack(f">{timecnt}{time_type}", fobj.read(timecnt * time_size))
         trans_idx = struct.unpack(f">{timecnt}B", fobj.read(timecnt))
     else:
         trans_list_utc = ()
@@ -68,9 +66,7 @@ def load_data(fobj):
 
     # Read the ttinfo struct, (utoff, isdst, abbrind)
     if typecnt:
-        utcoff, isdst, abbrind = zip(
-            *(struct.unpack(">lbb", fobj.read(6)) for i in range(typecnt))
-        )
+        utcoff, isdst, abbrind = zip(*(struct.unpack(">lbb", fobj.read(6)) for i in range(typecnt)))
     else:
         utcoff = ()
         isdst = ()

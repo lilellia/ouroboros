@@ -67,9 +67,7 @@ class Runner:
             loop = self._loop
             _cancel_all_tasks(loop)
             loop.run_until_complete(loop.shutdown_asyncgens())
-            loop.run_until_complete(
-                loop.shutdown_default_executor(constants.THREAD_JOIN_TIMEOUT)
-            )
+            loop.run_until_complete(loop.shutdown_default_executor(constants.THREAD_JOIN_TIMEOUT))
         finally:
             if self._set_event_loop:
                 events.set_event_loop(None)
@@ -89,9 +87,7 @@ class Runner:
 
         if events._get_running_loop() is not None:
             # fail fast with short traceback
-            raise RuntimeError(
-                "Runner.run() cannot be called from a running event loop"
-            )
+            raise RuntimeError("Runner.run() cannot be called from a running event loop")
 
         self._lazy_init()
 
@@ -124,10 +120,7 @@ class Runner:
                     raise KeyboardInterrupt()
             raise  # CancelledError
         finally:
-            if (
-                sigint_handler is not None
-                and signal.getsignal(signal.SIGINT) is sigint_handler
-            ):
+            if sigint_handler is not None and signal.getsignal(signal.SIGINT) is sigint_handler:
                 signal.signal(signal.SIGINT, signal.default_int_handler)
 
     def _lazy_init(self):

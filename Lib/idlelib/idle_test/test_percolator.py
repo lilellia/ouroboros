@@ -1,7 +1,7 @@
 "Test percolator, coverage 100%."
 
-import unittest
 from idlelib.percolator import Delegator, Percolator
+import unittest
 
 from test.support import requires
 
@@ -80,9 +80,7 @@ class PercolatorTest(unittest.TestCase):
     def test_insert(self):
         self.text.insert("insert", "foo")
         self.assertEqual(self.text.get("1.0", END), "foo\n")
-        self.assertTupleEqual(
-            self.filter_one.insert_called_with, ("insert", "foo", None)
-        )
+        self.assertTupleEqual(self.filter_one.insert_called_with, ("insert", "foo", None))
 
     def test_modify_insert(self):
         self.filter_one.insert = self.filter_one.uppercase_insert

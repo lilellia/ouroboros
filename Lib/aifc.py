@@ -276,9 +276,7 @@ with warnings.catch_warnings():
     from chunk import Chunk
 from collections import namedtuple
 
-_aifc_params = namedtuple(
-    "_aifc_params", "nchannels sampwidth framerate nframes comptype compname"
-)
+_aifc_params = namedtuple("_aifc_params", "nchannels sampwidth framerate nframes comptype compname")
 
 _aifc_params.nchannels.__doc__ = "Number of audio channels (1 for mono, 2 for stereo)"
 _aifc_params.sampwidth.__doc__ = "Sample width in bytes"
@@ -466,9 +464,7 @@ class Aifc_read:
         data = self._ssnd_chunk.read(nframes * self._framesize)
         if self._convert and data:
             data = self._convert(data)
-        self._soundpos = self._soundpos + len(data) // (
-            self._nchannels * self._sampwidth
-        )
+        self._soundpos = self._soundpos + len(data) // (self._nchannels * self._sampwidth)
         return data
 
     #
@@ -802,10 +798,7 @@ class Aifc_write:
 
     def writeframes(self, data):
         self.writeframesraw(data)
-        if (
-            self._nframeswritten != self._nframes
-            or self._datalength != self._datawritten
-        ):
+        if self._nframeswritten != self._nframes or self._datalength != self._datawritten:
             self._patchheader()
 
     def close(self):

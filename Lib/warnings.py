@@ -99,10 +99,7 @@ def _formatwarnmsg_impl(msg):
                     line = line.strip()
                     s += f"    {line}\n"
         elif suggest_tracemalloc:
-            s += (
-                f"{category}: Enable tracemalloc to get the object "
-                f"allocation traceback\n"
-            )
+            s += f"{category}: Enable tracemalloc to get the object allocation traceback\n"
     return s
 
 
@@ -120,9 +117,7 @@ def _showwarnmsg(msg):
         if sw is not _showwarning_orig:
             # warnings.showwarning() was replaced
             if not callable(sw):
-                raise TypeError(
-                    "warnings.showwarning() must be set to a function or method"
-                )
+                raise TypeError("warnings.showwarning() must be set to a function or method")
 
             sw(msg.message, msg.category, msg.filename, msg.lineno, msg.file, msg.line)
             return
@@ -146,9 +141,7 @@ def _formatwarnmsg(msg):
     return _formatwarnmsg_impl(msg)
 
 
-def filterwarnings(
-    action, message="", category=Warning, module="", lineno=0, append=False
-):
+def filterwarnings(action, message="", category=Warning, module="", lineno=0, append=False):
     """Insert an entry into the list of warnings filters (at the front).
 
     'action' -- one of "error", "ignore", "always", "default", "module",
@@ -331,9 +324,7 @@ def warn(message, category=None, stacklevel=1, source=None, *, skip_file_prefixe
     if category is None:
         category = UserWarning
     if not (isinstance(category, type) and issubclass(category, Warning)):
-        raise TypeError(
-            f"category must be a Warning subclass, not '{type(category).__name__:s}'"
-        )
+        raise TypeError(f"category must be a Warning subclass, not '{type(category).__name__:s}'")
     if not isinstance(skip_file_prefixes, tuple):
         # The C version demands a tuple for implementation performance.
         raise TypeError("skip_file_prefixes must be a tuple of strs.")
@@ -365,9 +356,7 @@ def warn(message, category=None, stacklevel=1, source=None, *, skip_file_prefixe
     else:
         module = "<string>"
     registry = globals.setdefault("__warningregistry__", {})
-    warn_explicit(
-        message, category, filename, lineno, module, registry, globals, source
-    )
+    warn_explicit(message, category, filename, lineno, module, registry, globals, source)
 
 
 def warn_explicit(
@@ -443,9 +432,7 @@ def warn_explicit(
         registry[key] = 1
     else:
         # Unrecognized actions are errors
-        raise RuntimeError(
-            f"Unrecognized action ({action!r}) in warnings.filters:\n {item}"
-        )
+        raise RuntimeError(f"Unrecognized action ({action!r}) in warnings.filters:\n {item}")
     # Print message and context
     msg = WarningMessage(message, category, filename, lineno, source=source)
     _showwarnmsg(msg)
@@ -462,9 +449,7 @@ class WarningMessage:
         "source",
     )
 
-    def __init__(
-        self, message, category, filename, lineno, file=None, line=None, source=None
-    ):
+    def __init__(self, message, category, filename, lineno, file=None, line=None, source=None):
         self.message = message
         self.category = category
         self.filename = filename
@@ -650,9 +635,7 @@ _processoptions(sys.warnoptions)
 if not _warnings_defaults:  # noqa: SIM102
     # Several warning categories are ignored by default in regular builds
     if not hasattr(sys, "gettotalrefcount"):
-        filterwarnings(
-            "default", category=DeprecationWarning, module="__main__", append=1
-        )
+        filterwarnings("default", category=DeprecationWarning, module="__main__", append=1)
         simplefilter("ignore", category=DeprecationWarning, append=1)
         simplefilter("ignore", category=PendingDeprecationWarning, append=1)
         simplefilter("ignore", category=ImportWarning, append=1)

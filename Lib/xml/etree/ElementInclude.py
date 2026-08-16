@@ -123,9 +123,7 @@ def include(elem, loader=None, base_url=None, max_depth=DEFAULT_MAX_INCLUSION_DE
     if max_depth is None:
         max_depth = -1
     elif max_depth < 0:
-        raise ValueError(
-            f"expected non-negative depth or None for 'max_depth', got {max_depth!r}"
-        )
+        raise ValueError(f"expected non-negative depth or None for 'max_depth', got {max_depth!r}")
 
     if hasattr(elem, "getroot"):
         elem = elem.getroot()
@@ -157,9 +155,7 @@ def _include(elem, loader, base_url, max_depth, _parent_hrefs):
                 node = loader(href, parse)
                 if node is None:
                     raise FatalIncludeError(f"cannot load {href!r} as {parse!r}")
-                node = copy.copy(
-                    node
-                )  # FIXME: this makes little sense with recursive includes
+                node = copy.copy(node)  # FIXME: this makes little sense with recursive includes
                 _include(node, loader, href, max_depth - 1, _parent_hrefs)
                 _parent_hrefs.remove(href)
                 if e.tail:
@@ -179,13 +175,9 @@ def _include(elem, loader, base_url, max_depth, _parent_hrefs):
                 del elem[i]
                 continue
             else:
-                raise FatalIncludeError(
-                    f"unknown parse type in xi:include tag ({parse!r})"
-                )
+                raise FatalIncludeError(f"unknown parse type in xi:include tag ({parse!r})")
         elif e.tag == XINCLUDE_FALLBACK:
-            raise FatalIncludeError(
-                f"xi:fallback tag must be child of xi:include ({e.tag!r})"
-            )
+            raise FatalIncludeError(f"xi:fallback tag must be child of xi:include ({e.tag!r})")
         else:
             _include(e, loader, base_url, max_depth, _parent_hrefs)
         i += 1

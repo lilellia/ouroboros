@@ -4,11 +4,11 @@ See the notes at the top of Python/frozen.c for more info.
 """
 
 import argparse
+from collections import namedtuple
 import hashlib
 import ntpath
 import os
 import posixpath
-from collections import namedtuple
 
 from update_file import updating_file_with_tmpfile
 
@@ -368,9 +368,7 @@ def _get_checksum(filename):
 def resolve_modules(modname, pyfile=None):
     if modname.startswith("<") and modname.endswith(">"):
         if pyfile:
-            assert os.path.isdir(pyfile) or os.path.basename(pyfile) == "__init__.py", (
-                pyfile
-            )
+            assert os.path.isdir(pyfile) or os.path.basename(pyfile) == "__init__.py", pyfile
         ispkg = True
         modname = modname[1:-1]
         rawname = modname
@@ -482,9 +480,7 @@ def replace_block(lines, start_marker, end_marker, replacements, file):
     end_pos = find_marker(lines, end_marker, file)
     if end_pos <= start_pos:
         raise Exception(  # noqa: TRY002
-            f"End marker {end_marker!r} "
-            f"occurs before start marker {start_marker!r} "
-            f"in file {file}"
+            f"End marker {end_marker!r} occurs before start marker {start_marker!r} in file {file}"
         )
     replacements = [line.rstrip() + "\n" for line in replacements]
     return lines[: start_pos + 1] + replacements + lines[end_pos:]
@@ -543,7 +539,9 @@ def regen_frozen(modules, frozen_modules: bool):
         if not frozen_modules:
             line = f'{{"{mod.name}", NULL, 0, {pkg}, GET_CODE({code_name})}},'
         else:
-            line = f'{{"{mod.name}", {symbol}, (int)sizeof({symbol}), {pkg}, GET_CODE({code_name})}},'
+            line = (
+                f'{{"{mod.name}", {symbol}, (int)sizeof({symbol}), {pkg}, GET_CODE({code_name})}},'
+            )
         lines.append(line)
 
         if mod.isalias:
@@ -703,9 +701,7 @@ def regen_pcbuild(modules):
         filterlines.append("      <Filter>Python Files</Filter>")
         filterlines.append("    </None>")
         deepfreezerules.append(f'\t\t "$(PySourcePath){header}:{src.frozenid}" ^')
-    deepfreezerules.append(
-        '\t\t "-o" "$(PySourcePath)Python\\deepfreeze\\deepfreeze.c"\'/>'
-    )
+    deepfreezerules.append('\t\t "-o" "$(PySourcePath)Python\\deepfreeze\\deepfreeze.c"\'/>')
 
     corelines.append('    <ClCompile Include="..\\Python\\deepfreeze\\deepfreeze.c" />')
 

@@ -36,6 +36,7 @@ __all__ = [
     "MozillaCookieJar",
 ]
 
+from calendar import timegm
 import copy
 import datetime
 import http.client  # only for the default HTTP port
@@ -45,7 +46,6 @@ import threading as _threading
 import time
 import urllib.parse
 import urllib.request
-from calendar import timegm
 
 debug = False  # set to True to enable debugging via the logging module
 logger = None
@@ -269,9 +269,7 @@ STRICT_DATE_RE = re.compile(
     r"(\d\d\d\d) (\d\d):(\d\d):(\d\d) GMT$",
     re.ASCII,
 )
-WEEKDAY_RE = re.compile(
-    r"^(?:Sun|Mon|Tue|Wed|Thu|Fri|Sat)[a-z]*,?\s*", re.IGNORECASE | re.ASCII
-)
+WEEKDAY_RE = re.compile(r"^(?:Sun|Mon|Tue|Wed|Thu|Fri|Sat)[a-z]*,?\s*", re.IGNORECASE | re.ASCII)
 LOOSE_HTTP_DATE_RE = re.compile(
     r"""^
     (\d\d?)            # day
@@ -1334,15 +1332,13 @@ class DefaultCookiePolicy(CookiePolicy):
             and domain != erhn
         ):
             _debug(
-                "   cookie with unspecified domain does not string-compare "
-                "equal to request domain"
+                "   cookie with unspecified domain does not string-compare equal to request domain"
             )
             return False
 
         if cookie.version > 0 and not domain_match(erhn, domain):
             _debug(
-                "   effective request-host name %s does not domain-match "
-                "RFC 2965 cookie domain %s",
+                "   effective request-host name %s does not domain-match RFC 2965 cookie domain %s",
                 erhn,
                 domain,
             )
@@ -1500,11 +1496,7 @@ class CookieJar:
             # quote cookie value if necessary
             # (not for Netscape protocol, which already has any quotes
             #  intact, due to the poorly-specified Netscape Cookie: syntax)
-            if (
-                (cookie.value is not None)
-                and self.non_word_re.search(cookie.value)
-                and version > 0
-            ):
+            if (cookie.value is not None) and self.non_word_re.search(cookie.value) and version > 0:
                 value = self.quote_re.sub(r"\\\1", cookie.value)
             else:
                 value = cookie.value
@@ -1641,10 +1633,7 @@ class CookieJar:
                     try:
                         v = int(v)
                     except ValueError:
-                        _debug(
-                            "   missing or invalid (non-numeric) value for "
-                            "max-age attribute"
-                        )
+                        _debug("   missing or invalid (non-numeric) value for max-age attribute")
                         bad_cookie = True
                         break
                     # convert RFC 2965 Max-Age to seconds since epoch
@@ -1746,9 +1735,7 @@ class CookieJar:
                 self.clear(domain, path, name)
             except KeyError:
                 pass
-            _debug(
-                "Expiring cookie, domain='%s', path='%s', name='%s'", domain, path, name
-            )
+            _debug("Expiring cookie, domain='%s', path='%s', name='%s'", domain, path, name)
             return None
 
         return Cookie(
@@ -1812,9 +1799,7 @@ class CookieJar:
             return []  # no relevant cookie headers: quick exit
 
         try:
-            cookies = self._cookies_from_attrs_set(
-                split_header_words(rfc2965_hdrs), request
-            )
+            cookies = self._cookies_from_attrs_set(split_header_words(rfc2965_hdrs), request)
         except Exception:  # noqa: BLE001
             _warn_unhandled_exception()
             cookies = []
@@ -1822,9 +1807,7 @@ class CookieJar:
         if ns_hdrs and netscape:
             try:
                 # RFC 2109 and Netscape cookies
-                ns_cookies = self._cookies_from_attrs_set(
-                    parse_ns_headers(ns_hdrs), request
-                )
+                ns_cookies = self._cookies_from_attrs_set(parse_ns_headers(ns_hdrs), request)
             except Exception:  # noqa: BLE001
                 _warn_unhandled_exception()
                 ns_cookies = []
@@ -1905,9 +1888,7 @@ class CookieJar:
         """
         if name is not None:
             if (domain is None) or (path is None):
-                raise ValueError(
-                    "domain and path must be given to remove a cookie by name"
-                )
+                raise ValueError("domain and path must be given to remove a cookie by name")
             del self._cookies[domain][path][name]
         elif path is not None:
             if domain is None:
@@ -2242,9 +2223,7 @@ class MozillaCookieJar(FileCookieJar):
         now = time.time()
 
         if not NETSCAPE_MAGIC_RGX.match(f.readline()):
-            raise LoadError(
-                f"{filename!r} does not look like a Netscape format cookies file"
-            )
+            raise LoadError(f"{filename!r} does not look like a Netscape format cookies file")
 
         try:
             while (line := f.readline()) != "":
@@ -2264,9 +2243,7 @@ class MozillaCookieJar(FileCookieJar):
                 if line.strip().startswith(("#", "$")) or line.strip() == "":
                     continue
 
-                domain, domain_specified, path, secure, expires, name, value = (
-                    line.split("\t")
-                )
+                domain, domain_specified, path, secure, expires, name, value = line.split("\t")
                 secure = secure == "TRUE"
                 domain_specified = domain_specified == "TRUE"
                 if name == "":
@@ -2313,9 +2290,7 @@ class MozillaCookieJar(FileCookieJar):
             raise
         except Exception:  # noqa: BLE001
             _warn_unhandled_exception()
-            raise LoadError(
-                f"invalid Netscape format cookies file {filename!r}: {line!r}"
-            )
+            raise LoadError(f"invalid Netscape format cookies file {filename!r}: {line!r}")
 
     def save(self, filename=None, ignore_discard=False, ignore_expires=False):
         if filename is None:

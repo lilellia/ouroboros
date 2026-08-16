@@ -3,8 +3,6 @@ import re
 
 from c_parser import (
     parse_file as _parse_file,
-)
-from c_parser import (
     parse_files as _parse_files,
 )
 from c_parser.preprocessor import (
@@ -23,11 +21,7 @@ def _abs(relfile):
 def clean_lines(text):
     """Clear out comments, blank lines, and leading/trailing whitespace."""
     lines = (line.strip() for line in text.splitlines())
-    lines = (
-        line.partition("#")[0].rstrip()
-        for line in lines
-        if line and not line.startswith("#")
-    )
+    lines = (line.partition("#")[0].rstrip() for line in lines if line and not line.startswith("#"))
     glob_all = f"{GLOB_ALL} "
     lines = (re.sub(r"^[*] ", glob_all, line) for line in lines)
     lines = (_abs(line) for line in lines)

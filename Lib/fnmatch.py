@@ -131,9 +131,7 @@ def translate(pat):
                             del chunks[k]
                     # Escape backslashes and hyphens for set difference (--).
                     # Hyphens that create ranges shouldn't be escaped.
-                    stuff = "-".join(
-                        s.replace("\\", r"\\").replace("-", r"\-") for s in chunks
-                    )
+                    stuff = "-".join(s.replace("\\", r"\\").replace("-", r"\-") for s in chunks)
                 # Escape set operations (&&, ~~ and ||).
                 stuff = re.sub(r"([&~|])", r"\\\1", stuff)
                 i = j + 1

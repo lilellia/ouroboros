@@ -88,9 +88,7 @@ class Node(xml.dom.Node):
             ### The DOM does not clearly specify what to return in this case
             return newChild
         if newChild.nodeType not in self._child_node_types:
-            raise xml.dom.HierarchyRequestErr(
-                f"{newChild!r} cannot be child of {self!r}"
-            )
+            raise xml.dom.HierarchyRequestErr(f"{newChild!r} cannot be child of {self!r}")
         if newChild.parentNode is not None:
             newChild.parentNode.removeChild(newChild)
         if refChild is None:
@@ -136,9 +134,7 @@ class Node(xml.dom.Node):
             self.removeChild(oldChild)
             return self.insertBefore(newChild, refChild)
         if newChild.nodeType not in self._child_node_types:
-            raise xml.dom.HierarchyRequestErr(
-                f"{newChild!r} cannot be child of {self!r}"
-            )
+            raise xml.dom.HierarchyRequestErr(f"{newChild!r} cannot be child of {self!r}")
         if newChild is oldChild:
             return
         if newChild.parentNode is not None:
@@ -368,9 +364,7 @@ class Attr(Node):
 
     _child_node_types = (Node.TEXT_NODE, Node.ENTITY_REFERENCE_NODE)
 
-    def __init__(
-        self, qName, namespaceURI=EMPTY_NAMESPACE, localName=None, prefix=None
-    ):
+    def __init__(self, qName, namespaceURI=EMPTY_NAMESPACE, localName=None, prefix=None):
         self.ownerElement = None
         self.ownerDocument = None
         self._name = qName
@@ -422,9 +416,7 @@ class Attr(Node):
     def _set_prefix(self, prefix):
         nsuri = self.namespaceURI
         if prefix == "xmlns" and nsuri and nsuri != XMLNS_NAMESPACE:
-            raise xml.dom.NamespaceErr(
-                "illegal use of 'xmlns' prefix for the wrong namespace"
-            )
+            raise xml.dom.NamespaceErr("illegal use of 'xmlns' prefix for the wrong namespace")
         self._prefix = prefix
         if prefix is None:
             newName = self.localName
@@ -666,9 +658,7 @@ class TypeInfo:
 
     def __repr__(self):
         if self.namespace:
-            return (
-                f"<{self.__class__.__name__} {self.name!r} (from {self.namespace!r})>"
-            )
+            return f"<{self.__class__.__name__} {self.name!r} (from {self.namespace!r})>"
         else:
             return f"<{self.__class__.__name__} {self.name!r}>"
 
@@ -712,9 +702,7 @@ class Element(Node):
         Node.ENTITY_REFERENCE_NODE,
     )
 
-    def __init__(
-        self, tagName, namespaceURI=EMPTY_NAMESPACE, prefix=None, localName=None
-    ):
+    def __init__(self, tagName, namespaceURI=EMPTY_NAMESPACE, prefix=None, localName=None):
         self.ownerDocument = None
         self.parentNode = None
         self.tagName = self.nodeName = tagName
@@ -898,9 +886,7 @@ class Element(Node):
         return _get_elements_by_tagName_helper(self, name, NodeList())
 
     def getElementsByTagNameNS(self, namespaceURI, localName):
-        return _get_elements_by_tagName_ns_helper(
-            self, namespaceURI, localName, NodeList()
-        )
+        return _get_elements_by_tagName_ns_helper(self, namespaceURI, localName, NodeList())
 
     def __repr__(self):
         return f"<DOM Element: {self.tagName} at {id(self):#x}>"
@@ -1478,9 +1464,7 @@ class DOMImplementation(DOMImplementationLS):
             raise xml.dom.WrongDocumentErr("doctype object owned by another DOM tree")
         doc = self._create_document()
 
-        add_root_element = not (
-            namespaceURI is None and qualifiedName is None and doctype is None
-        )
+        add_root_element = not (namespaceURI is None and qualifiedName is None and doctype is None)
 
         if not qualifiedName and add_root_element:
             # The spec is unclear what to raise here; SyntaxErr
@@ -1499,10 +1483,7 @@ class DOMImplementation(DOMImplementationLS):
 
         if add_root_element:
             prefix, _localname = _nssplit(qualifiedName)
-            if (
-                prefix == "xml"
-                and namespaceURI != "http://www.w3.org/XML/1998/namespace"
-            ):
+            if prefix == "xml" and namespaceURI != "http://www.w3.org/XML/1998/namespace":
                 raise xml.dom.NamespaceErr("illegal use of 'xml' prefix")
             if prefix and not namespaceURI:
                 raise xml.dom.NamespaceErr("illegal use of prefix without namespaces")
@@ -1803,11 +1784,7 @@ class Document(Node, DocumentLS):
             node = stack.pop()
             # add child elements to stack for continued searching
             stack.extend(
-                [
-                    child
-                    for child in node.childNodes
-                    if child.nodeType in _nodeTypes_with_children
-                ]
+                [child for child in node.childNodes if child.nodeType in _nodeTypes_with_children]
             )
             # check this node
             info = self._get_elem_info(node)
@@ -1849,9 +1826,7 @@ class Document(Node, DocumentLS):
         return _get_elements_by_tagName_helper(self, name, NodeList())
 
     def getElementsByTagNameNS(self, namespaceURI, localName):
-        return _get_elements_by_tagName_ns_helper(
-            self, namespaceURI, localName, NodeList()
-        )
+        return _get_elements_by_tagName_ns_helper(self, namespaceURI, localName, NodeList())
 
     def isSupported(self, feature, version):
         return self.implementation.hasFeature(feature, version)
@@ -1863,9 +1838,7 @@ class Document(Node, DocumentLS):
             raise xml.dom.NotSupportedErr("cannot import document type nodes")
         return _clone_node(node, deep, self)
 
-    def writexml(
-        self, writer, indent="", addindent="", newl="", encoding=None, standalone=None
-    ):
+    def writexml(self, writer, indent="", addindent="", newl="", encoding=None, standalone=None):
         declarations = []
 
         if encoding:
@@ -2042,9 +2015,7 @@ def parse(file, parser=None, bufsize=None):
     else:
         from xml.dom import pulldom
 
-        return _do_pulldom_parse(
-            pulldom.parse, (file,), {"parser": parser, "bufsize": bufsize}
-        )
+        return _do_pulldom_parse(pulldom.parse, (file,), {"parser": parser, "bufsize": bufsize})
 
 
 def parseString(string, parser=None):

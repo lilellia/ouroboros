@@ -1,12 +1,12 @@
 "Test colorizer, coverage 99%."
 
-import textwrap
-import unittest
 from functools import partial
 from idlelib import colorizer, config
 from idlelib.idle_test.tkinter_testing_utils import run_in_tk_mainloop
 from idlelib.percolator import Percolator
+import textwrap
 from tkinter import Text, Tk
+import unittest
 from unittest import mock
 
 from test.support import requires
@@ -565,9 +565,7 @@ class ColorDelegatorTest(unittest.TestCase):
         self._assert_highlighting("case\t,", {})
 
         # case followed by a lone underscore
-        self._assert_highlighting(
-            "case _:", {"KEYWORD": [("1.0", "1.4"), ("1.5", "1.6")]}
-        )
+        self._assert_highlighting("case _:", {"KEYWORD": [("1.0", "1.4"), ("1.5", "1.6")]})
 
     def test_long_multiline_string(self):
         source = textwrap.dedent('''\

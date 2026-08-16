@@ -12,10 +12,10 @@ The page now contains the following note:
 Written by Ezio Melotti and Iuliia Proskurnia.
 """
 
+from html.entities import html5
 import json
 import os
 import sys
-from html.entities import html5
 from urllib.request import urlopen
 
 SCRIPT_NAME = "Tools/build/parse_html5_entities.py"

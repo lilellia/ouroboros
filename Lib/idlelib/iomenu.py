@@ -1,13 +1,13 @@
+from idlelib.config import idleConf
+from idlelib.util import py_extensions
 import io
 import os
 import shlex
 import sys
 import tempfile
-import tokenize
-from idlelib.config import idleConf
-from idlelib.util import py_extensions
 from tkinter import filedialog, messagebox
 from tkinter.simpledialog import askstring  # loadfile encoding.
+import tokenize
 
 py_extensions = " ".join("*" + ext for ext in py_extensions)
 encoding = "utf-8"
@@ -25,9 +25,7 @@ class IOBinding:
         self.__id_open = self.text.bind("<<open-window-from-file>>", self.open)
         self.__id_save = self.text.bind("<<save-window>>", self.save)
         self.__id_saveas = self.text.bind("<<save-window-as-file>>", self.save_as)
-        self.__id_savecopy = self.text.bind(
-            "<<save-copy-of-window-as-file>>", self.save_a_copy
-        )
+        self.__id_savecopy = self.text.bind("<<save-copy-of-window-as-file>>", self.save_a_copy)
         self.fileencoding = "utf-8"
         self.__id_print = self.text.bind("<<print-window>>", self.print_window)
 
@@ -190,11 +188,7 @@ class IOBinding:
         """
         if self.get_saved():
             return "yes"
-        message = (
-            "Do you want to save "
-            f"{self.filename or 'this untitled document'}"
-            " before closing?"
-        )
+        message = f"Do you want to save {self.filename or 'this untitled document'} before closing?"
         confirm = messagebox.askyesnocancel(
             title="Save On Close",
             message=message,
@@ -295,9 +289,7 @@ class IOBinding:
             failed = str(err)
         except UnicodeEncodeError:
             failed = f"Invalid encoding '{enc}'"
-        messagebox.showerror(
-            "I/O Error", f"{failed}.\nSaving as UTF-8", parent=self.text
-        )
+        messagebox.showerror("I/O Error", f"{failed}.\nSaving as UTF-8", parent=self.text)
         # Fallback: save as UTF-8, with BOM - ignoring the incorrect
         # declared encoding
         return chars.encode("utf-8-sig")
@@ -365,9 +357,7 @@ class IOBinding:
     def askopenfile(self):
         dir, base = self.defaultfilename("open")
         if not self.opendialog:
-            self.opendialog = filedialog.Open(
-                parent=self.text, filetypes=self.filetypes
-            )
+            self.opendialog = filedialog.Open(parent=self.text, filetypes=self.filetypes)
         filename = self.opendialog.show(initialdir=dir, initialfile=base)
         return filename
 

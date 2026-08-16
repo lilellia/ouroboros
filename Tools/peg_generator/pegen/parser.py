@@ -1,11 +1,11 @@
+from abc import abstractmethod
 import argparse
+from collections.abc import Callable
 import sys
 import time
 import token
 import tokenize
 import traceback
-from abc import abstractmethod
-from collections.abc import Callable
 from typing import Any, ClassVar, TypeVar, cast
 
 from pegen.tokenizer import Mark, Tokenizer, exact_token_types
@@ -15,7 +15,7 @@ P = TypeVar("P", bound="Parser")
 F = TypeVar("F", bound=Callable[..., Any])
 
 
-def logger(method: F) -> F:
+def logger(method: F) -> F:  # noqa: UP047
     """For non-memoized functions that we want to be logged.
 
     (In practice this is only non-leader left-recursive functions.)
@@ -38,7 +38,7 @@ def logger(method: F) -> F:
     return cast(F, logger_wrapper)
 
 
-def memoize(method: F) -> F:
+def memoize(method: F) -> F:  # noqa: UP047
     """Memoize a symbol method."""
     method_name = method.__name__
 
@@ -56,9 +56,7 @@ def memoize(method: F) -> F:
         fill = "  " * self._level
         if key not in self._cache:
             if verbose:
-                print(
-                    f"{fill}{method_name}({argsr}) ... (looking at {self.showpeek()})"
-                )
+                print(f"{fill}{method_name}({argsr}) ... (looking at {self.showpeek()})")
             self._level += 1
             tree = method(self, *args)
             self._level -= 1
@@ -77,7 +75,7 @@ def memoize(method: F) -> F:
     return cast(F, memoize_wrapper)
 
 
-def memoize_left_rec(method: Callable[[P], T | None]) -> Callable[[P], T | None]:
+def memoize_left_rec(method: Callable[[P], T | None]) -> Callable[[P], T | None]:  # noqa: UP047
     """Memoize a left-recursive symbol method."""
     method_name = method.__name__
 
@@ -184,9 +182,7 @@ class Parser:
 
     def showpeek(self) -> str:
         tok = self._tokenizer.peek()
-        return (
-            f"{tok.start[0]}.{tok.start[1]}: {token.tok_name[tok.type]}:{tok.string!r}"
-        )
+        return f"{tok.start[0]}.{tok.start[1]}: {token.tok_name[tok.type]}:{tok.string!r}"
 
     @memoize
     def name(self) -> tokenize.TokenInfo | None:
@@ -260,13 +256,9 @@ class Parser:
         self._reset(mark)
         return not ok
 
-    def make_syntax_error(
-        self, message: str, filename: str = "<unknown>"
-    ) -> SyntaxError:
+    def make_syntax_error(self, message: str, filename: str = "<unknown>") -> SyntaxError:
         tok = self._tokenizer.diagnose()
-        return SyntaxError(
-            message, (filename, tok.start[0], 1 + tok.start[1], tok.line)
-        )
+        return SyntaxError(message, (filename, tok.start[0], 1 + tok.start[1], tok.line))
 
 
 def simple_parser_main(parser_class: type[Parser]) -> None:

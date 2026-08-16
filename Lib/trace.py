@@ -60,9 +60,9 @@ import pickle
 import sys
 import sysconfig
 import threading
+from time import monotonic as _time
 import token
 import tokenize
-from time import monotonic as _time
 
 PRAGMA_NOCOVER = "#pragma NO COVER"
 
@@ -155,9 +155,7 @@ def _fullmodname(path):
 
 
 class CoverageResults:
-    def __init__(
-        self, counts=None, calledfuncs=None, infile=None, callers=None, outfile=None
-    ):
+    def __init__(self, counts=None, calledfuncs=None, infile=None, callers=None, outfile=None):
         self.counts = counts
         if self.counts is None:
             self.counts = {}
@@ -223,9 +221,7 @@ class CoverageResults:
             print("functions called:")
             calls = self.calledfuncs
             for filename, modulename, funcname in sorted(calls):
-                print(
-                    f"filename: {filename}, modulename: {modulename}, funcname: {funcname}"
-                )
+                print(f"filename: {filename}, modulename: {modulename}, funcname: {funcname}")
 
         if self.callers:
             print()
@@ -277,9 +273,7 @@ class CoverageResults:
             coverpath = os.path.join(dir, modulename + ".cover")
             with open(filename, "rb") as fp:
                 encoding, _ = tokenize.detect_encoding(fp.readline)
-            n_hits, n_lines = self.write_results_file(
-                coverpath, source, lnotab, count, encoding
-            )
+            n_hits, n_lines = self.write_results_file(coverpath, source, lnotab, count, encoding)
             if summary and n_lines:
                 percent = int(100 * n_hits / n_lines)
                 sums[modulename] = n_lines, percent, modulename, filename
@@ -510,9 +504,7 @@ class Trace:
             if len(funcs) == 1:
                 dicts = [d for d in gc.get_referrers(funcs[0]) if isinstance(d, dict)]
                 if len(dicts) == 1:
-                    classes = [
-                        c for c in gc.get_referrers(dicts[0]) if hasattr(c, "__bases__")
-                    ]
+                    classes = [c for c in gc.get_referrers(dicts[0]) if hasattr(c, "__bases__")]
                     if len(classes) == 1:
                         # ditto for new.classobj()
                         clsname = classes[0].__name__
@@ -563,9 +555,7 @@ class Trace:
                     ignore_it = self.ignore.names(filename, modulename)
                     if not ignore_it:
                         if self.trace:
-                            print(
-                                f" --- modulename: {modulename}, funcname: {code.co_name}"
-                            )
+                            print(f" --- modulename: {modulename}, funcname: {code.co_name}")
                         return self.localtrace
             else:
                 return None
@@ -630,9 +620,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--version", action="version", version="trace 2.0")
 
-    grp = parser.add_argument_group(
-        "Main options", "One of these (or --report) must be given"
-    )
+    grp = parser.add_argument_group("Main options", "One of these (or --report) must be given")
 
     grp.add_argument(
         "-c",
@@ -710,8 +698,7 @@ def main():
         "-g",
         "--timing",
         action="store_true",
-        help="Prefix each line with the time since the program started. "
-        "Only used while tracing",
+        help="Prefix each line with the time since the program started. Only used while tracing",
     )
 
     grp = parser.add_argument_group("Filters", "Can be specified multiple times")
@@ -731,13 +718,9 @@ def main():
         "(multiple directories can be joined by os.pathsep).",
     )
 
-    parser.add_argument(
-        "--module", action="store_true", default=False, help="Trace a module. "
-    )
+    parser.add_argument("--module", action="store_true", default=False, help="Trace a module. ")
     parser.add_argument("progname", nargs="?", help="file to run as main program")
-    parser.add_argument(
-        "arguments", nargs=argparse.REMAINDER, help="arguments to the program"
-    )
+    parser.add_argument("arguments", nargs=argparse.REMAINDER, help="arguments to the program")
 
     opts = parser.parse_args()
 
@@ -750,12 +733,8 @@ def main():
         s = s.replace("$prefix", _prefix).replace("$exec_prefix", _exec_prefix)
         return os.path.normpath(s)
 
-    opts.ignore_module = [
-        mod.strip() for i in opts.ignore_module for mod in i.split(",")
-    ]
-    opts.ignore_dir = [
-        parse_ignore_dir(s) for i in opts.ignore_dir for s in i.split(os.pathsep)
-    ]
+    opts.ignore_module = [mod.strip() for i in opts.ignore_module for mod in i.split(",")]
+    opts.ignore_dir = [parse_ignore_dir(s) for i in opts.ignore_dir for s in i.split(os.pathsep)]
 
     if opts.report:
         if not opts.file:
@@ -764,10 +743,7 @@ def main():
         return results.write_results(opts.missing, opts.summary, opts.coverdir)
 
     if not any([opts.trace, opts.count, opts.listfuncs, opts.trackcalls]):
-        parser.error(
-            "must specify one of --trace, --count, --report, "
-            "--listfuncs, or --trackcalls"
-        )
+        parser.error("must specify one of --trace, --count, --report, --listfuncs, or --trackcalls")
 
     if opts.listfuncs and (opts.count or opts.trace):
         parser.error("cannot specify both --listfuncs and (--trace or --count)")

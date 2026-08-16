@@ -113,9 +113,7 @@ def _run_module_code(
     fname = script_name if mod_spec is None else mod_spec.origin
     with _TempModule(mod_name) as temp_module, _ModifiedArgv0(fname):
         mod_globals = temp_module.module.__dict__
-        _run_code(
-            code, mod_globals, init_globals, mod_name, mod_spec, pkg_name, script_name
-        )
+        _run_code(code, mod_globals, init_globals, mod_name, mod_spec, pkg_name, script_name)
     # Copy the globals of the temporary module, as they
     # may be cleared when the temporary module goes away
     return mod_globals.copy()
@@ -134,9 +132,7 @@ def _get_module_details(mod_name, error=ImportError):
             # If the parent or higher ancestor package is missing, let the
             # error be raised by find_spec() below and then be caught. But do
             # not allow other errors to be caught.
-            if e.name is None or (
-                e.name != pkg_name and not pkg_name.startswith(e.name + ".")
-            ):
+            if e.name is None or (e.name != pkg_name and not pkg_name.startswith(e.name + ".")):
                 raise
         # Warn if the module has already been imported under its normal name
         existing = sys.modules.get(mod_name)
@@ -159,10 +155,7 @@ def _get_module_details(mod_name, error=ImportError):
         # pkgutil previously raised ImportError
         msg = "Error while finding module specification for {!r} ({}: {})"
         if mod_name.endswith(".py"):
-            msg += (
-                f". Try using '{mod_name[:-3]}' instead of "
-                f"'{mod_name}' as the module name."
-            )
+            msg += f". Try using '{mod_name[:-3]}' instead of '{mod_name}' as the module name."
         raise error(msg.format(mod_name, type(ex).__name__, ex)) from ex
     if spec is None:
         raise error(f"No module named {mod_name}")
@@ -176,8 +169,7 @@ def _get_module_details(mod_name, error=ImportError):
             if mod_name not in sys.modules:
                 raise  # No module loaded; being a package is irrelevant
             raise error(
-                ("%s; %r is a package and cannot " + "be directly executed")
-                % (e, mod_name)
+                ("%s; %r is a package and cannot " + "be directly executed") % (e, mod_name)
             )
     loader = spec.loader
     if loader is None:

@@ -2,13 +2,13 @@
 code that adds all the email6 features.
 """
 
-import re
-import sys
 from email._policybase import Compat32, Policy, _extend_docstrings, compat32
 from email.contentmanager import raw_data_manager
 from email.headerregistry import HeaderRegistry
 from email.message import EmailMessage
 from email.utils import _has_surrogates
+import re
+import sys
 
 __all__ = [
     "HTTP",
@@ -143,9 +143,7 @@ class EmailPolicy(Policy):
         if isinstance(value, str) and len(value.splitlines()) > 1:
             # XXX this error message isn't quite right when we use splitlines
             # (see issue 22233), but I'm not sure what should happen here.
-            raise ValueError(
-                "Header values may not contain linefeed or carriage return characters"
-            )
+            raise ValueError("Header values may not contain linefeed or carriage return characters")
         return (name, self.header_factory(name, value))
 
     def header_fetch_parse(self, name, value):

@@ -1,10 +1,10 @@
 import os.path
 
+from c_common import fsutil
 import c_common.tables as _tables
 import c_parser.datafiles as _parser
 import c_parser.info as _info
 import c_parser.match as _match
-from c_common import fsutil
 
 from . import analyze as _analyze
 

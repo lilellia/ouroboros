@@ -19,14 +19,14 @@
 # either express or implied.  See the License for the specific language
 # governing permissions and limitations under the License.
 
+from dataclasses import dataclass
+from enum import StrEnum, _simple_enum
+from functools import cmp_to_key
 import marshal
 import os
 import re
 import sys
 import time
-from dataclasses import dataclass
-from enum import StrEnum, _simple_enum
-from functools import cmp_to_key
 
 __all__ = ["FunctionProfile", "SortKey", "Stats", "StatsProfile"]
 
@@ -155,9 +155,7 @@ class Stats:
             self.stats = arg.stats
             arg.stats = {}
         if not self.stats:
-            raise TypeError(
-                f"Cannot create or construct a {self.__class__!r} object from {arg!r}"
-            )
+            raise TypeError(f"Cannot create or construct a {self.__class__!r} object from {arg!r}")
         return
 
     def get_top_level_stats(self):
@@ -299,9 +297,7 @@ class Stats:
                 newcallers[func_strip_path(func2)] = caller
 
             if newfunc in newstats:
-                newstats[newfunc] = add_func_stats(
-                    newstats[newfunc], (cc, nc, tt, ct, newcallers)
-                )
+                newstats[newfunc] = add_func_stats(newstats[newfunc], (cc, nc, tt, ct, newcallers))
             else:
                 newstats[newfunc] = (cc, nc, tt, ct, newcallers)
         old_top = self.top_level
@@ -479,9 +475,7 @@ class Stats:
             print(" " * name_size + "    ncalls  tottime  cumtime", file=self.stream)
 
     def print_call_line(self, name_size, source, call_dict, arrow="->"):
-        print(
-            func_std_string(source).ljust(name_size) + arrow, end=" ", file=self.stream
-        )
+        print(func_std_string(source).ljust(name_size) + arrow, end=" ", file=self.stream)
         if not call_dict:
             print(file=self.stream)
             return
@@ -496,9 +490,7 @@ class Stats:
                     substats = "%d/%d" % (nc, cc)  # noqa: UP031
                 else:
                     substats = "%d" % (nc,)  # noqa: UP031
-                substats = (
-                    f"{substats.rjust(7 + 2 * len(indent))} {f8(tt)} {f8(ct)}  {name}"
-                )
+                substats = f"{substats.rjust(7 + 2 * len(indent))} {f8(tt)} {f8(ct)}  {name}"
                 left_width = name_size + 1
             else:
                 substats = f"{name}({value!r}) {f8(self.stats[func][3])}"
@@ -507,9 +499,7 @@ class Stats:
             indent = " "
 
     def print_title(self):
-        print(
-            "   ncalls  tottime  percall  cumtime  percall", end=" ", file=self.stream
-        )
+        print("   ncalls  tottime  percall  cumtime  percall", end=" ", file=self.stream)
         print("filename:lineno(function)", file=self.stream)
 
     def print_line(self, func):  # hack: should print percentages
@@ -601,9 +591,7 @@ def add_callers(target, source):
         if func in new_callers:
             if isinstance(caller, tuple):
                 # format used by cProfile
-                new_callers[func] = tuple(
-                    i + j for i, j in zip(caller, new_callers[func])
-                )
+                new_callers[func] = tuple(i + j for i, j in zip(caller, new_callers[func]))
             else:
                 # format used by profile
                 new_callers[func] += caller
@@ -784,18 +772,14 @@ if __name__ == "__main__":
             if line and all((x in abbrevs) for x in line.split()):
                 self.stats.sort_stats(*line.split())
             else:
-                print(
-                    "Valid sort keys (unique prefixes are accepted):", file=self.stream
-                )
+                print("Valid sort keys (unique prefixes are accepted):", file=self.stream)
                 for key, value in Stats.sort_arg_dict_default.items():
                     print(f"{key} -- {value[1]}", file=self.stream)
             return 0
 
         def help_sort(self):
             print("Sort profile data according to specified keys.", file=self.stream)
-            print(
-                "(Typing `sort' without arguments lists valid keys.)", file=self.stream
-            )
+            print("(Typing `sort' without arguments lists valid keys.)", file=self.stream)
 
         def complete_sort(self, text, *args):
             return [a for a in Stats.sort_arg_dict_default if a.startswith(text)]

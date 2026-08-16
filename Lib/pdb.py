@@ -322,9 +322,7 @@ class Pdb(bdb.Bdb, cmd.Cmd):
 
         if self.rcLines:
             self.cmdqueue = [
-                line
-                for line in self.rcLines
-                if line.strip() and not line.strip().startswith("#")
+                line for line in self.rcLines if line.strip() and not line.strip().startswith("#")
             ]
             self.rcLines = []
 
@@ -394,9 +392,7 @@ class Pdb(bdb.Bdb, cmd.Cmd):
         # 'yield from' or a generator controlled by a for loop. No exception has
         # actually occurred in this case. The debugger uses this debug event to
         # stop when the debuggee is returning from such generators.
-        prefix = (
-            "Internal " if (not exc_traceback and exc_type is StopIteration) else ""
-        )
+        prefix = "Internal " if (not exc_traceback and exc_type is StopIteration) else ""
         self.message(f"{prefix}{self._format_exc(exc_value)}")
         self.interaction(frame, exc_traceback)
 
@@ -508,9 +504,7 @@ class Pdb(bdb.Bdb, cmd.Cmd):
         last_end = 0
         line_pieces = []
         for start, end, name in replace_variables:
-            line_pieces.append(
-                line[last_end:start] + f'__pdb_convenience_variables["{name}"]'
-            )
+            line_pieces.append(line[last_end:start] + f'__pdb_convenience_variables["{name}"]')
             last_end = end
         line_pieces.append(line[last_end:])
 
@@ -1242,9 +1236,7 @@ class Pdb(bdb.Bdb, cmd.Cmd):
         """
         if not self.nosigint:
             try:
-                Pdb._previous_sigint_handler = signal.signal(
-                    signal.SIGINT, self.sigint_handler
-                )
+                Pdb._previous_sigint_handler = signal.signal(signal.SIGINT, self.sigint_handler)
             except ValueError:
                 # ValueError happens when do_continue() is invoked from
                 # a non-main thread in which case we just continue without
@@ -1971,9 +1963,7 @@ def post_mortem(t=None):
             t = exc.__traceback__
 
     if t is None:
-        raise ValueError(
-            "A valid traceback must be passed if no exception is being handled"
-        )
+        raise ValueError("A valid traceback must be passed if no exception is being handled")
 
     p = Pdb()
     p.reset()

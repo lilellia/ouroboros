@@ -102,12 +102,9 @@ def _reduce_ex(self, proto):
         except AttributeError:
             dict = None
     else:
-        if type(self).__getstate__ is object.__getstate__ and getattr(
-            self, "__slots__", None
-        ):
+        if type(self).__getstate__ is object.__getstate__ and getattr(self, "__slots__", None):
             raise TypeError(
-                "a class that defines __slots__ without "
-                "defining __getstate__ cannot be pickled"
+                "a class that defines __slots__ without defining __getstate__ cannot be pickled"
             )
         dict = getstate()
     if dict:
@@ -207,13 +204,9 @@ def add_extension(module, name, code):
     if _extension_registry.get(key) == code and _inverted_registry.get(code) == key:
         return  # Redundant registrations are benign
     if key in _extension_registry:
-        raise ValueError(
-            f"key {key} is already registered with code {_extension_registry[key]}"
-        )
+        raise ValueError(f"key {key} is already registered with code {_extension_registry[key]}")
     if code in _inverted_registry:
-        raise ValueError(
-            f"code {code} is already in use for key {_inverted_registry[code]}"
-        )
+        raise ValueError(f"code {code} is already in use for key {_inverted_registry[code]}")
     _extension_registry[key] = code
     _inverted_registry[code] = key
 

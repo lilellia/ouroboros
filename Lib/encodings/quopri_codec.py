@@ -4,8 +4,8 @@ This codec de/encodes from bytes to bytes.
 """
 
 import codecs
-import quopri
 from io import BytesIO
+import quopri
 
 
 def quopri_encode(input, errors="strict"):

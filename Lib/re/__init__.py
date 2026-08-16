@@ -338,9 +338,7 @@ def _compile(pattern, flags):
     if p is None:
         if isinstance(pattern, Pattern):
             if flags:
-                raise ValueError(
-                    "cannot process flags argument with a compiled pattern"
-                )
+                raise ValueError("cannot process flags argument with a compiled pattern")
             return pattern
         if not _compiler.isstring(pattern):
             raise TypeError("first argument must be string or compiled pattern")

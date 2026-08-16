@@ -366,9 +366,7 @@ class HTTPResponse(io.BufferedIOBase):
                 print("headers:", skipped_headers)
             del skipped_headers
         else:
-            raise HTTPException(
-                f"got more than {_MAXINTERIMRESPONSES} interim responses"
-            )
+            raise HTTPException(f"got more than {_MAXINTERIMRESPONSES} interim responses")
 
         self.code = self.status = status
         self.reason = reason.strip()
@@ -1010,9 +1008,7 @@ class HTTPConnection:
 
     def _tunnel(self):
         if _contains_disallowed_url_pchar_re.search(self._tunnel_host):
-            raise ValueError(
-                f"Tunnel host can't contain control characters {self._tunnel_host!r}"
-            )
+            raise ValueError(f"Tunnel host can't contain control characters {self._tunnel_host!r}")
         connect = b"CONNECT %s:%d %s\r\n" % (
             self._wrap_ipv6(self._tunnel_host.encode("idna")),
             self._tunnel_port,
@@ -1130,8 +1126,7 @@ class HTTPConnection:
                     self.sock.sendall(d)
             else:
                 raise TypeError(
-                    "data should be a bytes-like object "
-                    f"or an iterable, got {type(data)!r}"
+                    f"data should be a bytes-like object or an iterable, got {type(data)!r}"
                 )
 
     def _output(self, s):
@@ -1350,8 +1345,7 @@ class HTTPConnection:
         match = _contains_disallowed_url_pchar_re.search(url)
         if match:
             raise InvalidURL(
-                f"URL can't contain control characters. {url!r} "
-                f"(found at least {match.group()!r})"
+                f"URL can't contain control characters. {url!r} (found at least {match.group()!r})"
             )
 
     def _validate_host(self, host):
@@ -1360,8 +1354,7 @@ class HTTPConnection:
         match = _contains_disallowed_url_pchar_re.search(host)
         if match:
             raise InvalidURL(
-                f"URL can't contain control characters. {host!r} "
-                f"(found at least {match.group()!r})"
+                f"URL can't contain control characters. {host!r} (found at least {match.group()!r})"
             )
 
     def putheader(self, header, *values):
@@ -1494,9 +1487,7 @@ class HTTPConnection:
             raise ResponseNotReady(self.__state)
 
         if self.debuglevel > 0:
-            response = self.response_class(
-                self.sock, self.debuglevel, method=self._method
-            )
+            response = self.response_class(self.sock, self.debuglevel, method=self._method)
         else:
             response = self.response_class(self.sock, method=self._method)
 
@@ -1558,9 +1549,7 @@ else:
             else:
                 server_hostname = self.host
 
-            self.sock = self._context.wrap_socket(
-                self.sock, server_hostname=server_hostname
-            )
+            self.sock = self._context.wrap_socket(self.sock, server_hostname=server_hostname)
 
     __all__.append("HTTPSConnection")
 
@@ -1636,7 +1625,8 @@ class BadStatusLine(HTTPException):
 class LineTooLong(HTTPException):
     def __init__(self, line_type):
         HTTPException.__init__(
-            self, "got more than %d bytes when reading %s" % (_MAXLINE, line_type)  # noqa: UP031
+            self,
+            "got more than %d bytes when reading %s" % (_MAXLINE, line_type),  # noqa: UP031
         )
 
 

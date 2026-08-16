@@ -103,8 +103,8 @@ The close() method is called automatically when the class instance
 is destroyed.
 """
 
-import warnings
 from collections import namedtuple
+import warnings
 
 warnings._deprecated(__name__, remove=(3, 13))
 
@@ -454,20 +454,14 @@ class Au_write:
 
     def writeframes(self, data):
         self.writeframesraw(data)
-        if (
-            self._nframeswritten != self._nframes
-            or self._datalength != self._datawritten
-        ):
+        if self._nframeswritten != self._nframes or self._datalength != self._datawritten:
             self._patchheader()
 
     def close(self):
         if self._file:
             try:
                 self._ensure_header_written()
-                if (
-                    self._nframeswritten != self._nframes
-                    or self._datalength != self._datawritten
-                ):
+                if self._nframeswritten != self._nframes or self._datalength != self._datawritten:
                     self._patchheader()
                 self._file.flush()
             finally:

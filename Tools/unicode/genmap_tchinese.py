@@ -14,16 +14,12 @@ BIG5HKSCS_C1 = (0x87, 0xFE)
 BIG5HKSCS_C2 = (0x40, 0xFE)
 
 MAPPINGS_BIG5 = "https://unicode.org/Public/MAPPINGS/OBSOLETE/EASTASIA/OTHER/BIG5.TXT"
-MAPPINGS_CP950 = (
-    "https://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WINDOWS/CP950.TXT"
-)
+MAPPINGS_CP950 = "https://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WINDOWS/CP950.TXT"
 
 HKSCS_VERSION = "2004"
 # The files for HKSCS mappings are available under a restrictive license.
 # Users of the script need to download the files from the HKSARG CCLI website:
-MAPPINGS_HKSCS = (
-    f"https://www.ccli.gov.hk/en/archive/terms_hkscs-{HKSCS_VERSION}-big5-iso.html"
-)
+MAPPINGS_HKSCS = f"https://www.ccli.gov.hk/en/archive/terms_hkscs-{HKSCS_VERSION}-big5-iso.html"
 
 
 def bh2s(code):

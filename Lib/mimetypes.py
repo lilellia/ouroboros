@@ -290,9 +290,7 @@ class MimeTypes:
                         if not subkeyname.startswith("."):
                             continue
                         # raises OSError if no 'Content Type' value
-                        mimetype, datatype = _winreg.QueryValueEx(
-                            subkey, "Content Type"
-                        )
+                        mimetype, datatype = _winreg.QueryValueEx(subkey, "Content Type")
                         if datatype != _winreg.REG_SZ:
                             continue
                         add_type(mimetype, subkeyname)
@@ -641,9 +639,7 @@ More than one type argument may be given.
         sys.exit(code)
 
     try:
-        opts, args = getopt.getopt(
-            sys.argv[1:], "hle", ["help", "lenient", "extension"]
-        )
+        opts, args = getopt.getopt(sys.argv[1:], "hle", ["help", "lenient", "extension"])
     except getopt.error as msg:
         usage(1, msg)
 

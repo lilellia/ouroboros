@@ -1,11 +1,11 @@
 import collections
+from importlib import resources
 import os
 import os.path
 import subprocess
 import sys
 import sysconfig
 import tempfile
-from importlib import resources
 
 __all__ = ["bootstrap", "version"]
 _PACKAGE_NAMES = ("pip",)

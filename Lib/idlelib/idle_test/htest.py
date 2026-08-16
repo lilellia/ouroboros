@@ -63,9 +63,9 @@ TODO test these modules and classes:
   pyshell.PyShellEditorWindow
 """
 
+from importlib import import_module
 import textwrap
 import tkinter as tk
-from importlib import import_module
 from tkinter.ttk import Scrollbar
 
 tk.NoDefaultRoot()
@@ -294,15 +294,13 @@ _search_dialog_spec = {
 _searchbase_spec = {
     "file": "searchbase",
     "kwds": {},
-    "msg": "Check the appearance of the base search dialog\n"
-    "Its only action is to close.",
+    "msg": "Check the appearance of the base search dialog\nIts only action is to close.",
 }
 
 show_idlehelp_spec = {
     "file": "help",
     "kwds": {},
-    "msg": "If the help text displays, this works.\n"
-    "Text is selectable. Window is scrollable.",
+    "msg": "If the help text displays, this works.\nText is selectable. Window is scrollable.",
 }
 
 _sidebar_number_scrolling_spec = {
@@ -328,15 +326,13 @@ _sidebar_number_scrolling_spec = {
 _stackbrowser_spec = {
     "file": "stackviewer",
     "kwds": {},
-    "msg": "A stacktrace for a NameError exception.\n"
-    "Should have NameError and 1 traceback line.",
+    "msg": "A stacktrace for a NameError exception.\nShould have NameError and 1 traceback line.",
 }
 
 _tooltip_spec = {
     "file": "tooltip",
     "kwds": {},
-    "msg": "Place mouse cursor over both the buttons\n"
-    "A tooltip should appear with some text.",
+    "msg": "Place mouse cursor over both the buttons\nA tooltip should appear with some text.",
 }
 
 _tree_widget_spec = {

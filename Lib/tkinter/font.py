@@ -90,9 +90,7 @@ class Font:
             self.delete_font = False
             # confirm font exists
             if self.name not in tk.splitlist(tk.call("font", "names")):
-                raise tkinter._tkinter.TclError(
-                    f"named font {self.name} does not already exist"
-                )
+                raise tkinter._tkinter.TclError(f"named font {self.name} does not already exist")
             # if font config info supplied, apply it
             if font:
                 tk.call("font", "configure", self.name, *font)
@@ -108,10 +106,7 @@ class Font:
         return self.name
 
     def __repr__(self):
-        return (
-            f"<{self.__class__.__module__}.{self.__class__.__qualname__}"
-            f" object {self.name!r}>"
-        )
+        return f"<{self.__class__.__module__}.{self.__class__.__qualname__} object {self.name!r}>"
 
     def __eq__(self, other):
         if not isinstance(other, Font):
@@ -144,9 +139,7 @@ class Font:
             args = args + ("-" + option,)
             return self._call("font", "actual", self.name, *args)
         else:
-            return self._mkdict(
-                self._split(self._call("font", "actual", self.name, *args))
-            )
+            return self._mkdict(self._split(self._call("font", "actual", self.name, *args)))
 
     def cget(self, option):
         "Get font attribute"

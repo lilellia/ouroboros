@@ -123,12 +123,12 @@ BaseServer:
 __version__ = "0.4"
 
 
+from io import BufferedIOBase
 import os
 import selectors
 import socket
 import sys
 import threading
-from io import BufferedIOBase
 from time import monotonic as time
 
 __all__ = [
@@ -716,9 +716,7 @@ class ThreadingMixIn:
         """Start a new thread to process the request."""
         if self.block_on_close:
             vars(self).setdefault("_threads", _Threads())
-        t = threading.Thread(
-            target=self.process_request_thread, args=(request, client_address)
-        )
+        t = threading.Thread(target=self.process_request_thread, args=(request, client_address))
         t.daemon = self.daemon_threads
         self._threads.append(t)
         t.start()

@@ -40,9 +40,7 @@ class IncompleteReadError(EOFError):
 
     def __init__(self, partial, expected):
         r_expected = "undefined" if expected is None else repr(expected)
-        super().__init__(
-            f"{len(partial)} bytes read on a total of {r_expected} expected bytes"
-        )
+        super().__init__(f"{len(partial)} bytes read on a total of {r_expected} expected bytes")
         self.partial = partial
         self.expected = expected
 

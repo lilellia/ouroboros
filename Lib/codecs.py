@@ -624,9 +624,7 @@ class StreamReader(Codec):
                 line0withoutend = lines[0].splitlines(keepends=False)[0]
                 if line0withend != line0withoutend:  # We really have a line end
                     # Put the rest back together and keep it until the next call
-                    self.charbuffer = (
-                        self._empty_charbuffer.join(lines[1:]) + self.charbuffer
-                    )
+                    self.charbuffer = self._empty_charbuffer.join(lines[1:]) + self.charbuffer
                     if keepends:
                         line = line0withend
                     else:

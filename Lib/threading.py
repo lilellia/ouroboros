@@ -1,11 +1,11 @@
 """Thread module emulating a subset of Java's threading model."""
 
 import _thread
+from _weakrefset import WeakSet
 import functools
+from itertools import count as _count
 import os as _os
 import sys as _sys
-from _weakrefset import WeakSet
-from itertools import count as _count
 from time import monotonic as _time
 
 try:
@@ -500,10 +500,7 @@ class Semaphore:
 
     def __repr__(self):
         cls = self.__class__
-        return (
-            f"<{cls.__module__}.{cls.__qualname__} at {id(self):#x}:"
-            f" value={self._value}>"
-        )
+        return f"<{cls.__module__}.{cls.__qualname__} at {id(self):#x}: value={self._value}>"
 
     def acquire(self, blocking=True, timeout=None):
         """Acquire a semaphore, decrementing the internal counter by one.
@@ -934,9 +931,7 @@ class Thread:
 
     _initialized = False
 
-    def __init__(
-        self, group=None, target=None, name=None, args=(), kwargs=None, *, daemon=None
-    ):
+    def __init__(self, group=None, target=None, name=None, args=(), kwargs=None, *, daemon=None):
         """This constructor should always be called with keyword arguments. Arguments are:
 
         *group* should be None; reserved for future extension when a ThreadGroup
@@ -978,9 +973,7 @@ class Thread:
         self._kwargs = kwargs
         if daemon is not None:
             if daemon and not _daemon_threads_allowed():
-                raise RuntimeError(
-                    "daemon threads are disabled in this (sub)interpreter"
-                )
+                raise RuntimeError("daemon threads are disabled in this (sub)interpreter")
             self._daemonic = daemon
         else:
             self._daemonic = current_thread().daemon
@@ -1378,16 +1371,16 @@ class Thread:
 
 
 try:
-    from _thread import _excepthook as excepthook
-    from _thread import _ExceptHookArgs as ExceptHookArgs
+    from _thread import (
+        _excepthook as excepthook,
+        _ExceptHookArgs as ExceptHookArgs,
+    )
 except ImportError:
     # Simple Python implementation if _thread._excepthook() is not available
     from collections import namedtuple
     from traceback import print_exception as _print_exception
 
-    _ExceptHookArgs = namedtuple(
-        "ExceptHookArgs", "exc_type exc_value exc_traceback thread"
-    )
+    _ExceptHookArgs = namedtuple("ExceptHookArgs", "exc_type exc_value exc_traceback thread")
 
     def ExceptHookArgs(args):
         return _ExceptHookArgs(*args)
@@ -1532,9 +1525,7 @@ class _MainThread(Thread):
 
 class _DummyThread(Thread):
     def __init__(self):
-        Thread.__init__(
-            self, name=_newname("Dummy-%d"), daemon=_daemon_threads_allowed()
-        )
+        Thread.__init__(self, name=_newname("Dummy-%d"), daemon=_daemon_threads_allowed())
         self._started.set()
         self._set_ident()
         if _HAVE_THREAD_NATIVE_ID:

@@ -83,9 +83,7 @@ def checkextensions(unknown, extra_inis, prefix):
                 break
         #                       print "Nope!"
         else:  # For not broken!
-            sys.stderr.write(
-                f"No definition of module {mod} in any specified map file.\n"
-            )
+            sys.stderr.write(f"No definition of module {mod} in any specified map file.\n")
 
     return ret
 

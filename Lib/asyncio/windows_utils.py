@@ -164,9 +164,7 @@ class Popen(subprocess.Popen):
         else:
             stderr_wfd = stderr
         try:
-            super().__init__(
-                args, stdin=stdin_rfd, stdout=stdout_wfd, stderr=stderr_wfd, **kwds
-            )
+            super().__init__(args, stdin=stdin_rfd, stdout=stdout_wfd, stderr=stderr_wfd, **kwds)
         except:
             for h in (stdin_wh, stdout_rh, stderr_rh):
                 if h is not None:

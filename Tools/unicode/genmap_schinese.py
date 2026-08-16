@@ -27,9 +27,7 @@ GB18030EXTP5_C1 = (0xFE, 0xFE)
 GB18030EXTP5_C2 = (0x50, 0xFE)
 
 MAPPINGS_GB2312 = "http://people.freebsd.org/~perky/i18n/GB2312.TXT"
-MAPPINGS_CP936 = (
-    "http://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WINDOWS/CP936.TXT"
-)
+MAPPINGS_CP936 = "http://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WINDOWS/CP936.TXT"
 MAPPINGS_GB18030 = (
     "http://oss.software.ibm.com/cvs/icu/~checkout~/charset/data/xml/gb-18030-2000.xml"
 )
@@ -59,9 +57,7 @@ def main():
     print("Loading Mapping File...")
     gb2312map = open_mapping_file("python-mappings/GB2312.TXT", MAPPINGS_GB2312)
     cp936map = open_mapping_file("python-mappings/CP936.TXT", MAPPINGS_CP936)
-    gb18030map = open_mapping_file(
-        "python-mappings/gb-18030-2000.xml", MAPPINGS_GB18030
-    )
+    gb18030map = open_mapping_file("python-mappings/gb-18030-2000.xml", MAPPINGS_GB18030)
 
     gb18030decmap, gb18030unilinear = parse_gb18030map(gb18030map)
     gbkdecmap = loadmap(cp936map)
@@ -115,7 +111,8 @@ def main():
         writer = DecodeMapWriter(fp, "gb18030ext", gb18030decmap)
         for i in range(1, 6):
             writer.update_decode_map(
-                eval("GB18030EXTP%d_C1" % i), eval("GB18030EXTP%d_C2" % i)  # noqa: UP031
+                eval("GB18030EXTP%d_C1" % i),  # noqa: UP031
+                eval("GB18030EXTP%d_C2" % i),  # noqa: UP031
             )
 
         writer.generate()

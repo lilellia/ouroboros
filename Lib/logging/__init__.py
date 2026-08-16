@@ -27,14 +27,16 @@ import collections.abc
 import io
 import os
 import re
+from string import (
+    Formatter as StrFormatter,
+    Template,
+)
 import sys
 import time
 import traceback
+from types import GenericAlias
 import warnings
 import weakref
-from string import Formatter as StrFormatter
-from string import Template
-from types import GenericAlias
 
 __all__ = [
     "BASIC_FORMAT",
@@ -249,9 +251,7 @@ _srcfile = os.path.normcase(addLevelName.__code__.co_filename)
 def _is_internal_frame(frame):
     """Signal whether the frame is a CPython or logging module internal."""
     filename = os.path.normcase(frame.f_code.co_filename)
-    return filename == _srcfile or (
-        "importlib" in filename and "_bootstrap" in filename
-    )
+    return filename == _srcfile or ("importlib" in filename and "_bootstrap" in filename)
 
 
 def _checkLevel(level):
@@ -388,12 +388,7 @@ class LogRecord:
         # formatting still seem to suggest a mapping object is required.
         # Thus, while not removing the isinstance check, it does now look
         # for collections.abc.Mapping rather than, as before, dict.
-        if (
-            args
-            and len(args) == 1
-            and isinstance(args[0], collections.abc.Mapping)
-            and args[0]
-        ):
+        if args and len(args) == 1 and isinstance(args[0], collections.abc.Mapping) and args[0]:
             args = args[0]
         self.args = args
         self.levelname = getLevelName(level)
@@ -525,9 +520,7 @@ class PercentStyle:
     def validate(self):
         """Validate the input format, ensure it matches the correct style"""
         if not self.validation_pattern.search(self._fmt):
-            raise ValueError(
-                f"Invalid format '{self._fmt}' for '{self.default_format[0]}' style"
-            )
+            raise ValueError(f"Invalid format '{self._fmt}' for '{self.default_format[0]}' style")
 
     def _format(self, record):
         if defaults := self._defaults:
@@ -568,9 +561,7 @@ class StrFormatStyle(PercentStyle):
             for _, fieldname, spec, conversion in _str_formatter.parse(self._fmt):
                 if fieldname:
                     if not self.field_spec.match(fieldname):
-                        raise ValueError(
-                            f"invalid field name/expression: {fieldname!r}"
-                        )
+                        raise ValueError(f"invalid field name/expression: {fieldname!r}")
                     fields.add(fieldname)
                 if conversion and conversion not in "rsa":
                     raise ValueError(f"invalid conversion: {conversion!r}")
@@ -672,9 +663,7 @@ class Formatter:
 
     converter = time.localtime
 
-    def __init__(
-        self, fmt=None, datefmt=None, style="%", validate=True, *, defaults=None
-    ):
+    def __init__(self, fmt=None, datefmt=None, style="%", validate=True, *, defaults=None):
         """
         Initialize the formatter with specified format strings.
 
@@ -691,9 +680,7 @@ class Formatter:
            Added the ``style`` parameter.
         """
         if style not in _STYLES:
-            raise ValueError(
-                "Style must be one of: {}".format(",".join(_STYLES.keys()))
-            )
+            raise ValueError("Style must be one of: {}".format(",".join(_STYLES.keys())))
         self._style = _STYLES[style][0](fmt, defaults=defaults)
         if validate:
             self._style.validate()
@@ -1177,22 +1164,16 @@ class Handler(Filterer):
                 # Walk the stack frame up until we're out of logging,
                 # so as to print the calling context.
                 frame = tb.tb_frame
-                while (
-                    frame and os.path.dirname(frame.f_code.co_filename) == __path__[0]
-                ):
+                while frame and os.path.dirname(frame.f_code.co_filename) == __path__[0]:
                     frame = frame.f_back
                 if frame:
                     traceback.print_stack(frame, file=sys.stderr)
                 else:
                     # couldn't find the right stack frame, for some reason
-                    sys.stderr.write(
-                        f"Logged from file {record.filename}, line {record.lineno}\n"
-                    )
+                    sys.stderr.write(f"Logged from file {record.filename}, line {record.lineno}\n")
                 # Issue 18671: output logging message and arguments
                 try:
-                    sys.stderr.write(
-                        f"Message: {record.msg!r}\nArguments: {record.args}\n"
-                    )
+                    sys.stderr.write(f"Message: {record.msg!r}\nArguments: {record.args}\n")
                 except RecursionError:  # See issue 36272
                     raise
                 except Exception:  # noqa: BLE001
@@ -1358,9 +1339,7 @@ class FileHandler(StreamHandler):
         Return the resulting stream.
         """
         open_func = self._builtin_open
-        return open_func(
-            self.baseFilename, self.mode, encoding=self.encoding, errors=self.errors
-        )
+        return open_func(self.baseFilename, self.mode, encoding=self.encoding, errors=self.errors)
 
     def emit(self, record):
         """
@@ -1805,9 +1784,7 @@ class Logger(Filterer):
                 exc_info = (type(exc_info), exc_info, exc_info.__traceback__)
             elif not isinstance(exc_info, tuple):
                 exc_info = sys.exc_info()
-        record = self.makeRecord(
-            self.name, level, fn, lno, msg, args, exc_info, func, extra, sinfo
-        )
+        record = self.makeRecord(self.name, level, fn, lno, msg, args, exc_info, func, extra, sinfo)
         self.handle(record)
 
     def handle(self, record):
@@ -1896,9 +1873,7 @@ class Logger(Filterer):
                 if record.levelno >= lastResort.level:
                     lastResort.handle(record)
             elif raiseExceptions and not self.manager.emittedNoHandlerWarning:
-                sys.stderr.write(
-                    f'No handlers could be found for logger "{self.name}"\n'
-                )
+                sys.stderr.write(f'No handlers could be found for logger "{self.name}"\n')
                 self.manager.emittedNoHandlerWarning = True
 
     def getEffectiveLevel(self):
@@ -2240,14 +2215,11 @@ def basicConfig(**kwargs):
             handlers = kwargs.pop("handlers", None)
             if handlers is None:
                 if "stream" in kwargs and "filename" in kwargs:
-                    raise ValueError(
-                        "'stream' and 'filename' should not be specified together"
-                    )
+                    raise ValueError("'stream' and 'filename' should not be specified together")
             else:
                 if "stream" in kwargs or "filename" in kwargs:
                     raise ValueError(
-                        "'stream' or 'filename' should not be "
-                        "specified together with 'handlers'"
+                        "'stream' or 'filename' should not be specified together with 'handlers'"
                     )
             if handlers is None:
                 filename = kwargs.pop("filename", None)
@@ -2265,9 +2237,7 @@ def basicConfig(**kwargs):
             dfs = kwargs.pop("datefmt", None)
             style = kwargs.pop("style", "%")
             if style not in _STYLES:
-                raise ValueError(
-                    "Style must be one of: {}".format(",".join(_STYLES.keys()))
-                )
+                raise ValueError("Style must be one of: {}".format(",".join(_STYLES.keys())))
             fs = kwargs.pop("format", _STYLES[style][1])
             fmt = Formatter(fs, dfs, style)
             for h in handlers:

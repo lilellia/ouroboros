@@ -59,9 +59,7 @@ def list_packages(names):
         package_path = os.path.join(STDLIB_PATH, name)
         if not os.path.isdir(package_path):
             continue
-        if any(
-            package_file.endswith(".py") for package_file in os.listdir(package_path)
-        ):
+        if any(package_file.endswith(".py") for package_file in os.listdir(package_path)):
             names.add(name)
 
 

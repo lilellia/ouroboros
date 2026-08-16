@@ -19,25 +19,6 @@ Any name not present in __all__ is an implementation detail
 that may be changed without notice. Use at your own risk!
 """
 
-import collections
-import collections.abc
-import contextlib
-import copyreg
-import functools
-import operator
-import re as stdlib_re  # Avoid confusion with the re we export.
-import sys
-import types
-import warnings
-from abc import ABCMeta, abstractmethod
-from collections import defaultdict
-from types import (
-    GenericAlias,
-    MethodDescriptorType,
-    MethodWrapperType,
-    WrapperDescriptorType,
-)
-
 from _typing import (
     Generic,
     ParamSpec,
@@ -48,6 +29,24 @@ from _typing import (
     TypeVarTuple,
     _idfunc,
 )
+from abc import ABCMeta, abstractmethod
+import collections
+from collections import defaultdict
+import collections.abc
+import contextlib
+import copyreg
+import functools
+import operator
+import re as stdlib_re  # Avoid confusion with the re we export.
+import sys
+import types
+from types import (
+    GenericAlias,
+    MethodDescriptorType,
+    MethodWrapperType,
+    WrapperDescriptorType,
+)
+import warnings
 
 # Please keep __all__ alphabetized within each category.
 __all__ = [
@@ -205,9 +204,7 @@ def _type_check(arg, msg, is_argument=True, module=None, *, allow_special_forms=
 
 
 def _is_param_expr(arg):
-    return arg is ... or isinstance(
-        arg, (tuple, list, ParamSpec, _ConcatenateGenericAlias)
-    )
+    return arg is ... or isinstance(arg, (tuple, list, ParamSpec, _ConcatenateGenericAlias))
 
 
 def _should_unflatten_callable_args(typ, args):
@@ -420,14 +417,10 @@ def _eval_type(t, globalns, localns, type_params=None, *, recursive_guard=frozen
     ForwardRef.
     """
     if isinstance(t, ForwardRef):
-        return t._evaluate(
-            globalns, localns, type_params, recursive_guard=recursive_guard
-        )
+        return t._evaluate(globalns, localns, type_params, recursive_guard=recursive_guard)
     if isinstance(t, (_GenericAlias, GenericAlias, types.UnionType)):
         if isinstance(t, GenericAlias):
-            args = tuple(
-                ForwardRef(arg) if isinstance(arg, str) else arg for arg in t.__args__
-            )
+            args = tuple(ForwardRef(arg) if isinstance(arg, str) else arg for arg in t.__args__)
             is_unpacked = t.__unpacked__
             if _should_unflatten_callable_args(t, args):
                 t = t.__origin__[(args[:-1], args[-1])]
@@ -437,9 +430,7 @@ def _eval_type(t, globalns, localns, type_params=None, *, recursive_guard=frozen
                 t = Unpack[t]
 
         ev_args = tuple(
-            _eval_type(
-                a, globalns, localns, type_params, recursive_guard=recursive_guard
-            )
+            _eval_type(a, globalns, localns, type_params, recursive_guard=recursive_guard)
             for a in t.__args__
         )
         if ev_args == t.__args__:
@@ -793,9 +784,7 @@ def Literal(self, *parameters):
     parameters = _flatten_literal_params(parameters)
 
     try:
-        parameters = tuple(
-            p for p, _ in _deduplicate(list(_value_and_type_iter(parameters)))
-        )
+        parameters = tuple(p for p, _ in _deduplicate(list(_value_and_type_iter(parameters))))
     except TypeError:  # unhashable parameters
         pass
 
@@ -839,8 +828,7 @@ def Concatenate(self, parameters):
         parameters = (parameters,)
     if not (parameters[-1] is ... or isinstance(parameters[-1], ParamSpec)):
         raise TypeError(
-            "The last parameter to Concatenate should be a "
-            "ParamSpec variable or ellipsis."
+            "The last parameter to Concatenate should be a ParamSpec variable or ellipsis."
         )
     msg = "Concatenate[arg, ...]: each arg must be a type."
     parameters = (*(_type_check(p, msg) for p in parameters[:-1]), parameters[-1])
@@ -1014,9 +1002,7 @@ class ForwardRef(_Final, _root=True):
 
 
 def _is_unpacked_typevartuple(x: Any) -> bool:
-    return (not isinstance(x, type)) and getattr(
-        x, "__typing_is_unpacked_typevartuple__", False
-    )
+    return (not isinstance(x, type)) and getattr(x, "__typing_is_unpacked_typevartuple__", False)
 
 
 def _is_typevar_like(x: Any) -> bool:
@@ -1058,9 +1044,7 @@ def _typevartuple_prepare_subst(self, alias, args):
             subargs = getattr(arg, "__typing_unpacked_tuple_args__", None)
             if subargs and len(subargs) == 2 and subargs[-1] is ...:
                 if var_tuple_index is not None:
-                    raise TypeError(
-                        "More than one unpacked arbitrary-length tuple argument"
-                    )
+                    raise TypeError("More than one unpacked arbitrary-length tuple argument")
                 var_tuple_index = k
                 fillarg = subargs[0]
     if var_tuple_index is not None:
@@ -1068,8 +1052,7 @@ def _typevartuple_prepare_subst(self, alias, args):
         right = min(right, alen - var_tuple_index - 1)
     elif left + right > alen:
         raise TypeError(
-            f"Too few arguments for {alias};"
-            f" actual {alen}, expected at least {plen - 1}"
+            f"Too few arguments for {alias}; actual {alen}, expected at least {plen - 1}"
         )
 
     return (
@@ -1086,8 +1069,7 @@ def _paramspec_subst(self, arg):
         arg = tuple(_type_check(a, "Expected a type.") for a in arg)
     elif not _is_param_expr(arg):
         raise TypeError(
-            f"Expected a list of types, an ellipsis, "
-            f"ParamSpec, or Concatenate. Got {arg}"
+            f"Expected a list of types, an ellipsis, ParamSpec, or Concatenate. Got {arg}"
         )
     return arg
 
@@ -1127,9 +1109,7 @@ def _generic_class_getitem(cls, params):
     if is_generic_or_protocol:
         # Generic and Protocol can only be subscripted with unique type variables.
         if not params:
-            raise TypeError(
-                f"Parameter list to {cls.__qualname__}[...] cannot be empty"
-            )
+            raise TypeError(f"Parameter list to {cls.__qualname__}[...] cannot be empty")
         if not all(_is_typevar_like(p) for p in params):
             raise TypeError(
                 f"Parameters to {cls.__name__}[...] must all be type variables "
@@ -1163,9 +1143,7 @@ def _generic_init_subclass(cls, *args, **kwargs):
         error = Generic in cls.__orig_bases__
     else:
         error = (
-            Generic in cls.__bases__
-            and cls.__name__ != "Protocol"
-            and type(cls) != _TypedDictMeta
+            Generic in cls.__bases__ and cls.__name__ != "Protocol" and type(cls) != _TypedDictMeta
         )
     if error:
         raise TypeError("Cannot inherit from plain Generic")
@@ -1189,8 +1167,7 @@ def _generic_init_subclass(cls, *args, **kwargs):
                 s_vars = ", ".join(str(t) for t in tvars if t not in gvarset)
                 s_args = ", ".join(str(g) for g in gvars)
                 raise TypeError(
-                    f"Some type variables ({s_vars}) are"
-                    f" not listed in Generic[{s_args}]"
+                    f"Some type variables ({s_vars}) are not listed in Generic[{s_args}]"
                 )
             tvars = gvars
     cls.__parameters__ = tuple(tvars)
@@ -1263,16 +1240,11 @@ class _BaseGenericAlias(_Final, _root=True):
         return self.__subclasscheck__(type(obj))
 
     def __subclasscheck__(self, cls):
-        raise TypeError(
-            "Subscripted generics cannot be used with class and instance checks"
-        )
+        raise TypeError("Subscripted generics cannot be used with class and instance checks")
 
     def __dir__(self):
         return list(
-            set(
-                super().__dir__()
-                + [attr for attr in dir(self.__origin__) if not _is_dunder(attr)]
-            )
+            set(super().__dir__() + [attr for attr in dir(self.__origin__) if not _is_dunder(attr)])
         )
 
 
@@ -1422,9 +1394,7 @@ class _GenericAlias(_BaseGenericAlias, _root=True):
                             subargs.append(new_arg_by_param[x])
                     new_arg = old_arg[tuple(subargs)]
 
-            if self.__origin__ == collections.abc.Callable and isinstance(
-                new_arg, tuple
-            ):
+            if self.__origin__ == collections.abc.Callable and isinstance(new_arg, tuple):
                 # Consider the following `Callable`.
                 #   C = Callable[[int], str]
                 # Here, `C.__args__` should be (int, str) - NOT ([int], str).
@@ -1520,9 +1490,7 @@ class _SpecialGenericAlias(_NotIterable, _BaseGenericAlias, _root=True):
         if origin.__module__ == "builtins":
             self.__doc__ = f"A generic version of {origin.__qualname__}."
         else:
-            self.__doc__ = (
-                f"A generic version of {origin.__module__}.{origin.__qualname__}."
-            )
+            self.__doc__ = f"A generic version of {origin.__module__}.{origin.__qualname__}."
 
     @_tp_cache
     def __getitem__(self, params):
@@ -1564,9 +1532,7 @@ class _DeprecatedGenericAlias(_SpecialGenericAlias, _root=True):
     def __instancecheck__(self, inst):
         import warnings
 
-        warnings._deprecated(
-            f"{self.__module__}.{self._name}", remove=self._removal_version
-        )
+        warnings._deprecated(f"{self.__module__}.{self._name}", remove=self._removal_version)
         return super().__instancecheck__(inst)
 
 
@@ -1591,9 +1557,7 @@ class _CallableGenericAlias(_NotIterable, _GenericAlias, _root=True):
 
 class _CallableType(_SpecialGenericAlias, _root=True):
     def copy_with(self, params):
-        return _CallableGenericAlias(
-            self.__origin__, params, name=self._name, inst=self._inst
-        )
+        return _CallableGenericAlias(self.__origin__, params, name=self._name, inst=self._inst)
 
     def __getitem__(self, params):
         if not isinstance(params, tuple) or len(params) != 2:
@@ -1686,9 +1650,7 @@ class _LiteralGenericAlias(_GenericAlias, _root=True):
         if not isinstance(other, _LiteralGenericAlias):
             return NotImplemented
 
-        return set(_value_and_type_iter(self.__args__)) == set(
-            _value_and_type_iter(other.__args__)
-        )
+        return set(_value_and_type_iter(self.__args__)) == set(_value_and_type_iter(other.__args__))
 
     def __hash__(self):
         return hash(frozenset(_value_and_type_iter(self.__args__)))
@@ -1945,10 +1907,7 @@ class _ProtocolMeta(ABCMeta):
                 if not (
                     base in {object, Generic}
                     or base.__name__ in _PROTO_ALLOWLIST.get(base.__module__, [])
-                    or (
-                        issubclass(base, Generic)
-                        and getattr(base, "_is_protocol", False)
-                    )
+                    or (issubclass(base, Generic) and getattr(base, "_is_protocol", False))
                 ):
                     raise TypeError(
                         f"Protocols can only inherit from other protocols, got {base!r}"
@@ -1969,17 +1928,14 @@ class _ProtocolMeta(ABCMeta):
                 raise TypeError("issubclass() arg 1 must be a class")
             if not getattr(cls, "_is_runtime_protocol", False):
                 raise TypeError(
-                    "Instance and class checks can only be used with "
-                    "@runtime_checkable protocols"
+                    "Instance and class checks can only be used with @runtime_checkable protocols"
                 )
             if (
                 # this attribute is set by @runtime_checkable:
                 cls.__non_callable_proto_members__
                 and cls.__dict__.get("__subclasshook__") is _proto_hook
             ):
-                raise TypeError(
-                    "Protocols with non-method members don't support issubclass()"
-                )
+                raise TypeError("Protocols with non-method members don't support issubclass()")
         return super().__subclasscheck__(other)
 
     def __instancecheck__(cls, instance):
@@ -1991,13 +1947,9 @@ class _ProtocolMeta(ABCMeta):
             # i.e., it's a concrete subclass of a protocol
             return super().__instancecheck__(instance)
 
-        if (
-            not getattr(cls, "_is_runtime_protocol", False)
-            and not _allow_reckless_class_checks()
-        ):
+        if not getattr(cls, "_is_runtime_protocol", False) and not _allow_reckless_class_checks():
             raise TypeError(
-                "Instance and class checks can only be used with"
-                " @runtime_checkable protocols"
+                "Instance and class checks can only be used with @runtime_checkable protocols"
             )
 
         if super().__instancecheck__(instance):
@@ -2132,10 +2084,7 @@ class _AnnotatedAlias(_NotIterable, _GenericAlias, _root=True):
     def __eq__(self, other):
         if not isinstance(other, _AnnotatedAlias):
             return NotImplemented
-        return (
-            self.__origin__ == other.__origin__
-            and self.__metadata__ == other.__metadata__
-        )
+        return self.__origin__ == other.__origin__ and self.__metadata__ == other.__metadata__
 
     def __hash__(self):
         return hash((self.__origin__, self.__metadata__))
@@ -2216,9 +2165,7 @@ class Annotated:
                 "annotation)."
             )
         if _is_unpacked_typevartuple(params[0]):
-            raise TypeError(
-                "Annotated[...] should not be used with an unpacked TypeVarTuple"
-            )
+            raise TypeError("Annotated[...] should not be used with an unpacked TypeVarTuple")
         msg = "Annotated[t, ...]: t must be a type."
         origin = _type_check(params[0], msg, allow_special_forms=True)
         metadata = tuple(params[1:])
@@ -2248,9 +2195,7 @@ def runtime_checkable(cls):
     not their type signatures!
     """
     if not issubclass(cls, Generic) or not getattr(cls, "_is_protocol", False):
-        raise TypeError(
-            f"@runtime_checkable can be only applied to protocol classes, got {cls!r}"
-        )
+        raise TypeError(f"@runtime_checkable can be only applied to protocol classes, got {cls!r}")
     cls._is_runtime_protocol = True
     # PEP 544 prohibits using issubclass()
     # with protocols that have non-method members.
@@ -2262,8 +2207,7 @@ def runtime_checkable(cls):
             is_callable = callable(getattr(cls, attr, None))
         except Exception as e:
             raise TypeError(
-                f"Failed to determine whether protocol member {attr!r} "
-                "is a method member"
+                f"Failed to determine whether protocol member {attr!r} is a method member"
             ) from e
         else:
             if not is_callable:
@@ -2347,9 +2291,7 @@ def get_type_hints(obj, globalns=None, localns=None, include_extras=False):
         hints = {}
         for base in reversed(obj.__mro__):
             if globalns is None:
-                base_globals = getattr(
-                    sys.modules.get(base.__module__, None), "__dict__", {}
-                )
+                base_globals = getattr(sys.modules.get(base.__module__, None), "__dict__", {})
             else:
                 base_globals = globalns
             ann = base.__dict__.get("__annotations__", {})  # noqa: RUF063
@@ -2369,15 +2311,9 @@ def get_type_hints(obj, globalns=None, localns=None, include_extras=False):
                     value = type(None)
                 if isinstance(value, str):
                     value = ForwardRef(value, is_argument=False, is_class=True)
-                value = _eval_type(
-                    value, base_globals, base_locals, base.__type_params__
-                )
+                value = _eval_type(value, base_globals, base_locals, base.__type_params__)
                 hints[name] = value
-        return (
-            hints
-            if include_extras
-            else {k: _strip_annotations(t) for k, t in hints.items()}
-        )
+        return hints if include_extras else {k: _strip_annotations(t) for k, t in hints.items()}
 
     if globalns is None:
         if isinstance(obj, types.ModuleType):
@@ -2413,11 +2349,7 @@ def get_type_hints(obj, globalns=None, localns=None, include_extras=False):
                 is_class=False,
             )
         hints[name] = _eval_type(value, globalns, localns, type_params)
-    return (
-        hints
-        if include_extras
-        else {k: _strip_annotations(t) for k, t in hints.items()}
-    )
+    return hints if include_extras else {k: _strip_annotations(t) for k, t in hints.items()}
 
 
 def _strip_annotations(t):
@@ -2465,9 +2397,7 @@ def get_origin(tp):
     """
     if isinstance(tp, _AnnotatedAlias):
         return Annotated
-    if isinstance(
-        tp, (_BaseGenericAlias, GenericAlias, ParamSpecArgs, ParamSpecKwargs)
-    ):
+    if isinstance(tp, (_BaseGenericAlias, GenericAlias, ParamSpecArgs, ParamSpecKwargs)):
         return tp.__origin__
     if tp is Generic:
         return Generic
@@ -2648,9 +2578,7 @@ def overload(func):
     # classmethod and staticmethod
     f = getattr(func, "__func__", func)
     try:
-        _overload_registry[f.__module__][f.__qualname__][f.__code__.co_firstlineno] = (
-            func
-        )
+        _overload_registry[f.__module__][f.__qualname__][f.__code__.co_firstlineno] = func
     except AttributeError:
         # Not a normal function; ignore.
         pass
@@ -2790,9 +2718,7 @@ KeysView = _alias(collections.abc.KeysView, 1)
 ItemsView = _alias(collections.abc.ItemsView, 2)
 ValuesView = _alias(collections.abc.ValuesView, 1)
 ContextManager = _alias(contextlib.AbstractContextManager, 1, name="ContextManager")
-AsyncContextManager = _alias(
-    contextlib.AbstractAsyncContextManager, 1, name="AsyncContextManager"
-)
+AsyncContextManager = _alias(contextlib.AbstractAsyncContextManager, 1, name="AsyncContextManager")
 Dict = _alias(dict, 2, inst=False, name="Dict")
 DefaultDict = _alias(collections.defaultdict, 2, name="DefaultDict")
 OrderedDict = _alias(collections.OrderedDict, 2)
@@ -2904,9 +2830,7 @@ class SupportsRound[T](Protocol):
 
 def _make_nmtuple(name, types, module, defaults=()):
     fields = [n for n, t in types]
-    types = {
-        n: _type_check(t, f"field {n} annotation must be a type") for n, t in types
-    }
+    types = {n: _type_check(t, f"field {n} annotation must be a type") for n, t in types}
     nm_tpl = collections.namedtuple(name, fields, defaults=defaults, module=module)
     nm_tpl.__annotations__ = nm_tpl.__new__.__annotations__ = types
     return nm_tpl
@@ -2994,9 +2918,7 @@ def NamedTuple(typename, fields=None, /, **kwargs):
     if fields is None:
         fields = kwargs.items()
     elif kwargs:
-        raise TypeError(
-            "Either list of fields or keywords can be provided to NamedTuple, not both"
-        )
+        raise TypeError("Either list of fields or keywords can be provided to NamedTuple, not both")
     nt = _make_nmtuple(typename, fields, module=_caller())
     nt.__orig_bases__ = (NamedTuple,)
     return nt
@@ -3025,8 +2947,7 @@ class _TypedDictMeta(type):
         for base in bases:
             if type(base) is not _TypedDictMeta and base is not Generic:
                 raise TypeError(
-                    "cannot inherit from both a TypedDict type "
-                    "and a non-TypedDict base class"
+                    "cannot inherit from both a TypedDict type and a non-TypedDict base class"
                 )
 
         if any(issubclass(b, Generic) for b in bases):
@@ -3043,8 +2964,7 @@ class _TypedDictMeta(type):
         own_annotations = ns.get("__annotations__", {})
         msg = "TypedDict('Name', {f0: t0, f1: t1, ...}); each t must be a type"
         own_annotations = {
-            n: _type_check(tp, msg, module=tp_dict.__module__)
-            for n, tp in own_annotations.items()
+            n: _type_check(tp, msg, module=tp_dict.__module__) for n, tp in own_annotations.items()
         }
         required_keys = set()
         optional_keys = set()
@@ -3153,9 +3073,7 @@ def TypedDict(typename, fields=None, /, *, total=True, **kwargs):
     if fields is None:
         fields = kwargs
     elif kwargs:
-        raise TypeError(
-            "TypedDict takes either a dict or keyword arguments, but not both"
-        )
+        raise TypeError("TypedDict takes either a dict or keyword arguments, but not both")
     if kwargs:
         warnings.warn(
             "The kwargs-based syntax for TypedDict definitions is deprecated "

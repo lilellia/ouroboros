@@ -391,8 +391,7 @@ def check_environ(environ):
         )
     assert_(
         environ.get("SCRIPT_NAME") != "/",
-        "SCRIPT_NAME cannot be '/'; it should instead be '', and "
-        "PATH_INFO should be '/'",
+        "SCRIPT_NAME cannot be '/'; it should instead be '', and PATH_INFO should be '/'",
     )
 
 
@@ -416,9 +415,7 @@ def check_status(status):
     status = check_string_type(status, "Status")
     # Implicitly check that we can turn it into an integer:
     status_code = status.split(None, 1)[0]
-    assert_(
-        len(status_code) == 3, f"Status codes must be three characters: {status_code!r}"
-    )
+    assert_(len(status_code) == 3, f"Status codes must be three characters: {status_code!r}")
     status_int = int(status_code)
     assert_(status_int >= 100, f"Status code is invalid: {status_int!r}")
     if len(status) < 4 or status[3] != " ":
@@ -478,10 +475,7 @@ def check_content_type(status, headers):
                 return
             assert_(
                 0,
-                (
-                    f"Content-Type header found in a {code} response, "
-                    "which must not return content."
-                ),
+                (f"Content-Type header found in a {code} response, which must not return content."),
             )
     if code not in NO_MESSAGE_BODY:
         assert_(0, f"No Content-Type header found in headers ({headers})")

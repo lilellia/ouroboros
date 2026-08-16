@@ -58,12 +58,12 @@ To create a new template object initialized to a given one:
 
 import os
 import re
-import tempfile
-import warnings
 
 # we import the quote function rather than the module for backward compat
 # (quote used to be an undocumented but used function in pipes)
 from shlex import quote
+import tempfile
+import warnings
 
 warnings._deprecated(__name__, remove=(3, 13))
 

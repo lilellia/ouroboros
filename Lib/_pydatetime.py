@@ -18,9 +18,9 @@ __all__ = (
 
 
 import math as _math
+from operator import index as _index
 import sys
 import time as _time
-from operator import index as _index
 
 
 def _cmp(x, y):
@@ -276,9 +276,7 @@ def _wrap_strftime(object, format, timetuple):
                         if ch2 == "z":
                             if colonzreplace is None:
                                 if hasattr(object, "utcoffset"):
-                                    colonzreplace = _format_offset(
-                                        object.utcoffset(), sep=":"
-                                    )
+                                    colonzreplace = _format_offset(object.utcoffset(), sep=":")
                                 else:
                                     colonzreplace = ""
                             assert "%" not in colonzreplace
@@ -542,9 +540,7 @@ def _isoweek_to_gregorian(year, week, day):
 # Just raise TypeError if the arg isn't None or a string.
 def _check_tzname(name):
     if name is not None and not isinstance(name, str):
-        raise TypeError(
-            f"tzinfo.tzname() must return None or string, not '{type(name)}'"
-        )
+        raise TypeError(f"tzinfo.tzname() must return None or string, not '{type(name)}'")
 
 
 # name is the offset-producing method, "utcoffset" or "dst".
@@ -558,9 +554,7 @@ def _check_utc_offset(name, offset):
     if offset is None:
         return
     if not isinstance(offset, timedelta):
-        raise TypeError(
-            f"tzinfo.{name}() must return None or timedelta, not '{type(offset)}'"
-        )
+        raise TypeError(f"tzinfo.{name}() must return None or timedelta, not '{type(offset)}'")
     if not -timedelta(1) < offset < timedelta(1):
         raise ValueError(
             f"{name}()={offset}, must be strictly between "
@@ -858,9 +852,7 @@ class timedelta:
         if isinstance(other, int):
             # for CPython compatibility, we cannot use
             # our __class__ here, but need a real timedelta
-            return timedelta(
-                self._days * other, self._seconds * other, self._microseconds * other
-            )
+            return timedelta(self._days * other, self._seconds * other, self._microseconds * other)
         if isinstance(other, float):
             usec = self._to_microseconds()
             a, b = other.as_integer_ratio()
@@ -959,9 +951,7 @@ class timedelta:
 
 
 timedelta.min = timedelta(-999999999)
-timedelta.max = timedelta(
-    days=999999999, hours=23, minutes=59, seconds=59, microseconds=999999
-)
+timedelta.max = timedelta(days=999999999, hours=23, minutes=59, seconds=59, microseconds=999999)
 timedelta.resolution = timedelta(microseconds=1)
 
 
@@ -1348,9 +1338,7 @@ class tzinfo:
             dt += delta
             dtdst = dt.dst()
             if dtdst is None:
-                raise ValueError(
-                    "fromutc(): dt.dst gave inconsistent results; cannot convert"
-                )
+                raise ValueError("fromutc(): dt.dst gave inconsistent results; cannot convert")
         return dt + dtdst
 
     # Pickle support.
@@ -1386,10 +1374,7 @@ class IsoCalendarDate(tuple):
         return (tuple, (tuple(self),))
 
     def __repr__(self):
-        return (
-            f"{self.__class__.__name__}"
-            f"(year={self[0]}, week={self[1]}, weekday={self[2]})"
-        )
+        return f"{self.__class__.__name__}(year={self[0]}, week={self[1]}, weekday={self[2]})"
 
 
 _IsoCalendarDate = IsoCalendarDate
@@ -1441,11 +1426,7 @@ class time:
         tzinfo (default to None)
         fold (keyword only, default to zero)
         """
-        if (
-            isinstance(hour, (bytes, str))
-            and len(hour) == 6
-            and ord(hour[0:1]) & 0x7F < 24
-        ):
+        if isinstance(hour, (bytes, str)) and len(hour) == 6 and ord(hour[0:1]) & 0x7F < 24:
             # Pickle support
             if isinstance(hour, str):
                 try:
@@ -1632,9 +1613,7 @@ class time:
         terms of the time to include. Valid options are 'auto', 'hours',
         'minutes', 'seconds', 'milliseconds' and 'microseconds'.
         """
-        s = _format_time(
-            self._hour, self._minute, self._second, self._microsecond, timespec
-        )
+        s = _format_time(self._hour, self._minute, self._second, self._microsecond, timespec)
         tz = self._tzstr()
         if tz:
             s += tz
@@ -1801,11 +1780,7 @@ class datetime(date):
         *,
         fold=0,
     ):
-        if (
-            isinstance(year, (bytes, str))
-            and len(year) == 10
-            and 1 <= ord(year[2:3]) & 0x7F <= 12
-        ):
+        if isinstance(year, (bytes, str)) and len(year) == 10 and 1 <= ord(year[2:3]) & 0x7F <= 12:
             # Pickle support
             if isinstance(year, str):
                 try:
@@ -2081,9 +2056,7 @@ class datetime(date):
 
     def time(self):
         "Return the time part, with tzinfo None."
-        return time(
-            self.hour, self.minute, self.second, self.microsecond, fold=self.fold
-        )
+        return time(self.hour, self.minute, self.second, self.microsecond, fold=self.fold)
 
     def timetz(self):
         "Return the time part, with same tzinfo."
@@ -2128,9 +2101,7 @@ class datetime(date):
             tzinfo = self.tzinfo
         if fold is None:
             fold = self.fold
-        return type(self)(
-            year, month, day, hour, minute, second, microsecond, tzinfo, fold=fold
-        )
+        return type(self)(year, month, day, hour, minute, second, microsecond, tzinfo, fold=fold)
 
     def _local_timezone(self):
         if self.tzinfo is None:
@@ -2210,9 +2181,7 @@ class datetime(date):
             self._month,
             self._day,
             sep,
-        ) + _format_time(
-            self._hour, self._minute, self._second, self._microsecond, timespec
-        )
+        ) + _format_time(self._hour, self._minute, self._second, self._microsecond, timespec)
 
         off = self.utcoffset()
         tz = _format_offset(off)
@@ -2424,9 +2393,7 @@ class datetime(date):
         days2 = other.toordinal()
         secs1 = self._second + self._minute * 60 + self._hour * 3600
         secs2 = other._second + other._minute * 60 + other._hour * 3600
-        base = timedelta(
-            days1 - days2, secs1 - secs2, self._microsecond - other._microsecond
-        )
+        base = timedelta(days1 - days2, secs1 - secs2, self._microsecond - other._microsecond)
         if self._tzinfo is other._tzinfo:
             return base
         myoff = self.utcoffset()
@@ -2449,9 +2416,7 @@ class datetime(date):
             else:
                 days = _ymd2ord(self.year, self.month, self.day)
                 seconds = self.hour * 3600 + self.minute * 60 + self.second
-                self._hashcode = hash(
-                    timedelta(days, seconds, self.microsecond) - tzoff
-                )
+                self._hashcode = hash(timedelta(days, seconds, self.microsecond) - tzoff)
         return self._hashcode
 
     # Pickle support.
@@ -2634,9 +2599,7 @@ class timezone(tzinfo):
         seconds = rest.seconds
         microseconds = rest.microseconds
         if microseconds:
-            return (
-                f"UTC{sign}{hours:02d}:{minutes:02d}:{seconds:02d}.{microseconds:06d}"
-            )
+            return f"UTC{sign}{hours:02d}:{minutes:02d}:{seconds:02d}.{microseconds:06d}"
         if seconds:
             return f"UTC{sign}{hours:02d}:{minutes:02d}:{seconds:02d}"
         return f"UTC{sign}{hours:02d}:{minutes:02d}"

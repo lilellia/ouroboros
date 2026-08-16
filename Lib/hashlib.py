@@ -242,14 +242,8 @@ def file_digest(fileobj, digest, /, *, _bufsize=2**18):
         return digestobj
 
     # Only binary files implement readinto().
-    if not (
-        hasattr(fileobj, "readinto")
-        and hasattr(fileobj, "readable")
-        and fileobj.readable()
-    ):
-        raise ValueError(
-            f"'{fileobj!r}' is not a file-like object in binary reading mode."
-        )
+    if not (hasattr(fileobj, "readinto") and hasattr(fileobj, "readable") and fileobj.readable()):
+        raise ValueError(f"'{fileobj!r}' is not a file-like object in binary reading mode.")
 
     # binary file, socket.SocketIO object
     # Note: socket I/O uses different syscalls than file I/O.

@@ -11,12 +11,12 @@ also includes default encodings for all supported locale names.
 """
 
 import _collections_abc
+from builtins import str as _builtin_str
 import encodings
 import encodings.aliases
 import functools
 import re
 import sys
-from builtins import str as _builtin_str
 
 # Try importing the _locale module.
 #
@@ -230,9 +230,7 @@ def _localize(formatted, grouping=False, monetary=False):
         parts = formatted.split(".")
         if grouping:
             parts[0], seps = _group(parts[0], monetary=monetary)
-        decimal_point = localeconv()[
-            monetary and "mon_decimal_point" or "decimal_point"
-        ]
+        decimal_point = localeconv()[monetary and "mon_decimal_point" or "decimal_point"]
         formatted = decimal_point.join(parts)
         if seps:
             formatted = _strip_padding(formatted, seps)

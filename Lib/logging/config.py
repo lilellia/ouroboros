@@ -32,10 +32,10 @@ import logging.handlers
 import os
 import queue
 import re
+from socketserver import StreamRequestHandler, ThreadingTCPServer
 import struct
 import threading
 import traceback
-from socketserver import StreamRequestHandler, ThreadingTCPServer
 
 DEFAULT_LOGGING_CONFIG_PORT = 9030
 
@@ -171,9 +171,7 @@ def _install_handlers(cp, formatters):
             h.setFormatter(formatters[fmt])
         if issubclass(klass, logging.handlers.MemoryHandler):
             target = section.get("target", "")
-            if len(
-                target
-            ):  # the target handler may not be loaded yet, so keep for later...
+            if len(target):  # the target handler may not be loaded yet, so keep for later...
                 fixups.append((h, target))
         handlers[hand] = h
     # now all handlers are loaded, fixup inter-handler references...
@@ -537,9 +535,7 @@ def _is_queue_like_object(obj):
     # queue handler and queue listener (see gh-124653) and that other
     # methods are either optional or unused.
     minimal_queue_interface = ["put_nowait", "get"]
-    return all(
-        callable(getattr(obj, method, None)) for method in minimal_queue_interface
-    )
+    return all(callable(getattr(obj, method, None)) for method in minimal_queue_interface)
 
 
 class DictConfigurator(BaseConfigurator):
@@ -573,9 +569,7 @@ class DictConfigurator(BaseConfigurator):
                             if level:
                                 handler.setLevel(logging._checkLevel(level))
                         except Exception as e:
-                            raise ValueError(
-                                f"Unable to configure handler {name!r}"
-                            ) from e
+                            raise ValueError(f"Unable to configure handler {name!r}") from e
                 loggers = config.get("loggers", EMPTY_DICT)
                 for name in loggers:
                     try:
@@ -599,9 +593,7 @@ class DictConfigurator(BaseConfigurator):
                     try:
                         formatters[name] = self.configure_formatter(formatters[name])
                     except Exception as e:
-                        raise ValueError(
-                            f"Unable to configure formatter {name!r}"
-                        ) from e
+                        raise ValueError(f"Unable to configure formatter {name!r}") from e
                 # Next, do filters - they don't refer to anything else, either
                 filters = config.get("filters", EMPTY_DICT)
                 for name in filters:
@@ -624,9 +616,7 @@ class DictConfigurator(BaseConfigurator):
                         if " not configured yet" in str(e.__cause__):
                             deferred.append(name)
                         else:
-                            raise ValueError(
-                                f"Unable to configure handler {name!r}"
-                            ) from e
+                            raise ValueError(f"Unable to configure handler {name!r}") from e
 
                 # Now do any that were deferred
                 for name in deferred:
@@ -738,9 +728,7 @@ class DictConfigurator(BaseConfigurator):
 
             # A TypeError would be raised if "validate" key is passed in with a formatter callable
             # that does not accept "validate" as a parameter
-            if (
-                "validate" in config
-            ):  # if user hasn't mentioned it, the default will be fine
+            if "validate" in config:  # if user hasn't mentioned it, the default will be fine
                 result = c(fmt, dfmt, style, config["validate"], **kwargs)
             else:
                 result = c(fmt, dfmt, style, **kwargs)
@@ -866,23 +854,14 @@ class DictConfigurator(BaseConfigurator):
                             h = self.config["handlers"][hn]
                             if not isinstance(h, logging.Handler):
                                 config.update(config_copy)  # restore for deferred cfg
-                                raise TypeError(
-                                    f"Required handler {hn!r} is not configured yet"
-                                )
+                                raise TypeError(f"Required handler {hn!r} is not configured yet")
                             hlist.append(h)
                     except Exception as e:
-                        raise ValueError(
-                            f"Unable to set required handler {hn!r}"
-                        ) from e
+                        raise ValueError(f"Unable to set required handler {hn!r}") from e
                     config["handlers"] = hlist
-            elif (
-                issubclass(klass, logging.handlers.SMTPHandler) and "mailhost" in config
-            ):
+            elif issubclass(klass, logging.handlers.SMTPHandler) and "mailhost" in config:
                 config["mailhost"] = self.as_tuple(config["mailhost"])
-            elif (
-                issubclass(klass, logging.handlers.SysLogHandler)
-                and "address" in config
-            ):
+            elif issubclass(klass, logging.handlers.SysLogHandler) and "address" in config:
                 config["address"] = self.as_tuple(config["address"])
             if issubclass(klass, logging.handlers.QueueHandler):
                 factory = functools.partial(self._configure_queue_handler, klass)
@@ -1057,9 +1036,7 @@ def listen(port=DEFAULT_LOGGING_CONFIG_PORT, verify=None):
 
             abort = 0
             while not abort:
-                rd, _wr, _ex = select.select(
-                    [self.socket.fileno()], [], [], self.timeout
-                )
+                rd, _wr, _ex = select.select([self.socket.fileno()], [], [], self.timeout)
                 if rd:
                     self.handle_request()
                 logging._acquireLock()

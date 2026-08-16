@@ -4,8 +4,10 @@ Allows fine grained feature control of how the package parses and emits data.
 """
 
 import abc
-from email import charset as _charset
-from email import header
+from email import (
+    charset as _charset,
+    header,
+)
 from email.utils import _has_surrogates
 
 __all__ = [
@@ -347,9 +349,7 @@ class Compat32(Policy):
         if isinstance(value, str):
             if _has_surrogates(value):
                 if sanitize:
-                    h = header.Header(
-                        value, charset=_charset.UNKNOWN8BIT, header_name=name
-                    )
+                    h = header.Header(value, charset=_charset.UNKNOWN8BIT, header_name=name)
                 else:
                     # If we have raw 8bit data in a byte string, we have no idea
                     # what the encoding is.  There is no safe way to split this

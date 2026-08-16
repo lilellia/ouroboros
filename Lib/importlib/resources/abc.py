@@ -1,9 +1,9 @@
 import abc
+from collections.abc import Iterable, Iterator
 import io
 import itertools
 import os
 import pathlib
-from collections.abc import Iterable, Iterator
 from typing import (
     Any,
     BinaryIO,
@@ -120,15 +120,11 @@ class Traversable(Protocol):
             path.parts for path in map(pathlib.PurePosixPath, descendants)
         )
         target = next(names)
-        matches = (
-            traversable for traversable in self.iterdir() if traversable.name == target
-        )
+        matches = (traversable for traversable in self.iterdir() if traversable.name == target)
         try:
             match = next(matches)
         except StopIteration:
-            raise TraversalError(
-                "Target not found during traversal.", target, list(names)
-            )
+            raise TraversalError("Target not found during traversal.", target, list(names))
         return match.joinpath(*names)
 
     def __truediv__(self, child: StrPath) -> "Traversable":

@@ -22,6 +22,7 @@ The default handler displays output as HTML.
 
 """
 
+from html import escape as html_escape
 import inspect
 import keyword
 import linecache
@@ -33,7 +34,6 @@ import time
 import tokenize
 import traceback
 import warnings
-from html import escape as html_escape
 
 warnings._deprecated(__name__, remove=(3, 13))
 
@@ -169,9 +169,7 @@ function calls leading up to the error, in the order they occurred.</p>"""
         vars = scanvars(reader, frame, locals)
 
         rows = [
-            '<tr><td bgcolor="#d8bbff">{}{} {}</td></tr>'.format(
-                "<big>&nbsp;</big>", link, call
-            )
+            '<tr><td bgcolor="#d8bbff">{}{} {}</td></tr>'.format("<big>&nbsp;</big>", link, call)
         ]
         if index is not None:
             i = lnum - index
@@ -208,9 +206,7 @@ function calls leading up to the error, in the order they occurred.</p>"""
 {}</table>""".format("\n".join(rows))
         )
 
-    exception = [
-        f"<p>{strong(pydoc.html.escape(str(etype)))}: {pydoc.html.escape(str(evalue))}"
-    ]
+    exception = [f"<p>{strong(pydoc.html.escape(str(etype)))}: {pydoc.html.escape(str(evalue))}"]
     for name in dir(evalue):
         if name[:1] == "_":
             continue
@@ -388,6 +384,4 @@ def enable(display=1, logdir=None, context=5, format="html"):
     The optional argument 'display' can be set to 0 to suppress sending the
     traceback to the browser, and 'logdir' can be set to a directory to cause
     tracebacks to be written to files there."""
-    sys.excepthook = Hook(
-        display=display, logdir=logdir, context=context, format=format
-    )
+    sys.excepthook = Hook(display=display, logdir=logdir, context=context, format=format)

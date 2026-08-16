@@ -45,9 +45,7 @@ def cfmakeraw(mode):
     mode[CFLAG] |= CS8
 
     # Clear all POSIX.1-2017 local mode flags.
-    mode[LFLAG] &= ~(
-        ECHO | ECHOE | ECHOK | ECHONL | ICANON | IEXTEN | ISIG | NOFLSH | TOSTOP
-    )
+    mode[LFLAG] &= ~(ECHO | ECHOE | ECHOK | ECHONL | ICANON | IEXTEN | ISIG | NOFLSH | TOSTOP)
 
     # POSIX.1-2017, 11.1.7 Non-Canonical Mode Input Processing,
     # Case B: MIN>0, TIME=0

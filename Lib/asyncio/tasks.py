@@ -30,9 +30,9 @@ import functools
 import inspect
 import itertools
 import types
+from types import GenericAlias
 import warnings
 import weakref
-from types import GenericAlias
 
 from . import base_tasks, coroutines, events, exceptions, futures, timeouts
 
@@ -303,9 +303,7 @@ class Task(futures._PyFuture):  # Inherit Python Task implementation
 
     def __step(self, exc=None):
         if self.done():
-            raise exceptions.InvalidStateError(
-                f"_step(): already done: {self!r}, {exc!r}"
-            )
+            raise exceptions.InvalidStateError(f"_step(): already done: {self!r}, {exc!r}")
         if self._must_cancel:
             if not isinstance(exc, exceptions.CancelledError):
                 exc = self._make_cancelled_error()
@@ -350,16 +348,13 @@ class Task(futures._PyFuture):  # Inherit Python Task implementation
                 # Yielded Future must come from Future.__iter__().
                 if futures._get_loop(result) is not self._loop:
                     new_exc = RuntimeError(
-                        f"Task {self!r} got Future "
-                        f"{result!r} attached to a different loop"
+                        f"Task {self!r} got Future {result!r} attached to a different loop"
                     )
                     self._loop.call_soon(self.__step, new_exc, context=self._context)
                 elif blocking:
                     if result is self:
                         new_exc = RuntimeError(f"Task cannot await on itself: {self!r}")
-                        self._loop.call_soon(
-                            self.__step, new_exc, context=self._context
-                        )
+                        self._loop.call_soon(self.__step, new_exc, context=self._context)
                     else:
                         result._asyncio_future_blocking = False
                         result.add_done_callback(self.__wakeup, context=self._context)
@@ -369,8 +364,7 @@ class Task(futures._PyFuture):  # Inherit Python Task implementation
                                 self._must_cancel = False
                 else:
                     new_exc = RuntimeError(
-                        f"yield was used instead of yield from "
-                        f"in task {self!r} with {result!r}"
+                        f"yield was used instead of yield from in task {self!r} with {result!r}"
                     )
                     self._loop.call_soon(self.__step, new_exc, context=self._context)
 
@@ -687,8 +681,7 @@ def ensure_future(coro_or_future, *, loop=None):
     if futures.isfuture(coro_or_future):
         if loop is not None and loop is not futures._get_loop(coro_or_future):
             raise ValueError(
-                "The future belongs to a different loop than "
-                "the one specified as the loop argument"
+                "The future belongs to a different loop than the one specified as the loop argument"
             )
         return coro_or_future
     should_close = True
@@ -701,9 +694,7 @@ def ensure_future(coro_or_future, *, loop=None):
             coro_or_future = _wrap_awaitable(coro_or_future)
             should_close = False
         else:
-            raise TypeError(
-                "An asyncio.Future, a coroutine or an awaitable is required"
-            )
+            raise TypeError("An asyncio.Future, a coroutine or an awaitable is required")
 
     if loop is None:
         loop = events.get_event_loop()

@@ -70,9 +70,7 @@ class CalltipWindow(TooltipBase):
             return
 
         self.anchor_widget.mark_set(MARK_RIGHT, parenright)
-        self.parenline, self.parencol = map(
-            int, self.anchor_widget.index(parenleft).split(".")
-        )
+        self.parenline, self.parencol = map(int, self.anchor_widget.index(parenleft).split("."))
 
         super().showtip()
 
@@ -117,9 +115,7 @@ class CalltipWindow(TooltipBase):
         # Re-schedule this function to be called again in a short while.
         if self.checkhide_after_id is not None:
             self.anchor_widget.after_cancel(self.checkhide_after_id)
-        self.checkhide_after_id = self.anchor_widget.after(
-            CHECKHIDE_TIME, self.checkhide_event
-        )
+        self.checkhide_after_id = self.anchor_widget.after(CHECKHIDE_TIME, self.checkhide_event)
         return None
 
     def hide_event(self, event):
@@ -157,9 +153,7 @@ class CalltipWindow(TooltipBase):
 
     def _bind_events(self):
         """Bind event handlers."""
-        self.checkhideid = self.anchor_widget.bind(
-            CHECKHIDE_EVENT, self.checkhide_event
-        )
+        self.checkhideid = self.anchor_widget.bind(CHECKHIDE_EVENT, self.checkhide_event)
         for seq in CHECKHIDE_SEQUENCES:
             self.anchor_widget.event_add(CHECKHIDE_EVENT, seq)
         self.anchor_widget.after(CHECKHIDE_TIME, self.checkhide_event)

@@ -17,8 +17,10 @@ For more information see:
 """
 
 from math import cos, pi
-from time import perf_counter as clock
-from time import sleep
+from time import (
+    perf_counter as clock,
+    sleep,
+)
 from turtle import *
 
 f = (5**0.5 - 1) / 2.0  # (sqrt(5)-1)/2 -- golden ratio

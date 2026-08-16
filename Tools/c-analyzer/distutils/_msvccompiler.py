@@ -13,13 +13,14 @@ for older versions in distutils.msvc9compiler and distutils.msvccompiler.
 # ported to VS 2005 and VS 2008 by Christian Heimes
 # ported to VS 2015 by Steve Dower
 
+from itertools import count
 import os
 import subprocess
 import winreg
+
 from distutils import log
 from distutils.ccompiler import CCompiler
 from distutils.errors import DistutilsPlatformError
-from itertools import count
 
 
 def _find_vc2015():
@@ -68,9 +69,7 @@ def _find_vc2017():
     try:
         path = subprocess.check_output(
             [
-                os.path.join(
-                    root, "Microsoft Visual Studio", "Installer", "vswhere.exe"
-                ),
+                os.path.join(root, "Microsoft Visual Studio", "Installer", "vswhere.exe"),
                 "-latest",
                 "-prerelease",
                 "-requires",

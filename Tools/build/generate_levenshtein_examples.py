@@ -1,9 +1,9 @@
 """Generate 10,000 unique examples for the Levenshtein short-circuit tests."""
 
 import argparse
+from functools import lru_cache
 import json
 import os.path
-from functools import lru_cache
 from random import choices, randrange
 
 # This should be in sync with Lib/traceback.py.  It's not importing those values
@@ -48,8 +48,7 @@ def main():
     if not args.overwrite and os.path.isfile(output_path):
         print(f"{output_path} already exists, skipping regeneration.")
         print(
-            "To force, add --overwrite to the invocation of this tool or"
-            " delete the existing file."
+            "To force, add --overwrite to the invocation of this tool or delete the existing file."
         )
         return
 

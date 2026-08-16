@@ -789,9 +789,7 @@ def _get_writer(file_or_filename, encoding):
         # file_or_filename is a file name
         if encoding.lower() == "unicode":
             encoding = "utf-8"
-        with open(
-            file_or_filename, "w", encoding=encoding, errors="xmlcharrefreplace"
-        ) as file:
+        with open(file_or_filename, "w", encoding=encoding, errors="xmlcharrefreplace") as file:
             yield file.write, encoding
     else:
         # file_or_filename is a file-like object
@@ -861,9 +859,7 @@ def _namespaces(elem, default_namespace=None):
             else:
                 if default_namespace:
                     # FIXME: can this be handled in XML 1.0?
-                    raise ValueError(
-                        "cannot use non-qualified names with default_namespace option"
-                    )
+                    raise ValueError("cannot use non-qualified names with default_namespace option")
                 qnames[qname] = qname
         except TypeError:
             _raise_serialization_error(qname)
@@ -905,17 +901,13 @@ def _serialize_xml(write, elem, qnames, namespaces, short_empty_elements, **kwar
             if text:
                 write(_escape_cdata(text))
             for e in elem:
-                _serialize_xml(
-                    write, e, qnames, None, short_empty_elements=short_empty_elements
-                )
+                _serialize_xml(write, e, qnames, None, short_empty_elements=short_empty_elements)
         else:
             write("<" + tag)
             items = list(elem.items())
             if items or namespaces:
                 if namespaces:
-                    for v, k in sorted(
-                        namespaces.items(), key=lambda x: x[1]
-                    ):  # sort on prefix
+                    for v, k in sorted(namespaces.items(), key=lambda x: x[1]):  # sort on prefix
                         if k:
                             k = ":" + k
                         write(f' xmlns{k}="{_escape_attrib(v)}"')
@@ -986,9 +978,7 @@ def _serialize_html(write, elem, qnames, namespaces, **kwargs):
             items = list(elem.items())
             if items or namespaces:
                 if namespaces:
-                    for v, k in sorted(
-                        namespaces.items(), key=lambda x: x[1]
-                    ):  # sort on prefix
+                    for v, k in sorted(namespaces.items(), key=lambda x: x[1]):  # sort on prefix
                         if k:
                             k = ":" + k
                         write(f' xmlns{k}="{_escape_attrib(v)}"')
@@ -1566,9 +1556,7 @@ class TreeBuilder:
         """
         self._flush()
         self._last = self._elem.pop()
-        assert self._last.tag == tag, (
-            f"end tag mismatch (expected {self._last.tag}, got {tag})"
-        )
+        assert self._last.tag == tag, f"end tag mismatch (expected {self._last.tag}, got {tag})"
         self._tail = 1
         return self._last
 
@@ -1616,9 +1604,7 @@ class XMLParser:
             try:
                 import pyexpat as expat
             except ImportError:
-                raise ImportError(
-                    "No module named expat; use SimpleXMLTreeBuilder instead"
-                )
+                raise ImportError("No module named expat; use SimpleXMLTreeBuilder instead")
         parser = expat.ParserCreate(encoding, "}")
         if target is None:
             target = TreeBuilder()
@@ -1667,9 +1653,7 @@ class XMLParser:
             if event_name == "start":
                 parser.ordered_attributes = 1
 
-                def handler(
-                    tag, attrib_in, event=event_name, append=append, start=self._start
-                ):
+                def handler(tag, attrib_in, event=event_name, append=append, start=self._start):
                     append((event, start(tag, attrib_in)))
 
                 parser.StartElementHandler = handler
@@ -1701,9 +1685,7 @@ class XMLParser:
                 # TreeBuilder does not implement .end_ns()
                 if hasattr(self.target, "end_ns"):
 
-                    def handler(
-                        prefix, event=event_name, append=append, end_ns=self._end_ns
-                    ):
+                    def handler(prefix, event=event_name, append=append, end_ns=self._end_ns):
                         append((event, end_ns(prefix)))
                 else:
 
@@ -1719,9 +1701,7 @@ class XMLParser:
                 parser.CommentHandler = handler
             elif event_name == "pi":
 
-                def handler(
-                    pi_target, data, event=event_name, append=append, self=self
-                ):
+                def handler(pi_target, data, event=event_name, append=append, self=self):
                     append((event, self.target.pi(pi_target, data)))
 
                 parser.ProcessingInstructionHandler = handler
@@ -1973,9 +1953,7 @@ class C14NWriterTarget:
         for uri, p in self._iter_namespaces(self._ns_stack):
             if p == prefix:
                 return f"{{{uri}}}{name}"
-        raise ValueError(
-            f'Prefix {prefix} of QName "{prefixed_name}" is not declared in scope'
-        )
+        raise ValueError(f'Prefix {prefix} of QName "{prefixed_name}" is not declared in scope')
 
     def _qname(self, qname, uri=None):
         if uri is None:
@@ -2041,9 +2019,7 @@ class C14NWriterTarget:
         self._ns_stack[-1].append((uri, prefix))
 
     def start(self, tag, attrs):
-        if self._exclude_tags is not None and (
-            self._ignored_depth or tag in self._exclude_tags
-        ):
+        if self._exclude_tags is not None and (self._ignored_depth or tag in self._exclude_tags):
             self._ignored_depth += 1
             return
         if self._data:
@@ -2084,15 +2060,12 @@ class C14NWriterTarget:
 
         # Assign prefixes in lexicographical order of used URIs.
         parse_qname = self._qname
-        parsed_qnames = {
-            n: parse_qname(n) for n in sorted(qnames, key=lambda n: n.split("}", 1))
-        }
+        parsed_qnames = {n: parse_qname(n) for n in sorted(qnames, key=lambda n: n.split("}", 1))}
 
         # Write namespace declarations in prefix order ...
         if new_namespaces:
             attr_list = [
-                ("xmlns:" + prefix if prefix else "xmlns", uri)
-                for uri, prefix in new_namespaces
+                ("xmlns:" + prefix if prefix else "xmlns", uri) for uri, prefix in new_namespaces
             ]
             attr_list.sort()
         else:
@@ -2111,9 +2084,7 @@ class C14NWriterTarget:
         # Honour xml:space attributes.
         space_behaviour = attrs.get("{http://www.w3.org/XML/1998/namespace}space")
         self._preserve_space.append(
-            space_behaviour == "preserve"
-            if space_behaviour
-            else self._preserve_space[-1]
+            space_behaviour == "preserve" if space_behaviour else self._preserve_space[-1]
         )
 
         # Write the tag.
@@ -2162,9 +2133,7 @@ class C14NWriterTarget:
             self._write("\n")
         elif self._root_seen and self._data:
             self._flush()
-        self._write(
-            f"<?{target} {_escape_cdata_c14n(data)}?>" if data else f"<?{target}?>"
-        )
+        self._write(f"<?{target} {_escape_cdata_c14n(data)}?>" if data else f"<?{target}?>")
         if not self._root_seen:
             self._write("\n")
 

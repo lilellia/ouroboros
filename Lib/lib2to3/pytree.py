@@ -12,8 +12,8 @@ There's also a pattern matching implementation here.
 
 __author__ = "Guido van Rossum <guido@python.org>"
 
-import sys
 from io import StringIO
+import sys
 
 HUGE = 0x7FFFFFFF  # maximum repeat count, default max
 
@@ -646,11 +646,7 @@ class WildcardPattern(BasePattern):
     def optimize(self):
         """Optimize certain stacked wildcard patterns."""
         subpattern = None
-        if (
-            self.content is not None
-            and len(self.content) == 1
-            and len(self.content[0]) == 1
-        ):
+        if self.content is not None and len(self.content) == 1 and len(self.content[0]) == 1:
             subpattern = self.content[0][0]
         if self.min == 1 and self.max == 1:
             if self.content is None:

@@ -2,11 +2,11 @@
 
 import idlelib.autocomplete as ac
 import idlelib.autocomplete_w as acw
-import os
-import unittest
 from idlelib.idle_test.mock_idle import Func
 from idlelib.idle_test.mock_tk import Event
+import os
 from tkinter import Text, Tk
+import unittest
 from unittest.mock import Mock, patch
 
 from test.support import requires

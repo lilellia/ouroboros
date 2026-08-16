@@ -65,9 +65,7 @@ class Driver:
             if type == token.OP:
                 type = grammar.opmap[value]
             if debug:
-                self.logger.debug(
-                    "%s %r (prefix=%r)", token.tok_name[type], value, prefix
-                )
+                self.logger.debug("%s %r (prefix=%r)", token.tok_name[type], value, prefix)
             if p.addtoken(type, value, (prefix, start)):
                 if debug:
                     self.logger.debug("Stop.")

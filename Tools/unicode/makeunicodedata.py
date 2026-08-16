@@ -26,13 +26,13 @@
 # written by Fredrik Lundh (fredrik@pythonware.com)
 #
 
+from collections.abc import Iterator
 import dataclasses
+from functools import partial
 import os
 import sys
-import zipfile
-from collections.abc import Iterator
-from functools import partial
 from textwrap import dedent
+import zipfile
 
 SCRIPT = os.path.normpath(sys.argv[0])
 VERSION = "3.3"
@@ -871,9 +871,7 @@ def makeunicodename(unicode, trace):
             """)
         )
 
-        fprint(
-            f"static const unsigned int named_sequences_start = {NAMED_SEQUENCES_START:#x};"
-        )
+        fprint(f"static const unsigned int named_sequences_start = {NAMED_SEQUENCES_START:#x};")
         fprint(
             "static const unsigned int named_sequences_end = %#x;"
             % (NAMED_SEQUENCES_START + len(unicode.named_sequences))
@@ -1003,9 +1001,7 @@ def open_data(template, version):
 
         if version == "3.2.0":
             # irregular url structure
-            url = ("https://www.unicode.org/Public/3.2-Update/" + template) % (
-                "-" + version,
-            )
+            url = ("https://www.unicode.org/Public/3.2-Update/" + template) % ("-" + version,)
         else:
             url = ("https://www.unicode.org/Public/%s/ucd/" + template) % (version, "")
         os.makedirs(DATA_DIR, exist_ok=True)

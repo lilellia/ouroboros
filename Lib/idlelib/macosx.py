@@ -2,10 +2,10 @@
 A number of functions that enhance IDLE on macOS.
 """
 
-import plistlib
-import tkinter
 from os.path import expanduser
+import plistlib
 from sys import platform  # Used in _init_tk_type, changed by test.
+import tkinter
 
 ## Define functions that query the Mac graphics type.
 ## _tk_type and its initializer are private to this section.

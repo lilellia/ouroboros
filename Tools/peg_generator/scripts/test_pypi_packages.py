@@ -1,6 +1,7 @@
 #!/usr/bin/env python3.8
 
 import argparse
+from collections.abc import Generator
 import glob
 import os
 import pathlib
@@ -8,7 +9,6 @@ import shutil
 import sys
 import tarfile
 import zipfile
-from collections.abc import Generator
 
 sys.path.insert(0, ".")
 

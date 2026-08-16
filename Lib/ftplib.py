@@ -37,8 +37,8 @@ python ftplib.py -d localhost -l -p -l
 #
 
 import socket
-import sys
 from socket import _GLOBAL_DEFAULT_TIMEOUT
+import sys
 
 __all__ = [
     "FTP",
@@ -761,9 +761,7 @@ else:
                 context = ssl._create_stdlib_context()
             self.context = context
             self._prot_p = False
-            super().__init__(
-                host, user, passwd, acct, timeout, source_address, encoding=encoding
-            )
+            super().__init__(host, user, passwd, acct, timeout, source_address, encoding=encoding)
 
         def login(self, user="", passwd="", acct="", secure=True):
             if secure and not isinstance(self.sock, ssl.SSLSocket):
@@ -995,9 +993,7 @@ def test():
         netrcobj = netrc.netrc(rcfile)
     except OSError:
         if rcfile is not None:
-            print(
-                "Could not open account file -- using anonymous login.", file=sys.stderr
-            )
+            print("Could not open account file -- using anonymous login.", file=sys.stderr)
     else:
         try:
             userid, acct, passwd = netrcobj.authenticators(host)

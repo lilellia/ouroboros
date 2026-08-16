@@ -1,8 +1,8 @@
 "Test window, coverage 47%."
 
-import unittest
 from idlelib import window
 from tkinter import Tk
+import unittest
 
 from test.support import requires
 

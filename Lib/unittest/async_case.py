@@ -92,8 +92,7 @@ class IsolatedAsyncioTestCase(TestCase):
     def _callTestMethod(self, method):
         if self._callMaybeAsync(method) is not None:
             warnings.warn(
-                f"It is deprecated to return a value that is not None from a "
-                f"test case ({method})",
+                f"It is deprecated to return a value that is not None from a test case ({method})",
                 DeprecationWarning,
                 stacklevel=4,
             )
@@ -108,9 +107,7 @@ class IsolatedAsyncioTestCase(TestCase):
     def _callAsync(self, func, /, *args, **kwargs):
         assert self._asyncioRunner is not None, "asyncio runner is not initialized"
         assert inspect.iscoroutinefunction(func), f"{func!r} is not an async function"
-        return self._asyncioRunner.run(
-            func(*args, **kwargs), context=self._asyncioTestContext
-        )
+        return self._asyncioRunner.run(func(*args, **kwargs), context=self._asyncioTestContext)
 
     def _callMaybeAsync(self, func, /, *args, **kwargs):
         assert self._asyncioRunner is not None, "asyncio runner is not initialized"

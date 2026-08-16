@@ -20,9 +20,7 @@ __all__ = ["get_appx_layout"]
 APPX_DATA = {
     "Name": f"PythonSoftwareFoundation.Python.{VER_DOT}",
     "Version": f"{VER_MAJOR}.{VER_MINOR}.{VER_FIELD3}.0",
-    "Publisher": os.getenv(
-        "APPX_DATA_PUBLISHER", "CN=4975D53F-AA7E-49A5-8B49-EA4FDC1BB66B"
-    ),
+    "Publisher": os.getenv("APPX_DATA_PUBLISHER", "CN=4975D53F-AA7E-49A5-8B49-EA4FDC1BB66B"),
     "DisplayName": f"Python {VER_DOT}",
     "Description": f"The Python {VER_DOT} runtime and console.",
 }
@@ -176,9 +174,7 @@ REGISTRY = {
                     "_condition": lambda ns: ns.include_html_doc,
                     "": "[{AppVPackageRoot}]\\Doc\\html\\index.html",
                 },
-                "Online Python Documentation": {
-                    "": f"https://docs.python.org/{VER_DOT}"
-                },
+                "Online Python Documentation": {"": f"https://docs.python.org/{VER_DOT}"},
             },
             "Idle": {
                 "_condition": lambda ns: ns.include_idle,
@@ -302,9 +298,7 @@ def add_file_type(xml, appid, name, suffix, parameters='"%1"', info=None, logo=N
         ET.SubElement(e, ET.QName(APPXMANIFEST_NS["uap"], "FileType")).text = s
 
 
-def add_application(
-    ns, xml, appid, executable, aliases, visual_element, subsystem, file_types
-):
+def add_application(ns, xml, appid, executable, aliases, visual_element, subsystem, file_types):
     node = xml.find("m:Applications", APPXMANIFEST_NS)
     suffix = "_d.exe" if ns.debug else ".exe"
     app = ET.SubElement(
@@ -364,9 +358,7 @@ def add_registry_entries(ns, xml):
     e.set("EntryPoint", "Windows.FullTrustApplication")
     e = ET.SubElement(e, ET.QName(APPXMANIFEST_NS["rescap4"], "ClassicAppCompatKeys"))
     for name, valuename, value in _get_registry_entries(ns):
-        k = ET.SubElement(
-            e, ET.QName(APPXMANIFEST_NS["rescap4"], "ClassicAppCompatKey")
-        )
+        k = ET.SubElement(e, ET.QName(APPXMANIFEST_NS["rescap4"], "ClassicAppCompatKey"))
         k.set("Name", name)
         if value:
             k.set("ValueName", valuename)
@@ -407,9 +399,7 @@ def get_appxmanifest(ns):
             node.text = value
 
     try:
-        winver = tuple(
-            int(i) for i in os.getenv("APPX_DATA_WINVER", "").split(".", maxsplit=3)
-        )
+        winver = tuple(int(i) for i in os.getenv("APPX_DATA_WINVER", "").split(".", maxsplit=3))
     except (TypeError, ValueError):
         winver = ()
 

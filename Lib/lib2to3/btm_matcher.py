@@ -7,9 +7,9 @@ matching. This reduces significantly the number of candidate nodes."""
 
 __author__ = "George Boutsioukis <gboutsioukis@gmail.com>"
 
+from collections import defaultdict
 import itertools
 import logging
-from collections import defaultdict
 
 from . import pytree
 from .btm_utils import reduce_tree
@@ -125,10 +125,7 @@ class BottomMatcher:
                 else:
                     # matching failed, reset automaton
                     current_ac_node = self.root
-                    if (
-                        current_ast_node.parent is not None
-                        and current_ast_node.parent.was_checked
-                    ):
+                    if current_ast_node.parent is not None and current_ast_node.parent.was_checked:
                         # the rest of the tree upwards has been checked, next leaf
                         break
 

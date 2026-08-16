@@ -11,18 +11,17 @@ import argparse
 import csv
 import dataclasses
 import difflib
+from functools import partial
 import io
 import os
 import os.path
+from pathlib import Path
 import pprint
 import re
 import subprocess
 import sys
 import sysconfig
 import textwrap
-from functools import partial
-from pathlib import Path
-
 import tomllib
 
 SCRIPT_NAME = "Tools/build/stable_abi.py"
@@ -222,9 +221,7 @@ def gen_python3dll(manifest, args, outfile):
         item.name for item in manifest.select({"feature_macro"}) if item.windows
     }
     for item in sorted(
-        manifest.select(
-            {"function"}, include_abi_only=True, ifdef=windows_feature_macros
-        ),
+        manifest.select({"function"}, include_abi_only=True, ifdef=windows_feature_macros),
         key=sort_key,
     ):
         write(f"EXPORT_FUNC({item.name})")
@@ -429,8 +426,7 @@ def do_unixy_check(manifest, args):
     missing_macros = expected_macros - present_macros
     okay &= _report_unexpected_items(
         missing_macros,
-        'Some macros from are not defined from "Include/Python.h"'
-        + "with Py_LIMITED_API:",
+        'Some macros from are not defined from "Include/Python.h"' + "with Py_LIMITED_API:",
     )
 
     expected_symbols = {
@@ -447,9 +443,7 @@ def do_unixy_check(manifest, args):
     if not LIBRARY:
         raise Exception("failed to get LIBRARY variable from sysconfig")  # noqa: TRY002
     if os.path.exists(LIBRARY):
-        okay &= binutils_check_library(
-            manifest, LIBRARY, expected_symbols, dynamic=False
-        )
+        okay &= binutils_check_library(manifest, LIBRARY, expected_symbols, dynamic=False)
 
     # Check the dynamic library (*.so)
     LDLIBRARY = sysconfig.get_config_var("LDLIBRARY")
@@ -481,8 +475,7 @@ def do_unixy_check(manifest, args):
     extra_defs = found_defs - expected_defs - private_symbols
     okay &= _report_unexpected_items(
         extra_defs,
-        'Some extra declarations were found in "Include/Python.h" '
-        + "with Py_LIMITED_API:",
+        'Some extra declarations were found in "Include/Python.h" ' + "with Py_LIMITED_API:",
     )
 
     return okay
@@ -581,10 +574,7 @@ def gcc_get_limited_api_macros(headers):
         text=True,
     )
 
-    return {
-        target
-        for target in re.findall(r"#define (\w+)", preprocesor_output_with_macros)
-    }
+    return {target for target in re.findall(r"#define (\w+)", preprocesor_output_with_macros)}
 
 
 def gcc_get_limited_api_definitions(headers):
@@ -622,15 +612,9 @@ def gcc_get_limited_api_definitions(headers):
         text=True,
         stderr=subprocess.DEVNULL,
     )
-    stable_functions = set(
-        re.findall(r"__PyAPI_FUNC\(.*?\)\s*(.*?)\s*\(", preprocesor_output)
-    )
-    stable_exported_data = set(
-        re.findall(r"__EXPORT_DATA\((.*?)\)", preprocesor_output)
-    )
-    stable_data = set(
-        re.findall(r"__PyAPI_DATA\(.*?\)[\s\*\(]*([^);]*)\)?.*;", preprocesor_output)
-    )
+    stable_functions = set(re.findall(r"__PyAPI_FUNC\(.*?\)\s*(.*?)\s*\(", preprocesor_output))
+    stable_exported_data = set(re.findall(r"__EXPORT_DATA\((.*?)\)", preprocesor_output))
+    stable_data = set(re.findall(r"__PyAPI_DATA\(.*?\)[\s\*\(]*([^);]*)\)?.*;", preprocesor_output))
     return stable_data | stable_exported_data | stable_functions
 
 
@@ -752,9 +736,7 @@ def main():
         if args.file.suffix == ".txt":
             # Provide a better error message
             suggestion = args.file.with_suffix(".toml")
-            raise FileNotFoundError(
-                f"{args.file} not found. Did you mean {suggestion} ?"
-            ) from err
+            raise FileNotFoundError(f"{args.file} not found. Did you mean {suggestion} ?") from err
         raise
     with file:
         manifest = parse_manifest(file)

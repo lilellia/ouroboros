@@ -14,15 +14,18 @@ __author__ = "Guido van Rossum <guido@python.org>"
 # Python imports
 import collections
 import io
+from itertools import chain
 import logging
 import operator
 import os
 import pkgutil
 import sys
-from itertools import chain
 
-from . import btm_matcher as bm
-from . import pygram, pytree
+from . import (
+    btm_matcher as bm,
+    pygram,
+    pytree,
+)
 from .fixer_util import find_root
 
 # Local imports
@@ -103,9 +106,7 @@ def get_fixers_from_package(pkg_name):
     """
     Return the fully qualified names for fixers in the package pkg_name.
     """
-    return [
-        pkg_name + "." + fix_name for fix_name in get_all_fix_names(pkg_name, False)
-    ]
+    return [pkg_name + "." + fix_name for fix_name in get_all_fix_names(pkg_name, False)]
 
 
 def _identity(obj):
@@ -196,9 +197,7 @@ class RefactoringTool:
         self.logger = logging.getLogger("RefactoringTool")
         self.fixer_log = []
         self.wrote = False
-        self.driver = driver.Driver(
-            self.grammar, convert=pytree.convert, logger=self.logger
-        )
+        self.driver = driver.Driver(self.grammar, convert=pytree.convert, logger=self.logger)
         self.pre_order, self.post_order = self.get_fixers()
 
         self.files = []  # List of files that were or should be modified
@@ -241,11 +240,7 @@ class RefactoringTool:
             except AttributeError:
                 raise FixerError(f"Can't find {fix_name}.{class_name}") from None
             fixer = fix_class(self.options, self.fixer_log)
-            if (
-                fixer.explicit
-                and self.explicit is not True
-                and fix_mod_path not in self.explicit
-            ):
+            if fixer.explicit and self.explicit is not True and fix_mod_path not in self.explicit:
                 self.log_message("Skipping optional fixer: %s", fix_name)
                 continue
 
@@ -343,9 +338,7 @@ class RefactoringTool:
             tree = self.refactor_string(input, filename)
             if self.write_unchanged_files or (tree and tree.was_changed):
                 # The [:-1] is to take off the \n we added earlier
-                self.processed_file(
-                    str(tree)[:-1], filename, write=write, encoding=encoding
-                )
+                self.processed_file(str(tree)[:-1], filename, write=write, encoding=encoding)
             else:
                 self.log_debug("No changes in %s", filename)
 
@@ -493,9 +486,7 @@ class RefactoringTool:
                         node.replace(new)
                         node = new
 
-    def processed_file(
-        self, new_text, filename, old_text=None, write=False, encoding=None
-    ):
+    def processed_file(self, new_text, filename, old_text=None, write=False, encoding=None):
         """
         Called when a file has been refactored and there may be changes.
         """
@@ -560,23 +551,18 @@ class RefactoringTool:
             lineno += 1  # noqa: SIM113
             if line.lstrip().startswith(self.PS1):
                 if block is not None:
-                    result.extend(
-                        self.refactor_doctest(block, block_lineno, indent, filename)
-                    )
+                    result.extend(self.refactor_doctest(block, block_lineno, indent, filename))
                 block_lineno = lineno
                 block = [line]
                 i = line.find(self.PS1)
                 indent = line[:i]
             elif indent is not None and (
-                line.startswith(indent + self.PS2)
-                or line == indent + self.PS2.rstrip() + "\n"
+                line.startswith(indent + self.PS2) or line == indent + self.PS2.rstrip() + "\n"
             ):
                 block.append(line)
             else:
                 if block is not None:
-                    result.extend(
-                        self.refactor_doctest(block, block_lineno, indent, filename)
-                    )
+                    result.extend(self.refactor_doctest(block, block_lineno, indent, filename))
                 block = None
                 indent = None
                 result.append(line)
@@ -705,9 +691,7 @@ class MultiprocessRefactoringTool(RefactoringTool):
             raise RuntimeError("already doing multiple processes")
         self.queue = multiprocessing.JoinableQueue()
         self.output_lock = multiprocessing.Lock()
-        processes = [
-            multiprocessing.Process(target=self._child) for i in range(num_processes)
-        ]
+        processes = [multiprocessing.Process(target=self._child) for i in range(num_processes)]
         try:
             for p in processes:
                 p.start()

@@ -86,13 +86,13 @@ SPECIAL demos, such as clock.py are those which run EVENTDRIVEN.
    a demo; it only acts in response to mouse clicks and movements.)
 """
 
-import os
-import sys
-import turtle
 from idlelib.colorizer import ColorDelegator, color_config
 from idlelib.percolator import Percolator
 from idlelib.textview import view_text
+import os
+import sys
 from tkinter import *
+import turtle
 from turtledemo import __doc__ as about_turtledemo
 
 if sys.platform == "win32":
@@ -119,9 +119,7 @@ font_sizes = [8, 9, 10, 11, 12, 14, 18, 20, 22, 24, 30]
 
 def getExampleEntries():
     return [
-        entry[:-3]
-        for entry in os.listdir(demo_dir)
-        if entry.endswith(".py") and entry[0] != "_"
+        entry[:-3] for entry in os.listdir(demo_dir) if entry.endswith(".py") and entry[0] != "_"
     ]
 
 
@@ -149,10 +147,7 @@ class DemoWindow:
                     "-e",
                     'tell application "System Events"',
                     "-e",
-                    (
-                        "set frontmost of the first process whose "
-                        f"unix id is {os.getpid()} to true"
-                    ),
+                    (f"set frontmost of the first process whose unix id is {os.getpid()} to true"),
                     "-e",
                     "end tell",
                 ],
@@ -167,20 +162,12 @@ class DemoWindow:
         root.grid_columnconfigure(3, minsize=90, weight=1)
 
         self.mBar = Menu(root, relief=RAISED, borderwidth=2)
-        self.mBar.add_cascade(
-            menu=self.makeLoadDemoMenu(self.mBar), label="Examples", underline=0
-        )
-        self.mBar.add_cascade(
-            menu=self.makeFontMenu(self.mBar), label="Fontsize", underline=0
-        )
-        self.mBar.add_cascade(
-            menu=self.makeHelpMenu(self.mBar), label="Help", underline=0
-        )
+        self.mBar.add_cascade(menu=self.makeLoadDemoMenu(self.mBar), label="Examples", underline=0)
+        self.mBar.add_cascade(menu=self.makeFontMenu(self.mBar), label="Fontsize", underline=0)
+        self.mBar.add_cascade(menu=self.makeHelpMenu(self.mBar), label="Help", underline=0)
         root["menu"] = self.mBar
 
-        pane = PanedWindow(
-            root, orient=HORIZONTAL, sashwidth=5, sashrelief=SOLID, bg="#ddd"
-        )
+        pane = PanedWindow(root, orient=HORIZONTAL, sashwidth=5, sashrelief=SOLID, bg="#ddd")
         pane.add(self.makeTextFrame(pane))
         pane.add(self.makeGraphFrame(pane))
         pane.grid(row=0, columnspan=4, sticky="news")
@@ -243,9 +230,7 @@ class DemoWindow:
         self.exitflag = False
         if filename:
             self.loadfile(filename)
-        self.configGUI(
-            DISABLED, DISABLED, DISABLED, "Choose example from menu", "black"
-        )
+        self.configGUI(DISABLED, DISABLED, DISABLED, "Choose example from menu", "black")
         self.state = STARTUP
 
     def onResize(self, event):
@@ -347,12 +332,8 @@ class DemoWindow:
 
     def makeFontMenu(self, master):
         menu = Menu(master)
-        menu.add_command(
-            label="Decrease (C-'-')", command=self.decrease_size, font=menufont
-        )
-        menu.add_command(
-            label="Increase (C-'+')", command=self.increase_size, font=menufont
-        )
+        menu.add_command(label="Decrease (C-'-')", command=self.decrease_size, font=menufont)
+        menu.add_command(label="Increase (C-'+')", command=self.increase_size, font=menufont)
         menu.add_separator()
 
         for size in font_sizes:
@@ -360,9 +341,7 @@ class DemoWindow:
             def resize(size=size):
                 self.set_txtsize(size)
 
-            menu.add_command(
-                label=str(size), underline=0, font=menufont, command=resize
-            )
+            menu.add_command(label=str(size), underline=0, font=menufont, command=resize)
         return menu
 
     def makeHelpMenu(self, master):

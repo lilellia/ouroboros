@@ -4,7 +4,6 @@ import textwrap
 
 import c_analyzer as _c_analyzer
 import c_analyzer.__main__ as c_analyzer
-import c_parser.__main__ as c_parser
 from c_analyzer.info import UNKNOWN
 from c_common.scriptutil import (
     VERBOSITY,
@@ -18,6 +17,7 @@ from c_common.scriptutil import (
     get_prog,
     process_args_by_key,
 )
+import c_parser.__main__ as c_parser
 from c_parser.info import KIND
 
 from . import REPO_ROOT, _analyzer, _builtin_types, _capi, _files, _parser
@@ -141,9 +141,7 @@ def cmd_parse(filenames=None, **kwargs):
     filenames = _resolve_filenames(filenames)
     if "get_file_preprocessor" not in kwargs:
         kwargs["get_file_preprocessor"] = _parser.get_preprocessor()
-    c_parser.cmd_parse(
-        filenames, relroot=REPO_ROOT, file_maxsizes=_parser.MAX_SIZES, **kwargs
-    )
+    c_parser.cmd_parse(filenames, relroot=REPO_ROOT, file_maxsizes=_parser.MAX_SIZES, **kwargs)
 
 
 def _cli_check(parser, **kwargs):
@@ -198,9 +196,7 @@ def _cli_data(parser):
 def cmd_data(datacmd, **kwargs):
     formats = dict(c_analyzer.FORMATS)
     formats["summary"] = fmt_summary
-    filenames = (
-        file for file in _resolve_filenames(None) if file not in _parser.EXCLUDED
-    )
+    filenames = (file for file in _resolve_filenames(None) if file not in _parser.EXCLUDED)
     kwargs["get_file_preprocessor"] = _parser.get_preprocessor(log_err=print)
     if datacmd == "show":
         types = _analyzer.read_known()
@@ -256,16 +252,10 @@ def cmd_data(datacmd, **kwargs):
 
 def _cli_capi(parser):
     parser.add_argument("--levels", action="append", metavar="LEVEL[,...]")
-    parser.add_argument(
-        "--public", dest="levels", action="append_const", const="public"
-    )
-    parser.add_argument(
-        "--no-public", dest="levels", action="append_const", const="no-public"
-    )
+    parser.add_argument("--public", dest="levels", action="append_const", const="public")
+    parser.add_argument("--no-public", dest="levels", action="append_const", const="no-public")
     for level in _capi.LEVELS:
-        parser.add_argument(
-            f"--{level}", dest="levels", action="append_const", const=level
-        )
+        parser.add_argument(f"--{level}", dest="levels", action="append_const", const=level)
 
     def process_levels(args, *, argv=None):
         levels = []
@@ -287,9 +277,7 @@ def _cli_capi(parser):
 
     parser.add_argument("--kinds", action="append", metavar="KIND[,...]")
     for kind in _capi.KINDS:
-        parser.add_argument(
-            f"--{kind}", dest="kinds", action="append_const", const=kind
-        )
+        parser.add_argument(f"--{kind}", dest="kinds", action="append_const", const=kind)
 
     def process_kinds(args, *, argv=None):
         kinds = []
@@ -298,17 +286,13 @@ def _cli_capi(parser):
                 if kind in _capi.KINDS:
                     kinds.append(kind)
                 else:
-                    parser.error(
-                        f"expected KIND to be one of {sorted(_capi.KINDS)}, got {kind!r}"
-                    )
+                    parser.error(f"expected KIND to be one of {sorted(_capi.KINDS)}, got {kind!r}")
         args.kinds = set(kinds)
 
     parser.add_argument("--group-by", dest="groupby", choices=["level", "kind"])
 
     parser.add_argument("--format", default="table")
-    parser.add_argument(
-        "--summary", dest="format", action="store_const", const="summary"
-    )
+    parser.add_argument("--summary", dest="format", action="store_const", const="summary")
 
     def process_format(args, *, argv=None):
         orig = args.format
@@ -369,9 +353,7 @@ def cmd_capi(
 
     filter = _capi.resolve_filter(ignored)
     if filter:
-        items = (
-            item for item in items if filter(item, log=lambda msg: logger.log(1, msg))
-        )
+        items = (item for item in items if filter(item, log=lambda msg: logger.log(1, msg)))
 
     lines = render(
         items,

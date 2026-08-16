@@ -2,12 +2,14 @@
 # The only thing not covered is inconsequential --
 # testing skipping of suite when self.needwrapbutton is false.
 
-import unittest
-from idlelib import searchbase as sdb
-from idlelib import searchengine as se
+from idlelib import (
+    searchbase as sdb,
+    searchengine as se,
+)
 from idlelib.idle_test.mock_idle import Func
 from tkinter import Text, Tk, Toplevel
 from tkinter.ttk import Frame
+import unittest
 
 from test.support import requires
 

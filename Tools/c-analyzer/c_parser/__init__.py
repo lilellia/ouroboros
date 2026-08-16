@@ -27,9 +27,7 @@ def parse_files(
         get_file_preprocessor = _get_preprocessor()
     for filename in filenames:
         try:
-            yield from _parse_file(
-                filename, match_kind, get_file_preprocessor, file_maxsizes
-            )
+            yield from _parse_file(filename, match_kind, get_file_preprocessor, file_maxsizes)
         except Exception:
             print(f"# requested file: <{filename}>")
             raise  # re-raise

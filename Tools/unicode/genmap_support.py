@@ -74,25 +74,17 @@ class DecodeMapWriter:
 
     def generate(self, wide=False):
         if not wide:
-            self.fp.write(
-                f"static const ucs2_t __{self.prefix}_decmap[{len(self.filler)}] = {{\n"
-            )
+            self.fp.write(f"static const ucs2_t __{self.prefix}_decmap[{len(self.filler)}] = {{\n")
         else:
-            self.fp.write(
-                f"static const Py_UCS4 __{self.prefix}_decmap[{len(self.filler)}] = {{\n"
-            )
+            self.fp.write(f"static const Py_UCS4 __{self.prefix}_decmap[{len(self.filler)}] = {{\n")
 
         self.filler.printout(self.fp)
         self.fp.write("};\n\n")
 
         if not wide:
-            self.fp.write(
-                f"static const struct dbcs_index {self.prefix}_decmap[256] = {{\n"
-            )
+            self.fp.write(f"static const struct dbcs_index {self.prefix}_decmap[256] = {{\n")
         else:
-            self.fp.write(
-                f"static const struct widedbcs_index {self.prefix}_decmap[256] = {{\n"
-            )
+            self.fp.write(f"static const struct widedbcs_index {self.prefix}_decmap[256] = {{\n")
 
         for i in range(256):
             if i in self.decode_map and self.prefix in self.decode_map[i]:

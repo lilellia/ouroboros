@@ -18,13 +18,11 @@ def generate_typeslots(out=sys.stdout):
             member = f"{{-1, offsetof(PyTypeObject, {member})}}"
         elif member.startswith("am_"):
             member = (
-                f"{{offsetof(PyAsyncMethods, {member}),"
-                + " offsetof(PyTypeObject, tp_as_async)}"
+                f"{{offsetof(PyAsyncMethods, {member})," + " offsetof(PyTypeObject, tp_as_async)}"
             )
         elif member.startswith("nb_"):
             member = (
-                f"{{offsetof(PyNumberMethods, {member}),"
-                + " offsetof(PyTypeObject, tp_as_number)}"
+                f"{{offsetof(PyNumberMethods, {member})," + " offsetof(PyTypeObject, tp_as_number)}"
             )
         elif member.startswith("mp_"):
             member = (
@@ -38,8 +36,7 @@ def generate_typeslots(out=sys.stdout):
             )
         elif member.startswith("bf_"):
             member = (
-                f"{{offsetof(PyBufferProcs, {member}),"
-                + " offsetof(PyTypeObject, tp_as_buffer)}"
+                f"{{offsetof(PyBufferProcs, {member})," + " offsetof(PyTypeObject, tp_as_buffer)}"
             )
         res[int(m.group(2))] = member
 

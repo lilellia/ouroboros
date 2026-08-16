@@ -43,9 +43,7 @@ else:
     _bootstrap_external.__name__ = "importlib._bootstrap_external"
     _bootstrap_external.__package__ = "importlib"
     try:
-        _bootstrap_external.__file__ = __file__.replace(
-            "__init__.py", "_bootstrap_external.py"
-        )
+        _bootstrap_external.__file__ = __file__.replace("__init__.py", "_bootstrap_external.py")
     except NameError:
         # __file__ is not guaranteed to be defined, e.g. if this code gets
         # frozen by a tool like cx_Freeze.
@@ -85,8 +83,7 @@ def import_module(name, package=None):
     if name.startswith("."):
         if not package:
             raise TypeError(
-                "the 'package' argument is required to perform a "
-                f"relative import for {name!r}"
+                f"the 'package' argument is required to perform a relative import for {name!r}"
             )
         for character in name:
             if character != ".":
@@ -133,9 +130,7 @@ def reload(module):
         target = module
         spec = module.__spec__ = _bootstrap._find_spec(name, pkgpath, target)
         if spec is None:
-            raise ModuleNotFoundError(
-                f"spec not found for the module {name!r}", name=name
-            )
+            raise ModuleNotFoundError(f"spec not found for the module {name!r}", name=name)
         _bootstrap._exec(spec, module)
         # The module may have replaced itself in sys.modules!
         return sys.modules[name]

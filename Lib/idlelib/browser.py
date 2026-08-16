@@ -8,14 +8,14 @@ XXX TO DO:
 - add base classes to class browser tree
 """
 
-import os
-import pyclbr
-import sys
 from idlelib import pyshell
 from idlelib.config import idleConf
 from idlelib.tree import ScrolledCanvas, TreeItem, TreeNode
 from idlelib.util import py_extensions
 from idlelib.window import ListedToplevel
+import os
+import pyclbr
+import sys
 
 file_open = None  # Method...Item and Class...Item use this.
 # Normally pyshell.flist.open, but there is no pyshell.flist for htest.
@@ -102,11 +102,7 @@ class ModuleBrowser:
         "Create browser tkinter widgets, including the tree."
         global file_open
         root = self.master
-        flist = (
-            pyshell.flist
-            if not (self._htest or self._utest)
-            else pyshell.PyShellFileList(root)
-        )
+        flist = pyshell.flist if not (self._htest or self._utest) else pyshell.PyShellFileList(root)
         file_open = flist.open
         pyclbr._modules.clear()
 
@@ -225,9 +221,7 @@ class ChildBrowserTreeItem(TreeItem):
 
     def GetSubList(self):
         "Return ChildBrowserTreeItems for children."
-        return [
-            ChildBrowserTreeItem(obj) for obj in transform_children(self.obj.children)
-        ]
+        return [ChildBrowserTreeItem(obj) for obj in transform_children(self.obj.children)]
 
     def OnDoubleClick(self):
         "Open module with file_open and position to lineno."

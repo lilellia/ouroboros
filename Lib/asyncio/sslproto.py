@@ -215,9 +215,7 @@ class _SSLProtocolTransport(transports._FlowControlMixin, transports.Transport):
         to be sent out asynchronously.
         """
         if not isinstance(data, (bytes, bytearray, memoryview)):
-            raise TypeError(
-                f"data: expecting a bytes-like instance, got {type(data).__name__}"
-            )
+            raise TypeError(f"data: expecting a bytes-like instance, got {type(data).__name__}")
         if not data:
             return
         self._ssl_protocol._write_appdata((data,))
@@ -290,15 +288,13 @@ class SSLProtocol(protocols.BufferedProtocol):
             ssl_handshake_timeout = constants.SSL_HANDSHAKE_TIMEOUT
         elif ssl_handshake_timeout <= 0:
             raise ValueError(
-                f"ssl_handshake_timeout should be a positive number, "
-                f"got {ssl_handshake_timeout}"
+                f"ssl_handshake_timeout should be a positive number, got {ssl_handshake_timeout}"
             )
         if ssl_shutdown_timeout is None:
             ssl_shutdown_timeout = constants.SSL_SHUTDOWN_TIMEOUT
         elif ssl_shutdown_timeout <= 0:
             raise ValueError(
-                f"ssl_shutdown_timeout should be a positive number, "
-                f"got {ssl_shutdown_timeout}"
+                f"ssl_shutdown_timeout should be a positive number, got {ssl_shutdown_timeout}"
             )
 
         if not sslcontext:
@@ -517,14 +513,8 @@ class SSLProtocol(protocols.BufferedProtocol):
                 self._state == SSLProtocolState.DO_HANDSHAKE
                 and new_state == SSLProtocolState.WRAPPED
             )
-            or (
-                self._state == SSLProtocolState.WRAPPED
-                and new_state == SSLProtocolState.FLUSHING
-            )
-            or (
-                self._state == SSLProtocolState.FLUSHING
-                and new_state == SSLProtocolState.SHUTDOWN
-            )
+            or (self._state == SSLProtocolState.WRAPPED and new_state == SSLProtocolState.FLUSHING)
+            or (self._state == SSLProtocolState.FLUSHING and new_state == SSLProtocolState.SHUTDOWN)
         ):
             allowed = True
 
@@ -634,9 +624,7 @@ class SSLProtocol(protocols.BufferedProtocol):
 
     def _check_shutdown_timeout(self):
         if self._state in (SSLProtocolState.FLUSHING, SSLProtocolState.SHUTDOWN):
-            self._transport._force_close(
-                exceptions.TimeoutError("SSL shutdown timed out")
-            )
+            self._transport._force_close(exceptions.TimeoutError("SSL shutdown timed out"))
 
     def _do_flush(self):
         self._do_read()
@@ -806,8 +794,7 @@ class SSLProtocol(protocols.BufferedProtocol):
                 keep_open = self._app_protocol.eof_received()
                 if keep_open:
                     logger.warning(
-                        "returning true from eof_received() "
-                        "has no effect when using ssl"
+                        "returning true from eof_received() has no effect when using ssl"
                     )
         except (KeyboardInterrupt, SystemExit):
             raise
@@ -853,9 +840,7 @@ class SSLProtocol(protocols.BufferedProtocol):
         return self._outgoing.pending + self._write_buffer_size
 
     def _set_write_buffer_limits(self, high=None, low=None):
-        high, low = add_flowcontrol_defaults(
-            high, low, constants.FLOW_CONTROL_HIGH_WATER_SSL_WRITE
-        )
+        high, low = add_flowcontrol_defaults(high, low, constants.FLOW_CONTROL_HIGH_WATER_SSL_WRITE)
         self._outgoing_high_water = high
         self._outgoing_low_water = low
 
@@ -890,9 +875,7 @@ class SSLProtocol(protocols.BufferedProtocol):
             self._transport.resume_reading()
 
     def _set_read_buffer_limits(self, high=None, low=None):
-        high, low = add_flowcontrol_defaults(
-            high, low, constants.FLOW_CONTROL_HIGH_WATER_SSL_READ
-        )
+        high, low = add_flowcontrol_defaults(high, low, constants.FLOW_CONTROL_HIGH_WATER_SSL_READ)
         self._incoming_high_water = high
         self._incoming_low_water = low
 

@@ -7,11 +7,11 @@
 # iterator interface by Gustavo Niemeyer, April 2003.
 # changes to tokenize more like Posix shells by Vinay Sajip, July 2016.
 
+from collections import deque
+from io import StringIO
 import os
 import re
 import sys
-from collections import deque
-from io import StringIO
 
 __all__ = ["join", "quote", "shlex", "split"]
 
@@ -19,9 +19,7 @@ __all__ = ["join", "quote", "shlex", "split"]
 class shlex:
     "A lexical analyzer class for simple shell-like syntaxes."
 
-    def __init__(
-        self, instream=None, infile=None, posix=False, punctuation_chars=False
-    ):
+    def __init__(self, instream=None, infile=None, posix=False, punctuation_chars=False):
         if isinstance(instream, str):
             instream = StringIO(instream)
         if instream is not None:
@@ -36,13 +34,9 @@ class shlex:
         else:
             self.eof = ""
         self.commenters = "#"
-        self.wordchars = (
-            "abcdfeghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
-        )
+        self.wordchars = "abcdfeghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
         if self.posix:
-            self.wordchars += (
-                "ßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞ"
-            )
+            self.wordchars += "ßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞ"
         self.whitespace = " \t\r\n"
         self.whitespace_split = False
         self.quotes = "'\""
@@ -198,11 +192,7 @@ class shlex:
                         break
                     else:
                         self.state = "a"
-                elif (
-                    self.posix
-                    and nextchar in self.escape
-                    and self.state in self.escapedquotes
-                ):
+                elif self.posix and nextchar in self.escape and self.state in self.escapedquotes:
                     escapedstate = self.state
                     self.state = nextchar
                 else:
@@ -260,9 +250,7 @@ class shlex:
                 elif (
                     nextchar in self.wordchars
                     or nextchar in self.quotes
-                    or (
-                        self.whitespace_split and nextchar not in self.punctuation_chars
-                    )
+                    or (self.whitespace_split and nextchar not in self.punctuation_chars)
                 ):
                     self.token += nextchar
                 else:

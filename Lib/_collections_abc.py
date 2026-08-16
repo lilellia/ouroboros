@@ -32,8 +32,8 @@ Unit tests are in test_collections.
 #
 #######################################################################
 
-import sys
 from abc import ABCMeta, abstractmethod
+import sys
 
 GenericAlias = type(list[int])
 EllipsisType = type(...)
@@ -295,9 +295,7 @@ class AsyncGenerator(AsyncIterator):
     @classmethod
     def __subclasshook__(cls, C):
         if cls is AsyncGenerator:
-            return _check_methods(
-                C, "__aiter__", "__anext__", "asend", "athrow", "aclose"
-            )
+            return _check_methods(C, "__aiter__", "__anext__", "asend", "athrow", "aclose")
         return NotImplemented
 
 
@@ -492,8 +490,7 @@ class _CallableGenericAlias(GenericAlias):
             args = (*t_args, t_result)
         elif not _is_param_expr(t_args):
             raise TypeError(
-                f"Expected a list of types, an ellipsis, "
-                f"ParamSpec, or Concatenate. Got {t_args}"
+                f"Expected a list of types, an ellipsis, ParamSpec, or Concatenate. Got {t_args}"
             )
         return super().__new__(cls, origin, args)
 

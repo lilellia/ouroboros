@@ -50,9 +50,9 @@ import signal
 import sys
 import threading
 import time
+from time import monotonic as _time
 import types
 import warnings
-from time import monotonic as _time
 
 try:
     import fcntl
@@ -544,14 +544,10 @@ class CompletedProcess:
     def check_returncode(self):
         """Raise CalledProcessError if the exit code is non-zero."""
         if self.returncode:
-            raise CalledProcessError(
-                self.returncode, self.args, self.stdout, self.stderr
-            )
+            raise CalledProcessError(self.returncode, self.args, self.stdout, self.stderr)
 
 
-def run(
-    *popenargs, input=None, capture_output=False, timeout=None, check=False, **kwargs
-):
+def run(*popenargs, input=None, capture_output=False, timeout=None, check=False, **kwargs):
     """Run command with arguments and return a CompletedProcess instance.
 
     The returned instance will have attributes args, returncode, stdout and
@@ -587,9 +583,7 @@ def run(
 
     if capture_output:
         if kwargs.get("stdout") is not None or kwargs.get("stderr") is not None:
-            raise ValueError(
-                "stdout and stderr arguments may not be used with capture_output."
-            )
+            raise ValueError("stdout and stderr arguments may not be used with capture_output.")
         kwargs["stdout"] = PIPE
         kwargs["stderr"] = PIPE
 
@@ -616,9 +610,7 @@ def run(
             raise
         retcode = process.poll()
         if check and retcode:
-            raise CalledProcessError(
-                retcode, process.args, output=stdout, stderr=stderr
-            )
+            raise CalledProcessError(retcode, process.args, output=stdout, stderr=stderr)
     return CompletedProcess(process.args, retcode, stdout, stderr)
 
 
@@ -971,26 +963,21 @@ class Popen:
         gid = None
         if group is not None:
             if not hasattr(os, "setregid"):
-                raise ValueError(
-                    "The 'group' parameter is not supported on the current platform"
-                )
+                raise ValueError("The 'group' parameter is not supported on the current platform")
 
             elif isinstance(group, str):
                 try:
                     import grp
                 except ImportError:
                     raise ValueError(
-                        "The group parameter cannot be a string "
-                        "on systems without the grp module"
+                        "The group parameter cannot be a string on systems without the grp module"
                     )
 
                 gid = grp.getgrnam(group).gr_gid
             elif isinstance(group, int):
                 gid = group
             else:
-                raise TypeError(
-                    f"Group must be a string or an integer, not {type(group)}"
-                )
+                raise TypeError(f"Group must be a string or an integer, not {type(group)}")
 
             if gid < 0:
                 raise ValueError(f"Group ID cannot be negative, got {gid}")
@@ -999,8 +986,7 @@ class Popen:
         if extra_groups is not None:
             if not hasattr(os, "setgroups"):
                 raise ValueError(
-                    "The 'extra_groups' parameter is not "
-                    "supported on the current platform"
+                    "The 'extra_groups' parameter is not supported on the current platform"
                 )
 
             elif isinstance(extra_groups, str):
@@ -1036,17 +1022,14 @@ class Popen:
         uid = None
         if user is not None:
             if not hasattr(os, "setreuid"):
-                raise ValueError(
-                    "The 'user' parameter is not supported on the current platform"
-                )
+                raise ValueError("The 'user' parameter is not supported on the current platform")
 
             elif isinstance(user, str):
                 try:
                     import pwd
                 except ImportError:
                     raise ValueError(
-                        "The user parameter cannot be a string "
-                        "on systems without the pwd module"
+                        "The user parameter cannot be a string on systems without the pwd module"
                     )
                 uid = pwd.getpwnam(user).pw_uid
             elif isinstance(user, int):
@@ -1104,15 +1087,11 @@ class Popen:
             if c2pread != -1:
                 self.stdout = open(c2pread, "rb", bufsize)  # noqa: SIM115
                 if self.text_mode:
-                    self.stdout = io.TextIOWrapper(
-                        self.stdout, encoding=encoding, errors=errors
-                    )
+                    self.stdout = io.TextIOWrapper(self.stdout, encoding=encoding, errors=errors)
             if errread != -1:
                 self.stderr = open(errread, "rb", bufsize)  # noqa: SIM115
                 if self.text_mode:
-                    self.stderr = io.TextIOWrapper(
-                        self.stderr, encoding=encoding, errors=errors
-                    )
+                    self.stderr = io.TextIOWrapper(self.stderr, encoding=encoding, errors=errors)
 
             self._execute_child(
                 args,
@@ -1169,10 +1148,7 @@ class Popen:
             raise
 
     def __repr__(self):
-        obj_repr = (
-            f"<{self.__class__.__name__}: "
-            f"returncode: {self.returncode} args: {self.args!r}>"
-        )
+        obj_repr = f"<{self.__class__.__name__}: returncode: {self.returncode} args: {self.args!r}>"
         if len(obj_repr) > 80:
             obj_repr = obj_repr[:76] + "...>"
         return obj_repr
@@ -1324,9 +1300,7 @@ class Popen:
                 # https://bugs.python.org/issue25942
                 # See the detailed comment in .wait().
                 if timeout is not None:
-                    sigint_timeout = min(
-                        self._sigint_wait_secs, self._remaining_time(endtime)
-                    )
+                    sigint_timeout = min(self._sigint_wait_secs, self._remaining_time(endtime))
                 else:
                     sigint_timeout = self._sigint_wait_secs
                 self._sigint_wait_secs = 0  # nothing else should wait.
@@ -1381,9 +1355,7 @@ class Popen:
             # exit under the common assumption that it also received the ^C
             # generated SIGINT and will exit rapidly.
             if timeout is not None:
-                sigint_timeout = min(
-                    self._sigint_wait_secs, self._remaining_time(endtime)
-                )
+                sigint_timeout = min(self._sigint_wait_secs, self._remaining_time(endtime))
             else:
                 sigint_timeout = self._sigint_wait_secs
             self._sigint_wait_secs = 0  # nothing else should wait.
@@ -1542,8 +1514,7 @@ class Popen:
                 {
                     handle
                     for handle in handle_list
-                    if handle & 0x3 != 0x3
-                    or _winapi.GetFileType(handle) != _winapi.FILE_TYPE_CHAR
+                    if handle & 0x3 != 0x3 or _winapi.GetFileType(handle) != _winapi.FILE_TYPE_CHAR
                 }
             )
 
@@ -1610,9 +1581,7 @@ class Popen:
 
             attribute_list = startupinfo.lpAttributeList
             have_handle_list = bool(
-                attribute_list
-                and "handle_list" in attribute_list
-                and attribute_list["handle_list"]
+                attribute_list and "handle_list" in attribute_list and attribute_list["handle_list"]
             )
 
             # If we were given an handle_list or need to create one
@@ -1631,8 +1600,7 @@ class Popen:
                 if handle_list:
                     if not close_fds:
                         warnings.warn(
-                            "startupinfo.lpAttributeList['handle_list'] "
-                            "overriding close_fds",
+                            "startupinfo.lpAttributeList['handle_list'] overriding close_fds",
                             RuntimeWarning,
                         )
 
@@ -1691,9 +1659,7 @@ class Popen:
                 # output pipe are maintained in this process or else the
                 # pipe will not close when the child process exits and the
                 # ReadFile will hang.
-                self._close_pipe_fds(
-                    p2cread, p2cwrite, c2pread, c2pwrite, errread, errwrite
-                )
+                self._close_pipe_fds(p2cread, p2cwrite, c2pread, c2pwrite, errread, errwrite)
 
             # Retain the process handle, but close the thread handle
             self._child_created = True
@@ -1930,9 +1896,7 @@ class Popen:
             self.pid = os.posix_spawn(executable, args, env, **kwargs)
             self._child_created = True
 
-            self._close_pipe_fds(
-                p2cread, p2cwrite, c2pread, c2pwrite, errread, errwrite
-            )
+            self._close_pipe_fds(p2cread, p2cwrite, c2pread, c2pwrite, errread, errwrite)
 
         def _execute_child(
             self,
@@ -1973,11 +1937,7 @@ class Popen:
 
             if shell:
                 # On Android the default shell is at '/system/bin/sh'.
-                unix_shell = (
-                    "/system/bin/sh"
-                    if hasattr(sys, "getandroidapilevel")
-                    else "/bin/sh"
-                )
+                unix_shell = "/system/bin/sh" if hasattr(sys, "getandroidapilevel") else "/bin/sh"
                 args = [unix_shell, "-c"] + args
                 if executable:
                     args[0] = executable
@@ -2088,9 +2048,7 @@ class Popen:
                     # be sure the FD is closed no matter what
                     os.close(errpipe_write)
 
-                self._close_pipe_fds(
-                    p2cread, p2cwrite, c2pread, c2pwrite, errread, errwrite
-                )
+                self._close_pipe_fds(p2cread, p2cwrite, c2pread, c2pwrite, errread, errwrite)
 
                 # Wait for exec to fail or succeed; possibly raising an
                 # exception (limited in size)
@@ -2318,9 +2276,7 @@ class Popen:
 
                     for key, events in ready:
                         if key.fileobj is self.stdin:
-                            chunk = input_view[
-                                self._input_offset : self._input_offset + _PIPE_BUF
-                            ]
+                            chunk = input_view[self._input_offset : self._input_offset + _PIPE_BUF]
                             try:
                                 self._input_offset += os.write(key.fd, chunk)
                             except BrokenPipeError:
@@ -2367,9 +2323,7 @@ class Popen:
                 self._input_offset = 0
                 self._input = input
                 if input is not None and self.text_mode:
-                    self._input = self._input.encode(
-                        self.stdin.encoding, self.stdin.errors
-                    )
+                    self._input = self._input.encode(self.stdin.encoding, self.stdin.errors)
 
         def send_signal(self, sig):
             """Send a signal to the process."""

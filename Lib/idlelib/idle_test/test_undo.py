@@ -1,8 +1,8 @@
 "Test undo, coverage 77%."
 # Only test UndoDelegator so far.
 
-import unittest
 from idlelib.undo import UndoDelegator
+import unittest
 
 from test.support import requires
 

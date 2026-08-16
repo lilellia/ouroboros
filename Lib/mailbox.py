@@ -17,8 +17,8 @@ import io
 import os
 import socket
 import time
-import warnings
 from types import GenericAlias
+import warnings
 
 try:
     import fcntl
@@ -217,9 +217,7 @@ class Mailbox:
         try:
             return message.encode("ascii")
         except UnicodeError:
-            raise ValueError(
-                "String input must be ASCII-only; use bytes or a Message instead"
-            )
+            raise ValueError("String input must be ASCII-only; use bytes or a Message instead")
 
     # Whether each message must end in a newline
     _append_newline = False
@@ -258,8 +256,7 @@ class Mailbox:
         elif hasattr(message, "read"):
             if hasattr(message, "buffer"):
                 warnings.warn(
-                    "Use of text mode files is deprecated, "
-                    "use a binary mode file instead",
+                    "Use of text mode files is deprecated, use a binary mode file instead",
                     DeprecationWarning,
                     3,
                 )
@@ -334,9 +331,7 @@ class Maildir(Mailbox):
         uniq = os.path.basename(tmp_file.name).split(self.colon)[0]
         dest = os.path.join(self._path, subdir, uniq + suffix)
         if isinstance(message, MaildirMessage):
-            os.utime(
-                tmp_file.name, (os.path.getatime(tmp_file.name), message.get_date())
-            )
+            os.utime(tmp_file.name, (os.path.getatime(tmp_file.name), message.get_date()))
         # No file modification should be done after the file is moved to its
         # final position in order to prevent race conditions with changes
         # from other programs
@@ -469,9 +464,7 @@ class Maildir(Mailbox):
 
     def get_folder(self, folder):
         """Return a Maildir instance for the named folder."""
-        return Maildir(
-            os.path.join(self._path, "." + folder), factory=self._factory, create=False
-        )
+        return Maildir(os.path.join(self._path, "." + folder), factory=self._factory, create=False)
 
     def add_folder(self, folder):
         """Create a folder and return a Maildir instance representing it."""
@@ -485,9 +478,7 @@ class Maildir(Mailbox):
     def remove_folder(self, folder):
         """Delete the named folder, which must be empty."""
         path = os.path.join(self._path, "." + folder)
-        for entry in os.listdir(os.path.join(path, "new")) + os.listdir(
-            os.path.join(path, "cur")
-        ):
+        for entry in os.listdir(os.path.join(path, "new")) + os.listdir(os.path.join(path, "cur")):
             if len(entry) < 1 or entry[0] != ".":
                 raise NotEmptyError(f"Folder contains message(s): {folder}")
         for entry in os.listdir(path):
@@ -816,9 +807,7 @@ class _mboxMMDF(_singlefileMailbox):
 
     def get_string(self, key, from_=False):
         """Return a string representation or raise a KeyError."""
-        return email.message_from_bytes(self.get_bytes(key, from_)).as_string(
-            unixfrom=from_
-        )
+        return email.message_from_bytes(self.get_bytes(key, from_)).as_string(unixfrom=from_)
 
     def get_bytes(self, key, from_=False):
         """Return a string representation or raise a KeyError."""
@@ -1114,9 +1103,7 @@ class MH(Mailbox):
 
     def iterkeys(self):
         """Return an iterator over keys."""
-        return iter(
-            sorted(int(entry) for entry in os.listdir(self._path) if entry.isdigit())
-        )
+        return iter(sorted(int(entry) for entry in os.listdir(self._path) if entry.isdigit()))
 
     def __contains__(self, key):
         """Return True if the keyed message exists, False otherwise."""
@@ -1181,9 +1168,7 @@ class MH(Mailbox):
     def get_sequences(self):
         """Return a name-to-key-list dictionary to define each sequence."""
         results = {}
-        with open(
-            os.path.join(self._path, ".mh_sequences"), "r", encoding="ASCII"
-        ) as f:
+        with open(os.path.join(self._path, ".mh_sequences"), "r", encoding="ASCII") as f:
             all_keys = set(self.keys())
             for line in f:
                 try:
@@ -1199,9 +1184,7 @@ class MH(Mailbox):
                     if len(results[name]) == 0:
                         del results[name]
                 except ValueError:
-                    raise FormatError(
-                        f"Invalid sequence specification: {line.rstrip()}"
-                    )
+                    raise FormatError(f"Invalid sequence specification: {line.rstrip()}")
         return results
 
     def set_sequences(self, sequences):
@@ -1496,8 +1479,7 @@ class Babyl(_singlefileMailbox):
         elif hasattr(message, "readline"):
             if hasattr(message, "buffer"):
                 warnings.warn(
-                    "Use of text mode files is deprecated, "
-                    "use a binary mode file instead",
+                    "Use of text mode files is deprecated, use a binary mode file instead",
                     DeprecationWarning,
                     3,
                 )
@@ -1759,9 +1741,7 @@ class _mboxMMDFMessage(Message):
             del message["x-status"]
             maybe_date = " ".join(self.get_from().split()[-5:])
             try:
-                message.set_date(
-                    calendar.timegm(time.strptime(maybe_date, "%a %b %d %H:%M:%S %Y"))
-                )
+                message.set_date(calendar.timegm(time.strptime(maybe_date, "%a %b %d %H:%M:%S %Y")))
             except (ValueError, OverflowError):
                 pass
         elif isinstance(message, _mboxMMDFMessage):
@@ -2163,9 +2143,7 @@ def _create_carefully(path):
 
 def _create_temporary(path):
     """Create a temp file based on path and open for reading and writing."""
-    return _create_carefully(
-        f"{path}.{int(time.time())}.{socket.gethostname()}.{os.getpid()}"
-    )
+    return _create_carefully(f"{path}.{int(time.time())}.{socket.gethostname()}.{os.getpid()}")
 
 
 def _sync_flush(f):

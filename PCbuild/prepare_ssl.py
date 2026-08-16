@@ -21,9 +21,9 @@
 
 import os
 import re
+from shutil import copy
 import subprocess
 import sys
-from shutil import copy
 
 
 # Find all "foo.exe" files on the PATH.

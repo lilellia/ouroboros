@@ -5,13 +5,13 @@ parameter and docstring information when you type an opening parenthesis, and
 which disappear when you type a closing parenthesis.
 """
 
+from idlelib import calltip_w
+from idlelib.hyperparser import HyperParser
 import inspect
 import re
 import sys
 import textwrap
 import types
-from idlelib import calltip_w
-from idlelib.hyperparser import HyperParser
 
 import __main__
 

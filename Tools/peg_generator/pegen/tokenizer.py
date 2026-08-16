@@ -1,6 +1,6 @@
+from collections.abc import Iterator
 import token
 import tokenize
-from collections.abc import Iterator
 
 Mark = int  # NewType('Mark', int)
 

@@ -1,10 +1,9 @@
 """About Dialog for IDLE"""
 
-import os
-import sys
-import webbrowser
 from idlelib import textview
+import os
 from platform import architecture, python_version
+import sys
 from tkinter import (
     BOTH,
     BOTTOM,
@@ -22,6 +21,7 @@ from tkinter import (
     W,
     X,
 )
+import webbrowser
 
 pyver = python_version()
 
@@ -93,19 +93,13 @@ class AboutDialog(Toplevel):
 
         tkpatch = self._root().getvar("tk_patchLevel")
         ext = ".png" if tkpatch >= "8.6" else ".gif"
-        icon = os.path.join(
-            os.path.abspath(os.path.dirname(__file__)), "Icons", f"idle_48{ext}"
-        )
+        icon = os.path.join(os.path.abspath(os.path.dirname(__file__)), "Icons", f"idle_48{ext}")
         self.icon_image = PhotoImage(master=self._root(), file=icon)
         logo = Label(frame_background, image=self.icon_image, bg=self.bg)
         logo.grid(row=0, column=0, sticky=W, rowspan=2, padx=10, pady=10)
 
-        byline_text = (
-            "Python's Integrated Development\nand Learning Environment" + 5 * "\n"
-        )
-        byline = Label(
-            frame_background, text=byline_text, justify=LEFT, fg=self.fg, bg=self.bg
-        )
+        byline_text = "Python's Integrated Development\nand Learning Environment" + 5 * "\n"
+        byline = Label(frame_background, text=byline_text, justify=LEFT, fg=self.fg, bg=self.bg)
         byline.grid(row=2, column=0, sticky=W, columnspan=3, padx=10, pady=5)
 
         forums_url = "https://discuss.python.org"
@@ -130,9 +124,9 @@ class AboutDialog(Toplevel):
         )
         docs.grid(row=7, column=0, columnspan=2, sticky=W, padx=10, pady=10)
 
-        Frame(
-            frame_background, borderwidth=1, relief=SUNKEN, height=2, bg=self.bg
-        ).grid(row=8, column=0, sticky=EW, columnspan=3, padx=5, pady=5)
+        Frame(frame_background, borderwidth=1, relief=SUNKEN, height=2, bg=self.bg).grid(
+            row=8, column=0, sticky=EW, columnspan=3, padx=5, pady=5
+        )
 
         tclver = str(self.info_patchlevel())
         tkver = " and " + tkpatch if tkpatch != tclver else ""
@@ -166,9 +160,9 @@ class AboutDialog(Toplevel):
         )
         self.py_credits.pack(side=LEFT, padx=10, pady=10)
 
-        Frame(
-            frame_background, borderwidth=1, relief=SUNKEN, height=2, bg=self.bg
-        ).grid(row=11, column=0, sticky=EW, columnspan=3, padx=5, pady=5)
+        Frame(frame_background, borderwidth=1, relief=SUNKEN, height=2, bg=self.bg).grid(
+            row=11, column=0, sticky=EW, columnspan=3, padx=5, pady=5
+        )
 
         idle = Label(frame_background, text="IDLE", fg=self.fg, bg=self.bg)
         idle.grid(row=12, column=0, sticky=W, padx=10, pady=0)
@@ -236,9 +230,7 @@ class AboutDialog(Toplevel):
         """
         printer._Printer__setup()
         text = "\n".join(printer._Printer__lines)
-        self._current_textview = textview.view_text(
-            self, title, text, _utest=self._utest
-        )
+        self._current_textview = textview.view_text(self, title, text, _utest=self._utest)
 
     def display_file_text(self, title, filename, encoding=None):
         """Create textview for filename.
@@ -248,9 +240,7 @@ class AboutDialog(Toplevel):
         the title of the popup, and the file encoding.
         """
         fn = os.path.join(os.path.abspath(os.path.dirname(__file__)), filename)
-        self._current_textview = textview.view_file(
-            self, title, fn, encoding, _utest=self._utest
-        )
+        self._current_textview = textview.view_file(self, title, fn, encoding, _utest=self._utest)
 
     def ok(self, event=None):
         "Dismiss help_about dialog."

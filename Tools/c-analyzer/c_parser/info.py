@@ -1,12 +1,12 @@
+from collections import namedtuple
 import enum
 import re
-from collections import namedtuple
 
+from c_common import fsutil
+from c_common.clsutil import classonly
 import c_common.misc as _misc
 import c_common.strutil as _strutil
 import c_common.tables as _tables
-from c_common import fsutil
-from c_common.clsutil import classonly
 
 from .parser._regexes import _STORAGE
 
@@ -811,9 +811,7 @@ class Declaration(HighlevelParsedItem):
     @classmethod
     def _resolve_parent(cls, parsed, *, _kind=None):
         if _kind is None:
-            raise TypeError(
-                f"{cls.kind.value} declarations do not have parents ({parsed})"
-            )
+            raise TypeError(f"{cls.kind.value} declarations do not have parents ({parsed})")
         return super()._resolve_parent(parsed, _kind=_kind)
 
     @classmethod
@@ -1237,8 +1235,7 @@ class _StructUnion(TypeDeclaration):
         # elif fmt == 'full':
         elif fmt == "row":
             members = [
-                Member.from_str(m.rstrip(">").lstrip("<"))
-                for m in datastr[1:-1].split(">, <")
+                Member.from_str(m.rstrip(">").lstrip("<")) for m in datastr[1:-1].split(">, <")
             ]
             return members, None
         else:
@@ -1396,9 +1393,7 @@ class Declarations:
 
     @classmethod
     def from_parsed(cls, items):
-        decls = (
-            resolve_parsed(item) for item in items if item.kind is not KIND.STATEMENT
-        )
+        decls = (resolve_parsed(item) for item in items if item.kind is not KIND.STATEMENT)
         return cls.from_decls(decls)
 
     @classmethod
@@ -1476,18 +1471,12 @@ class Declarations:
     def validate(self):
         for key, decl in self._decls.items():
             if type(key) is not tuple or len(key) != 3:
-                raise ValueError(
-                    f"expected 3-tuple key, got {key!r} (for decl {decl!r})"
-                )
+                raise ValueError(f"expected 3-tuple key, got {key!r} (for decl {decl!r})")
             _filename, _funcname, name = key
             if not name:
-                raise ValueError(
-                    f"expected name in key, got {key!r} (for decl {decl!r})"
-                )
+                raise ValueError(f"expected name in key, got {key!r} (for decl {decl!r})")
             elif type(name) is not str:
-                raise ValueError(
-                    f"expected name in key to be str, got {key!r} (for decl {decl!r})"
-                )
+                raise ValueError(f"expected name in key to be str, got {key!r} (for decl {decl!r})")
             # XXX Check filename type?
             # XXX Check funcname type?
 

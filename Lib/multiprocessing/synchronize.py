@@ -242,9 +242,7 @@ class Condition:
         )
 
     def __setstate__(self, state):
-        (self._lock, self._sleeping_count, self._woken_count, self._wait_semaphore) = (
-            state
-        )
+        (self._lock, self._sleeping_count, self._woken_count, self._wait_semaphore) = state
         self._make_methods()
 
     def __enter__(self):
@@ -260,17 +258,14 @@ class Condition:
     def __repr__(self):
         try:
             num_waiters = (
-                self._sleeping_count._semlock._get_value()
-                - self._woken_count._semlock._get_value()
+                self._sleeping_count._semlock._get_value() - self._woken_count._semlock._get_value()
             )
         except Exception:  # noqa: BLE001
             num_waiters = "unknown"
         return f"<{self.__class__.__name__}({self._lock}, {num_waiters})>"
 
     def wait(self, timeout=None):
-        assert self._lock._semlock._is_mine(), (
-            "must acquire() condition before using wait()"
-        )
+        assert self._lock._semlock._is_mine(), "must acquire() condition before using wait()"
 
         # indicate that this thread is going to sleep
         self._sleeping_count.release()
@@ -301,9 +296,7 @@ class Condition:
         # woken_count from sleeping_count and rezero woken_count
         while self._woken_count.acquire(False):
             res = self._sleeping_count.acquire(False)
-            assert res, (
-                "notify: Bug in sleeping_count.acquire" + "- res should not be False"
-            )
+            assert res, "notify: Bug in sleeping_count.acquire" + "- res should not be False"
 
         sleepers = 0
         while sleepers < n and self._sleeping_count.acquire(False):

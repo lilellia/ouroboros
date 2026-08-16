@@ -58,13 +58,9 @@ class NodeList(list):
         return len(self)
 
     def _set_length(self, value):
-        raise xml.dom.NoModificationAllowedErr(
-            "attempt to modify read-only attribute 'length'"
-        )
+        raise xml.dom.NoModificationAllowedErr("attempt to modify read-only attribute 'length'")
 
-    length = property(
-        _get_length, _set_length, doc="The number of nodes in the NodeList."
-    )
+    length = property(_get_length, _set_length, doc="The number of nodes in the NodeList.")
 
     # For backward compatibility
     def __setstate__(self, state):
@@ -93,13 +89,9 @@ class EmptyNodeList(tuple):
         return 0
 
     def _set_length(self, value):
-        raise xml.dom.NoModificationAllowedErr(
-            "attempt to modify read-only attribute 'length'"
-        )
+        raise xml.dom.NoModificationAllowedErr("attempt to modify read-only attribute 'length'")
 
-    length = property(
-        _get_length, _set_length, doc="The number of nodes in the NodeList."
-    )
+    length = property(_get_length, _set_length, doc="The number of nodes in the NodeList.")
 
 
 def defproperty(klass, name, doc):

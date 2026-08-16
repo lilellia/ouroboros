@@ -16,8 +16,6 @@ from c_common.scriptutil import (
 
 from . import (
     errors as _errors,
-)
-from . import (
     get_preprocessor as _get_preprocessor,
 )
 

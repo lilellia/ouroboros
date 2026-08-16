@@ -20,9 +20,9 @@ barrier, in particular frame and traceback objects.
 
 """
 
+from idlelib import debugger
 import reprlib
 import types
-from idlelib import debugger
 
 debugging = 0
 
@@ -377,9 +377,7 @@ def close_subprocess_debugger(rpcclt):
 
 
 def restart_subprocess_debugger(rpcclt):
-    idb_adap_oid_ret = rpcclt.remotecall(
-        "exec", "start_the_debugger", (gui_adap_oid,), {}
-    )
+    idb_adap_oid_ret = rpcclt.remotecall("exec", "start_the_debugger", (gui_adap_oid,), {})
     assert idb_adap_oid_ret == idb_adap_oid, "Idb restarted with different oid"
 
 

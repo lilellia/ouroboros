@@ -42,9 +42,7 @@ def configure_logger(ns):
 
     if ns.log:
         handler = logging.FileHandler(ns.log, encoding="utf-8", delay=True)
-        handler.setFormatter(
-            logging.Formatter("[{asctime}]{levelname:8s}: {message}", style="{")
-        )
+        handler.setFormatter(logging.Formatter("[{asctime}]{levelname:8s}: {message}", style="{"))
         handler.setLevel(f_level)
         LOG.addHandler(handler)
 

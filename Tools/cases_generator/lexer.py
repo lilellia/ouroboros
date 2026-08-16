@@ -2,9 +2,9 @@
 # Originally by Mark Shannon (mark@hotpy.org)
 # https://gist.github.com/markshannon/db7ab649440b5af765451bb77c7dba34
 
+from dataclasses import dataclass
 import re
 import sys
-from dataclasses import dataclass
 
 
 def choice(*opts):
@@ -102,9 +102,7 @@ NUMBER = "NUMBER"
 simple_escape = r"""([a-zA-Z._~!=&\^\-\\?'"])"""
 decimal_escape = r"""(\d+)"""
 hex_escape = r"""(x[0-9a-fA-F]+)"""
-escape_sequence = (
-    r"""(\\(""" + simple_escape + "|" + decimal_escape + "|" + hex_escape + "))"
-)
+escape_sequence = r"""(\\(""" + simple_escape + "|" + decimal_escape + "|" + hex_escape + "))"
 string_char = r"""([^"\\\n]|""" + escape_sequence + ")"
 str_re = '"' + string_char + '*"'
 STRING = "STRING"
@@ -115,9 +113,7 @@ comment_re = r"//.*|/\*([^*]|\*[^/])*\*/"
 COMMENT = "COMMENT"
 
 newline = r"\n"
-invalid = (
-    r"\S"  # A single non-space character that's not caught by any of the other patterns
-)
+invalid = r"\S"  # A single non-space character that's not caught by any of the other patterns
 matcher = re.compile(
     choice(
         id_re,

@@ -296,11 +296,7 @@ def getFilesForName(name):
                 dirs.remove("CVS")
             # add all *.py files to list
             list.extend(
-                [
-                    os.path.join(root, file)
-                    for file in files
-                    if os.path.splitext(file)[1] == _py_ext
-                ]
+                [os.path.join(root, file) for file in files if os.path.splitext(file)[1] == _py_ext]
             )
         return list
     elif os.path.exists(name):
@@ -358,9 +354,7 @@ class TokenEater:
             for value in filter(
                 lambda node: isinstance(node, ast.FormattedValue), maybe_fstring.values
             ):
-                for call in filter(
-                    lambda node: isinstance(node, ast.Call), ast.walk(value)
-                ):
+                for call in filter(lambda node: isinstance(node, ast.Call), ast.walk(value)):
                     func = call.func
                     if isinstance(func, ast.Name):
                         func_name = func.id
@@ -378,8 +372,7 @@ class TokenEater:
                                 " positional arguments in gettext call: %(source_segment)s"
                             )
                             % {
-                                "source_segment": ast.get_source_segment(tstring, call)
-                                or tstring,
+                                "source_segment": ast.get_source_segment(tstring, call) or tstring,
                                 "file": self.__curfile,
                                 "lineno": lineno,
                             },
@@ -393,8 +386,7 @@ class TokenEater:
                                 " in gettext call: %(source_segment)s"
                             )
                             % {
-                                "source_segment": ast.get_source_segment(tstring, call)
-                                or tstring,
+                                "source_segment": ast.get_source_segment(tstring, call) or tstring,
                                 "file": self.__curfile,
                                 "lineno": lineno,
                             },
@@ -409,8 +401,7 @@ class TokenEater:
                                 " in gettext call: %(source_segment)s"
                             )
                             % {
-                                "source_segment": ast.get_source_segment(tstring, call)
-                                or tstring,
+                                "source_segment": ast.get_source_segment(tstring, call) or tstring,
                                 "file": self.__curfile,
                                 "lineno": lineno,
                             },

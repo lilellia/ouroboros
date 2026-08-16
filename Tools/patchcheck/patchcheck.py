@@ -58,9 +58,7 @@ def get_git_branch():
     """Get the symbolic name for the current git branch"""
     cmd = ["git", "rev-parse", "--abbrev-ref", "HEAD"]
     try:
-        return subprocess.check_output(
-            cmd, stderr=subprocess.DEVNULL, cwd=SRCDIR, encoding="UTF-8"
-        )
+        return subprocess.check_output(cmd, stderr=subprocess.DEVNULL, cwd=SRCDIR, encoding="UTF-8")
     except subprocess.CalledProcessError:
         return None
 
@@ -72,9 +70,7 @@ def get_git_upstream_remote():
     """
     cmd = ["git", "remote", "get-url", "upstream"]
     try:
-        subprocess.check_output(
-            cmd, stderr=subprocess.DEVNULL, cwd=SRCDIR, encoding="UTF-8"
-        )
+        subprocess.check_output(cmd, stderr=subprocess.DEVNULL, cwd=SRCDIR, encoding="UTF-8")
     except subprocess.CalledProcessError:
         return "origin"
     return "upstream"
@@ -277,11 +273,7 @@ def main():
     file_paths = changed_files(base_branch)
     python_files = [fn for fn in file_paths if fn.endswith(".py")]
     c_files = [fn for fn in file_paths if fn.endswith((".c", ".h"))]
-    doc_files = [
-        fn
-        for fn in file_paths
-        if fn.startswith("Doc") and fn.endswith((".rst", ".inc"))
-    ]
+    doc_files = [fn for fn in file_paths if fn.startswith("Doc") and fn.endswith((".rst", ".inc"))]
     misc_files = {p for p in file_paths if p.startswith("Misc")}
     # PEP 8 whitespace rules enforcement.
     normalize_whitespace(python_files)

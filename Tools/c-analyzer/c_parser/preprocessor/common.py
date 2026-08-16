@@ -1,10 +1,11 @@
 import contextlib
-import distutils.ccompiler
 import logging
 import os
 import shlex
 import subprocess
 import sys
+
+import distutils.ccompiler
 
 from .errors import (
     ErrorDirectiveError,

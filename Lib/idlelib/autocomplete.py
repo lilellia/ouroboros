@@ -12,9 +12,7 @@ import sys
 import __main__
 
 # Modified keyword list is used in fetch_completions.
-completion_kwds = [
-    s for s in keyword.kwlist if s not in {"True", "False", "None"}
-]  # In builtins.
+completion_kwds = [s for s in keyword.kwlist if s not in {"True", "False", "None"}]  # In builtins.
 completion_kwds.extend(("match", "case"))  # Context keywords.
 completion_kwds.sort()
 
@@ -162,7 +160,11 @@ class AutoComplete:
             return None
         self.autocompletewindow = self._make_autocomplete_window()
         return not self.autocompletewindow.show_window(
-            comp_lists, "insert-%dc" % len(comp_start), complete, mode, wantwin  # noqa: UP031
+            comp_lists,
+            "insert-%dc" % len(comp_start),  # noqa: UP031
+            complete,
+            mode,
+            wantwin,
         )
 
     def fetch_completions(self, what, mode):
@@ -182,9 +184,7 @@ class AutoComplete:
         except:  # noqa: E722
             rpcclt = None
         if rpcclt:
-            return rpcclt.remotecall(
-                "exec", "get_the_completion_list", (what, mode), {}
-            )
+            return rpcclt.remotecall("exec", "get_the_completion_list", (what, mode), {})
         else:
             if mode == ATTRS:
                 if what == "":  # Main module names.

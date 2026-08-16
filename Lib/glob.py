@@ -11,9 +11,7 @@ import sys
 __all__ = ["escape", "glob", "iglob"]
 
 
-def glob(
-    pathname, *, root_dir=None, dir_fd=None, recursive=False, include_hidden=False
-):
+def glob(pathname, *, root_dir=None, dir_fd=None, recursive=False, include_hidden=False):
     """Return a list of paths matching a pathname pattern.
 
     The pattern may contain simple shell-style wildcards a la
@@ -38,9 +36,7 @@ def glob(
     )
 
 
-def iglob(
-    pathname, *, root_dir=None, dir_fd=None, recursive=False, include_hidden=False
-):
+def iglob(pathname, *, root_dir=None, dir_fd=None, recursive=False, include_hidden=False):
     """Return an iterator which yields the paths matching a pathname pattern.
 
     The pattern may contain simple shell-style wildcards a la
@@ -57,9 +53,7 @@ def iglob(
         root_dir = os.fspath(root_dir)
     else:
         root_dir = pathname[:0]
-    it = _iglob(
-        pathname, root_dir, dir_fd, recursive, False, include_hidden=include_hidden
-    )
+    it = _iglob(pathname, root_dir, dir_fd, recursive, False, include_hidden=include_hidden)
     if not pathname or recursive and _isrecursive(pathname[:2]):
         try:
             s = next(it)  # skip empty string
@@ -84,21 +78,15 @@ def _iglob(pathname, root_dir, dir_fd, recursive, dironly, include_hidden=False)
         return
     if not dirname:
         if recursive and _isrecursive(basename):
-            yield from _glob2(
-                root_dir, basename, dir_fd, dironly, include_hidden=include_hidden
-            )
+            yield from _glob2(root_dir, basename, dir_fd, dironly, include_hidden=include_hidden)
         else:
-            yield from _glob1(
-                root_dir, basename, dir_fd, dironly, include_hidden=include_hidden
-            )
+            yield from _glob1(root_dir, basename, dir_fd, dironly, include_hidden=include_hidden)
         return
     # `os.path.split()` returns the argument itself as a dirname if it is a
     # drive or UNC path.  Prevent an infinite recursion if a drive or UNC path
     # contains magic characters (i.e. r'\\?\C:').
     if dirname != pathname and has_magic(dirname):
-        dirs = _iglob(
-            dirname, root_dir, dir_fd, recursive, True, include_hidden=include_hidden
-        )
+        dirs = _iglob(dirname, root_dir, dir_fd, recursive, True, include_hidden=include_hidden)
     else:
         dirs = [dirname]
     if has_magic(basename):

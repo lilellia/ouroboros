@@ -3,13 +3,13 @@
 
 """Fraction, infinite-precision, rational numbers."""
 
+from decimal import Decimal
 import functools
 import math
 import numbers
 import operator
 import re
 import sys
-from decimal import Decimal
 
 __all__ = ["Fraction"]
 
@@ -274,9 +274,7 @@ class Fraction(numbers.Rational):
         elif type(numerator) is int is type(denominator):
             pass  # *very* normal case
 
-        elif isinstance(numerator, numbers.Rational) and isinstance(
-            denominator, numbers.Rational
-        ):
+        elif isinstance(numerator, numbers.Rational) and isinstance(denominator, numbers.Rational):
             numerator, denominator = (
                 numerator.numerator * denominator.denominator,
                 denominator.numerator * numerator.denominator,
@@ -475,9 +473,7 @@ class Fraction(numbers.Rational):
             negative, significand, exponent = _round_to_figures(
                 self._numerator, self._denominator, figures
             )
-            scientific = (
-                presentation_type in "eE" or exponent > 0 or exponent + figures <= -4
-            )
+            scientific = presentation_type in "eE" or exponent > 0 or exponent + figures <= -4
             point_pos = figures - 1 if scientific else -exponent
 
         # Get the suffix - the part following the digits, if any.
@@ -508,16 +504,13 @@ class Fraction(numbers.Rational):
             min_leading = minimumwidth - len(sign) - len(trailing)
             # When adding thousands separators, they'll be added to the
             # zero-padded portion too, so we need to compensate.
-            leading = leading.zfill(
-                3 * min_leading // 4 + 1 if thousands_sep else min_leading
-            )
+            leading = leading.zfill(3 * min_leading // 4 + 1 if thousands_sep else min_leading)
 
         # Insert thousands separators if required.
         if thousands_sep:
             first_pos = 1 + (len(leading) - 1) % 3
             leading = leading[:first_pos] + "".join(
-                thousands_sep + leading[pos : pos + 3]
-                for pos in range(first_pos, len(leading), 3)
+                thousands_sep + leading[pos : pos + 3] for pos in range(first_pos, len(leading), 3)
             )
 
         # We now have a sign and a body. Pad with fill character if necessary
@@ -817,13 +810,9 @@ class Fraction(numbers.Rational):
             if b.denominator == 1:
                 power = b.numerator
                 if power >= 0:
-                    return Fraction._from_coprime_ints(
-                        a._numerator**power, a._denominator**power
-                    )
+                    return Fraction._from_coprime_ints(a._numerator**power, a._denominator**power)
                 elif a._numerator > 0:
-                    return Fraction._from_coprime_ints(
-                        a._denominator**-power, a._numerator**-power
-                    )
+                    return Fraction._from_coprime_ints(a._denominator**-power, a._numerator**-power)
                 elif a._numerator == 0:
                     raise ZeroDivisionError("Fraction(%s, 0)" % a._denominator**-power)
                 else:
@@ -950,9 +939,7 @@ class Fraction(numbers.Rational):
         """
         # convert other to a Rational instance where reasonable.
         if isinstance(other, numbers.Rational):
-            return op(
-                self._numerator * other.denominator, self._denominator * other.numerator
-            )
+            return op(self._numerator * other.denominator, self._denominator * other.numerator)
         if isinstance(other, float):
             if math.isnan(other) or math.isinf(other):
                 return op(0.0, other)

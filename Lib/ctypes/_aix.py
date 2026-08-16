@@ -47,9 +47,9 @@ naming style.
 
 __author__ = "Michael Felt <aixtools@felt.demon.nl>"
 
-import re
 from ctypes import c_void_p, sizeof
 from os import environ, path
+import re
 from subprocess import DEVNULL, PIPE, Popen
 from sys import executable
 

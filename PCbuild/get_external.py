@@ -5,8 +5,8 @@ import os
 import pathlib
 import sys
 import time
-import zipfile
 from urllib.request import urlretrieve
+import zipfile
 
 
 def fetch_zip(commit_hash, zip_dir, *, org="python", binary=False, verbose):

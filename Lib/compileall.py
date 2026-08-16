@@ -12,13 +12,13 @@ See module py_compile for details of the actual byte-compilation.
 """
 
 import filecmp
+from functools import partial
 import importlib.util
 import os
+from pathlib import Path
 import py_compile
 import struct
 import sys
-from functools import partial
-from pathlib import Path
 
 __all__ = ["compile_dir", "compile_file", "compile_path"]
 
@@ -95,8 +95,7 @@ def compile_dir(
     ProcessPoolExecutor = None
     if ddir is not None and (stripdir is not None or prependdir is not None):
         raise ValueError(
-            "Destination dir (ddir) cannot be used "
-            "in combination with stripdir or prependdir"
+            "Destination dir (ddir) cannot be used in combination with stripdir or prependdir"
         )
     if ddir is not None:
         stripdir = dir
@@ -127,9 +126,7 @@ def compile_dir(
             mp_context = None
         # If workers == 0, let ProcessPoolExecutor choose
         workers = workers or None
-        with ProcessPoolExecutor(
-            max_workers=workers, mp_context=mp_context
-        ) as executor:
+        with ProcessPoolExecutor(max_workers=workers, mp_context=mp_context) as executor:
             results = executor.map(
                 partial(
                     compile_file,
@@ -208,8 +205,7 @@ def compile_file(
 
     if ddir is not None and (stripdir is not None or prependdir is not None):
         raise ValueError(
-            "Destination dir (ddir) cannot be used "
-            "in combination with stripdir or prependdir"
+            "Destination dir (ddir) cannot be used in combination with stripdir or prependdir"
         )
 
     success = True
@@ -321,9 +317,7 @@ def compile_file(
                     print("*** ", end="")
                 # escape non-printable characters in msg
                 encoding = sys.stdout.encoding or sys.getdefaultencoding()
-                msg = err.msg.encode(encoding, errors="backslashreplace").decode(
-                    encoding
-                )
+                msg = err.msg.encode(encoding, errors="backslashreplace").decode(encoding)
                 print(msg)
             except (SyntaxError, UnicodeError, OSError) as e:
                 success = False
@@ -416,8 +410,7 @@ def main():
         action="count",
         dest="quiet",
         default=0,
-        help="output only error messages; -qq will suppress "
-        "the error messages as well.",
+        help="output only error messages; -qq will suppress the error messages as well.",
     )
     parser.add_argument(
         "-b",
@@ -494,9 +487,7 @@ def main():
             "to the equivalent of -l sys.path"
         ),
     )
-    parser.add_argument(
-        "-j", "--workers", default=1, type=int, help="Run compileall concurrently"
-    )
+    parser.add_argument("-j", "--workers", default=1, type=int, help="Run compileall concurrently")
     invalidation_modes = [
         mode.name.lower().replace("_", "-") for mode in py_compile.PycInvalidationMode
     ]
@@ -559,17 +550,13 @@ def main():
             "only for more than one optimization level."
         )
 
-    if args.ddir is not None and (
-        args.stripdir is not None or args.prependdir is not None
-    ):
+    if args.ddir is not None and (args.stripdir is not None or args.prependdir is not None):
         parser.error("-d cannot be used in combination with -s or -p")
 
     # if flist is provided then load it
     if args.flist:
         try:
-            with (
-                sys.stdin if args.flist == "-" else open(args.flist, encoding="utf-8")
-            ) as f:
+            with sys.stdin if args.flist == "-" else open(args.flist, encoding="utf-8") as f:
                 for line in f:
                     compile_dests.append(line.strip())
         except OSError:

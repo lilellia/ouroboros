@@ -10,11 +10,11 @@ The appearance of the widgets is checked by the Query and
 HelpSource htests.  These are run by running query.py.
 """
 
-import sys
-import unittest
 from idlelib import query
 from idlelib.idle_test.mock_tk import Var
+import sys
 from tkinter import END, Tk
+import unittest
 from unittest import mock
 
 from test.support import requires
@@ -435,9 +435,7 @@ class HelpsourceGuiTest(unittest.TestCase):
     def test_click_help_source(self):
         root = Tk()
         root.withdraw()
-        dialog = query.HelpSource(
-            root, "T", menuitem="__test__", filepath=__file__, _utest=True
-        )
+        dialog = query.HelpSource(root, "T", menuitem="__test__", filepath=__file__, _utest=True)
         Equal = self.assertEqual
         Equal(dialog.entry.get(), "__test__")
         Equal(dialog.path.get(), __file__)

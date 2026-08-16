@@ -23,14 +23,10 @@ THIS = os.path.relpath(__file__, ROOT).replace(os.path.sep, posixpath.sep)
 
 DEFAULT_INPUT = os.path.relpath(os.path.join(ROOT, "Python/bytecodes.c"))
 DEFAULT_OUTPUT = os.path.relpath(os.path.join(ROOT, "Python/generated_cases.c.h"))
-DEFAULT_METADATA_OUTPUT = os.path.relpath(
-    os.path.join(ROOT, "Python/opcode_metadata.h")
-)
+DEFAULT_METADATA_OUTPUT = os.path.relpath(os.path.join(ROOT, "Python/opcode_metadata.h"))
 BEGIN_MARKER = "// BEGIN BYTECODES //"
 END_MARKER = "// END BYTECODES //"
-RE_PREDICTED = (
-    r"^\s*(?:PREDICT\(|GO_TO_INSTRUCTION\(|DEOPT_IF\(.*?,\s*)(\w+)\);\s*(?://.*)?$"
-)
+RE_PREDICTED = r"^\s*(?:PREDICT\(|GO_TO_INSTRUCTION\(|DEOPT_IF\(.*?,\s*)(\w+)\);\s*(?://.*)?$"
 UNUSED = "unused"
 BITS_PER_CODE_UNIT = 16
 
@@ -38,9 +34,7 @@ arg_parser = argparse.ArgumentParser(
     description="Generate the code for the interpreter switch.",
     formatter_class=argparse.ArgumentDefaultsHelpFormatter,
 )
-arg_parser.add_argument(
-    "-o", "--output", type=str, help="Generated code", default=DEFAULT_OUTPUT
-)
+arg_parser.add_argument("-o", "--output", type=str, help="Generated code", default=DEFAULT_OUTPUT)
 arg_parser.add_argument(
     "-m",
     "--metadata",
@@ -51,9 +45,7 @@ arg_parser.add_argument(
 arg_parser.add_argument(
     "-l", "--emit-line-directives", help="Emit #line directives", action="store_true"
 )
-arg_parser.add_argument(
-    "input", nargs=argparse.REMAINDER, help="Instruction definition file(s)"
-)
+arg_parser.add_argument("input", nargs=argparse.REMAINDER, help="Instruction definition file(s)")
 
 
 def effect_size(effect: StackEffect) -> tuple[int, str]:
@@ -265,9 +257,7 @@ class Instruction:
             effect for effect in inst.inputs if isinstance(effect, parser.CacheEffect)
         ]
         self.cache_offset = sum(c.size for c in self.cache_effects)
-        self.input_effects = [
-            effect for effect in inst.inputs if isinstance(effect, StackEffect)
-        ]
+        self.input_effects = [effect for effect in inst.inputs if isinstance(effect, StackEffect)]
         self.output_effects = inst.outputs  # For consistency/completeness
         unmoved_names: set[str] = set()
         for ieffect, oeffect in zip(self.input_effects, self.output_effects):
@@ -293,20 +283,15 @@ class Instruction:
         if (family := self.family) and self.name == family.members[0]:  # noqa: SIM102
             if cache_size := family.size:
                 out.emit(
-                    f"static_assert({cache_size} == "
-                    f'{self.cache_offset}, "incorrect cache size");'
+                    f'static_assert({cache_size} == {self.cache_offset}, "incorrect cache size");'
                 )
 
         # Write input stack effect variable declarations and initializations
         ieffects = list(reversed(self.input_effects))
         for i, ieffect in enumerate(ieffects):
-            isize = string_effect_size(
-                list_effect_size([ieff for ieff in ieffects[: i + 1]])
-            )
+            isize = string_effect_size(list_effect_size([ieff for ieff in ieffects[: i + 1]]))
             if ieffect.size:
-                src = StackEffect(
-                    f"(stack_pointer - {maybe_parenthesize(isize)})", "PyObject **"
-                )
+                src = StackEffect(f"(stack_pointer - {maybe_parenthesize(isize)})", "PyObject **")
             elif ieffect.cond:
                 src = StackEffect(
                     f"({ieffect.cond}) ? stack_pointer[-{maybe_parenthesize(isize)}] : NULL",
@@ -356,13 +341,9 @@ class Instruction:
         for i, oeffect in enumerate(oeffects):
             if oeffect.name in self.unmoved_names:
                 continue
-            osize = string_effect_size(
-                list_effect_size([oeff for oeff in oeffects[: i + 1]])
-            )
+            osize = string_effect_size(list_effect_size([oeff for oeff in oeffects[: i + 1]]))
             if oeffect.size:
-                dst = StackEffect(
-                    f"stack_pointer - {maybe_parenthesize(osize)}", "PyObject **"
-                )
+                dst = StackEffect(f"stack_pointer - {maybe_parenthesize(osize)}", "PyObject **")
             else:
                 dst = StackEffect(f"stack_pointer[-{maybe_parenthesize(osize)}]", "")
             out.assign(dst, oeffect)
@@ -388,9 +369,7 @@ class Instruction:
                 else:
                     typ = f"uint{bits}_t "
                     func = f"read_u{bits}"
-                out.emit(
-                    f"{typ}{ceffect.name} = {func}(&next_instr[{cache_offset}].cache);"
-                )
+                out.emit(f"{typ}{ceffect.name} = {func}(&next_instr[{cache_offset}].cache);")
             cache_offset += ceffect.size
         assert cache_offset == self.cache_offset + cache_adjust
 
@@ -435,9 +414,7 @@ class Instruction:
                     if ieff.name in names_to_skip:
                         continue
                     if ieff.size:
-                        out.write_raw(
-                            f"{space}for (int _i = {ieff.size}; --_i >= 0;) {{\n"
-                        )
+                        out.write_raw(f"{space}for (int _i = {ieff.size}; --_i >= 0;) {{\n")
                         out.write_raw(f"{space}    Py_DECREF({ieff.name}[_i]);\n")
                         out.write_raw(f"{space}}}\n")
                     else:
@@ -518,9 +495,7 @@ class Analyzer:
     errors: int = 0
     emit_line_directives: bool = False
 
-    def __init__(
-        self, input_filenames: list[str], output_filename: str, metadata_filename: str
-    ):
+    def __init__(self, input_filenames: list[str], output_filename: str, metadata_filename: str):
         """Read the input file."""
         self.input_filenames = input_filenames
         self.output_filename = output_filename
@@ -590,9 +565,7 @@ class Analyzer:
             if tkn.text == BEGIN_MARKER:
                 break
         else:
-            raise psr.make_syntax_error(
-                f"Couldn't find {BEGIN_MARKER!r} in {psr.filename}"
-            )
+            raise psr.make_syntax_error(f"Couldn't find {BEGIN_MARKER!r} in {psr.filename}")
         start = psr.getpos()
 
         # Find end marker, then delete everything after it
@@ -615,8 +588,8 @@ class Analyzer:
                                 f"previous definition @ {self.instrs[name].inst.context}",
                                 thing_first_token,
                             )
-                        self.everything[instrs_idx[name]] = (
-                            OverriddenInstructionPlaceHolder(name=name)
+                        self.everything[instrs_idx[name]] = OverriddenInstructionPlaceHolder(
+                            name=name
                         )
                     if name not in self.instrs and thing.override:
                         raise psr.make_syntax_error(
@@ -714,9 +687,7 @@ class Analyzer:
             ]
             if members != family.members:
                 unknown = set(family.members) - set(members)
-                self.error(
-                    f"Family {family.name!r} has unknown members: {unknown}", family
-                )
+                self.error(f"Family {family.name!r} has unknown members: {unknown}", family)
             if len(members) < 2:
                 continue
             expected_effects = self.effect_counts(members[0])
@@ -775,9 +746,7 @@ class Analyzer:
             parts.append(part)
             format += instr.instr_fmt
         final_sp = sp
-        return SuperInstruction(
-            super.name, stack, initial_sp, final_sp, format, super, parts
-        )
+        return SuperInstruction(super.name, stack, initial_sp, final_sp, format, super, parts)
 
     def analyze_macro(self, macro: parser.Macro) -> MacroInstruction:
         components = self.check_macro_components(macro)
@@ -803,9 +772,7 @@ class Analyzer:
                 case _:
                     typing.assert_never(component)
         final_sp = sp
-        return MacroInstruction(
-            macro.name, stack, initial_sp, final_sp, format, macro, parts
-        )
+        return MacroInstruction(macro.name, stack, initial_sp, final_sp, format, macro, parts)
 
     def analyze_instruction(
         self, instr: Instruction, stack: list[StackEffect], sp: int
@@ -829,9 +796,7 @@ class Analyzer:
                 components.append(self.instrs[op.name])
         return components
 
-    def check_macro_components(
-        self, macro: parser.Macro
-    ) -> list[InstructionOrCacheEffect]:
+    def check_macro_components(self, macro: parser.Macro) -> list[InstructionOrCacheEffect]:
         components: list[InstructionOrCacheEffect] = []
         for uop in macro.uops:
             match uop:
@@ -858,9 +823,7 @@ class Analyzer:
         for thing in components:
             match thing:
                 case Instruction() as instr:
-                    if any(
-                        eff.size for eff in instr.input_effects + instr.output_effects
-                    ):
+                    if any(eff.size for eff in instr.input_effects + instr.output_effects):
                         # TODO: Eventually this will be needed, at least for macros.
                         self.error(
                             f"Instruction {instr.name!r} has variable-sized stack effect, "
@@ -879,9 +842,7 @@ class Analyzer:
         # and 'lowest' and 'highest' are the extremes.
         # Note that 'lowest' may be negative.
         # TODO: Reverse the numbering.
-        stack = [
-            StackEffect(f"_tmp_{i + 1}", "") for i in reversed(range(highest - lowest))
-        ]
+        stack = [StackEffect(f"_tmp_{i + 1}", "") for i in reversed(range(highest - lowest))]
         return stack, -lowest
 
     def get_stack_effect_info(
@@ -908,21 +869,13 @@ class Analyzer:
                     pushed = ""
             case parser.Super():
                 instr = self.super_instrs[thing.name]
-                popped = "+".join(
-                    effect_str(comp.instr.input_effects) for comp in instr.parts
-                )
-                pushed = "+".join(
-                    effect_str(comp.instr.output_effects) for comp in instr.parts
-                )
+                popped = "+".join(effect_str(comp.instr.input_effects) for comp in instr.parts)
+                pushed = "+".join(effect_str(comp.instr.output_effects) for comp in instr.parts)
             case parser.Macro():
                 instr = self.macro_instrs[thing.name]
                 parts = [comp for comp in instr.parts if isinstance(comp, Component)]
-                popped = "+".join(
-                    effect_str(comp.instr.input_effects) for comp in parts
-                )
-                pushed = "+".join(
-                    effect_str(comp.instr.output_effects) for comp in parts
-                )
+                popped = "+".join(effect_str(comp.instr.input_effects) for comp in parts)
+                pushed = "+".join(effect_str(comp.instr.output_effects) for comp in parts)
             case _:
                 typing.assert_never(thing)
         return instr, popped, pushed
@@ -938,9 +891,7 @@ class Analyzer:
                 popped_data.append((instr, popped))
                 pushed_data.append((instr, pushed))
 
-        def write_function(
-            direction: str, data: list[tuple[AnyInstruction, str]]
-        ) -> None:
+        def write_function(direction: str, data: list[tuple[AnyInstruction, str]]) -> None:
             self.out.emit("")
             self.out.emit("#ifndef NEED_OPCODE_METADATA")
             self.out.emit(
@@ -948,9 +899,7 @@ class Analyzer:
             )
             self.out.emit("#else")
             self.out.emit("int")
-            self.out.emit(
-                f"_PyOpcode_num_{direction}(int opcode, int oparg, bool jump) {{"
-            )
+            self.out.emit(f"_PyOpcode_num_{direction}(int opcode, int oparg, bool jump) {{")
             self.out.emit("    switch(opcode) {")
             for instr, effect in data:
                 self.out.emit(f"        case {instr.name}:")
@@ -1019,13 +968,9 @@ class Analyzer:
 
             # Write metadata array declaration
             self.out.emit("#ifndef NEED_OPCODE_METADATA")
-            self.out.emit(
-                "extern const struct opcode_metadata _PyOpcode_opcode_metadata[256];"
-            )
+            self.out.emit("extern const struct opcode_metadata _PyOpcode_opcode_metadata[256];")
             self.out.emit("#else")
-            self.out.emit(
-                "const struct opcode_metadata _PyOpcode_opcode_metadata[256] = {"
-            )
+            self.out.emit("const struct opcode_metadata _PyOpcode_opcode_metadata[256] = {")
 
             # Write metadata for each instruction
             for thing in self.everything:
@@ -1048,21 +993,15 @@ class Analyzer:
 
     def write_metadata_for_inst(self, instr: Instruction) -> None:
         """Write metadata for a single instruction."""
-        self.out.emit(
-            f"    [{instr.name}] = {{ true, {INSTR_FMT_PREFIX}{instr.instr_fmt} }},"
-        )
+        self.out.emit(f"    [{instr.name}] = {{ true, {INSTR_FMT_PREFIX}{instr.instr_fmt} }},")
 
     def write_metadata_for_super(self, sup: SuperInstruction) -> None:
         """Write metadata for a super-instruction."""
-        self.out.emit(
-            f"    [{sup.name}] = {{ true, {INSTR_FMT_PREFIX}{sup.instr_fmt} }},"
-        )
+        self.out.emit(f"    [{sup.name}] = {{ true, {INSTR_FMT_PREFIX}{sup.instr_fmt} }},")
 
     def write_metadata_for_macro(self, mac: MacroInstruction) -> None:
         """Write metadata for a macro-instruction."""
-        self.out.emit(
-            f"    [{mac.name}] = {{ true, {INSTR_FMT_PREFIX}{mac.instr_fmt} }},"
-        )
+        self.out.emit(f"    [{mac.name}] = {{ true, {INSTR_FMT_PREFIX}{mac.instr_fmt} }},")
 
     def write_instructions(self) -> None:
         """Write instructions to output file."""
@@ -1161,8 +1100,7 @@ class Analyzer:
                 and (cache_size := family.size)
             ):
                 self.out.emit(
-                    f"static_assert({cache_size} == "
-                    f'{cache_adjust}, "incorrect cache size");'
+                    f'static_assert({cache_size} == {cache_adjust}, "incorrect cache size");'
                 )
 
     @contextlib.contextmanager
@@ -1218,17 +1156,13 @@ def extract_block_text(block: parser.Block) -> tuple[list[str], bool, list[str],
         blocklines.pop()
 
     # Separate CHECK_EVAL_BREAKER() macro from end
-    check_eval_breaker = (
-        blocklines != [] and blocklines[-1].strip() == "CHECK_EVAL_BREAKER();"
-    )
+    check_eval_breaker = blocklines != [] and blocklines[-1].strip() == "CHECK_EVAL_BREAKER();"
     if check_eval_breaker:
         del blocklines[-1]
 
     # Separate PREDICT(...) macros from end
     predictions: list[str] = []
-    while blocklines and (
-        m := re.match(r"^\s*PREDICT\((\w+)\);\s*(?://.*)?$", blocklines[-1])
-    ):
+    while blocklines and (m := re.match(r"^\s*PREDICT\((\w+)\);\s*(?://.*)?$", blocklines[-1])):
         predictions.insert(0, m.group(1))
         blocklines.pop()
 
@@ -1258,9 +1192,7 @@ def always_exits(lines: list[str]) -> bool:
 
 def variable_used(node: parser.Node, name: str) -> bool:
     """Determine whether a variable with a given name is used in a node."""
-    return any(
-        token.kind == "IDENTIFIER" and token.text == name for token in node.tokens
-    )
+    return any(token.kind == "IDENTIFIER" and token.text == name for token in node.tokens)
 
 
 def main():
@@ -1268,9 +1200,7 @@ def main():
     args = arg_parser.parse_args()  # Prints message and sys.exit(2) on error
     if len(args.input) == 0:
         args.input.append(DEFAULT_INPUT)
-    a = Analyzer(
-        args.input, args.output, args.metadata
-    )  # Raises OSError if input unreadable
+    a = Analyzer(args.input, args.output, args.metadata)  # Raises OSError if input unreadable
     if args.emit_line_directives:
         a.emit_line_directives = True
     a.parse()  # Raises SyntaxError on failure

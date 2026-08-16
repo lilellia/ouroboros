@@ -1,11 +1,16 @@
 import abc
 import collections
+from collections.abc import Mapping
 import contextlib  # noqa: F401
+from contextlib import suppress
 import csv
 import email
 import functools
+from importlib import import_module
+from importlib.abc import MetaPathFinder
 import inspect
 import itertools
+from itertools import starmap
 import operator
 import os
 import pathlib
@@ -13,14 +18,9 @@ import posixpath
 import re
 import sys
 import textwrap
+from typing import List, Optional, cast  # noqa: F401, UP035
 import warnings
 import zipfile
-from collections.abc import Mapping
-from contextlib import suppress
-from importlib import import_module
-from importlib.abc import MetaPathFinder
-from itertools import starmap
-from typing import List, Optional, cast  # noqa: F401, UP035
 
 from . import _adapters, _meta
 from ._collections import FreezableDefaultDict, Pair
@@ -260,10 +260,7 @@ class EntryPoint(DeprecatedTuple):
         raise AttributeError("EntryPoint objects are immutable.")
 
     def __repr__(self):
-        return (
-            f"EntryPoint(name={self.name!r}, value={self.value!r}, "
-            f"group={self.group!r})"
-        )
+        return f"EntryPoint(name={self.name!r}, value={self.value!r}, group={self.group!r})"
 
     def __hash__(self):
         return hash(self._key())
@@ -344,13 +341,9 @@ class FileHash:
 
 class DeprecatedNonAbstract:
     def __new__(cls, *args, **kwargs):
-        all_names = {
-            name for subclass in inspect.getmro(cls) for name in vars(subclass)
-        }
+        all_names = {name for subclass in inspect.getmro(cls) for name in vars(subclass)}
         abstract = {
-            name
-            for name in all_names
-            if getattr(getattr(cls, name), "__isabstractmethod__", False)
+            name for name in all_names if getattr(getattr(cls, name), "__isabstractmethod__", False)
         }
         if abstract:
             warnings.warn(
@@ -427,9 +420,7 @@ class Distribution(DeprecatedNonAbstract):
     @staticmethod
     def _discover_resolvers():
         """Search the meta_path for resolvers."""
-        declared = (
-            getattr(finder, "find_distributions", None) for finder in sys.meta_path
-        )
+        declared = (getattr(finder, "find_distributions", None) for finder in sys.meta_path)
         return filter(None, declared)
 
     @property
@@ -790,9 +781,7 @@ class MetadataPathFinder(DistributionFinder):
     def _search_paths(cls, name, paths):
         """Find metadata directories in paths heuristically."""
         prepared = Prepared(name)
-        return itertools.chain.from_iterable(
-            path.search(prepared) for path in map(FastPath, paths)
-        )
+        return itertools.chain.from_iterable(path.search(prepared) for path in map(FastPath, paths))
 
     @classmethod
     def invalidate_caches(cls):
@@ -829,10 +818,7 @@ class PathDistribution(Distribution):
         normalized name from the file system path.
         """
         stem = os.path.basename(str(self._path))
-        return (
-            pass_none(Prepared.normalize)(self._name_from_stem(stem))
-            or super()._normalized_name
-        )
+        return pass_none(Prepared.normalize)(self._name_from_stem(stem)) or super()._normalized_name
 
     @staticmethod
     def _name_from_stem(stem):
@@ -906,9 +892,7 @@ def entry_points(**params) -> EntryPoints:
 
     :return: EntryPoints for all installed packages.
     """
-    eps = itertools.chain.from_iterable(
-        dist.entry_points for dist in _unique(distributions())
-    )
+    eps = itertools.chain.from_iterable(dist.entry_points for dist in _unique(distributions()))
     return EntryPoints(eps).select(**params)
 
 

@@ -10,15 +10,11 @@ from c_common.tables import parse_table as _parse_table
 
 from ..source import (
     good_file as _good_file,
-)
-from ..source import (
     resolve as _resolve_source,
 )
-from . import errors as _errors
 from . import (
+    errors as _errors,
     gcc as _gcc,
-)
-from . import (
     pure as _pure,
 )
 
@@ -156,9 +152,7 @@ def _resolve_file_values(filename, file_values):
 
 
 def _parse_macros(macros):
-    for row, srcfile in _parse_table(
-        macros, "\t", "glob\tname\tvalue", rawsep="=", default=None
-    ):
+    for row, srcfile in _parse_table(macros, "\t", "glob\tname\tvalue", rawsep="=", default=None):
         yield row
 
 

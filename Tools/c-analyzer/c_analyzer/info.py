@@ -1,8 +1,8 @@
 import os.path
 
-import c_common.misc as _misc
 from c_common import fsutil
 from c_common.clsutil import classonly
+import c_common.misc as _misc
 from c_parser.info import (
     KIND,
     Declaration,
@@ -113,13 +113,9 @@ class Analyzed:
         # Check extra.
         for key, value in extra.items():
             if key.startswith("_"):
-                raise ValueError(
-                    f"extra items starting with {'_'!r} not allowed, got {extra!r}"
-                )
+                raise ValueError(f"extra items starting with {'_'!r} not allowed, got {extra!r}")
             if hasattr(item, key) and not callable(getattr(item, key)):
-                raise ValueError(
-                    f"extra cannot override item, got {value!r} for key {key!r}"
-                )
+                raise ValueError(f"extra cannot override item, got {value!r} for key {key!r}")
 
     def __repr__(self):
         kwargs = [

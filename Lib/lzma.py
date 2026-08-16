@@ -48,10 +48,10 @@ __all__ = [
 ]
 
 import _compression
+from _lzma import *
 import builtins
 import io
 import os
-from _lzma import *
 
 _MODE_CLOSED = 0
 _MODE_READ = 1
@@ -132,8 +132,7 @@ class LZMAFile(_compression.BaseStream):
                 )
             if preset is not None:
                 raise ValueError(
-                    "Cannot specify a preset compression "
-                    "level when opening a file for reading"
+                    "Cannot specify a preset compression level when opening a file for reading"
                 )
             if format is None:
                 format = FORMAT_AUTO
@@ -398,9 +397,7 @@ def decompress(data, format=FORMAT_AUTO, memlimit=None, filters=None):
                 raise  # Error on the first iteration; bail out.
         results.append(res)
         if not decomp.eof:
-            raise LZMAError(
-                "Compressed data ended before the end-of-stream marker was reached"
-            )
+            raise LZMAError("Compressed data ended before the end-of-stream marker was reached")
         data = decomp.unused_data
         if not data:
             break

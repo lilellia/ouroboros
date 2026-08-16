@@ -92,20 +92,22 @@ ALERT_DESCRIPTION_UNKNOWN_PSK_IDENTITY
 """
 
 import _ssl  # if we can't import it, let the error propagate
-import os
-import sys
 from _ssl import (
     SSLCertVerificationError,
     SSLError,
     _SSLContext,
+    nid2obj as _nid2obj,
+    txt2obj as _txt2obj,
 )
-from _ssl import nid2obj as _nid2obj
-from _ssl import txt2obj as _txt2obj
 from collections import namedtuple
-from enum import Enum as _Enum
-from enum import IntEnum as _IntEnum
-from enum import IntFlag as _IntFlag
-from enum import _simple_enum
+from enum import (
+    Enum as _Enum,
+    IntEnum as _IntEnum,
+    IntFlag as _IntFlag,
+    _simple_enum,
+)
+import os
+import sys
 
 try:
     from _ssl import RAND_egd  # noqa: F401
@@ -123,9 +125,7 @@ _IntEnum._convert_(
     source=_ssl,
 )
 
-_IntFlag._convert_(
-    "Options", __name__, lambda name: name.startswith("OP_"), source=_ssl
-)
+_IntFlag._convert_("Options", __name__, lambda name: name.startswith("OP_"), source=_ssl)
 
 _IntEnum._convert_(
     "AlertDescription",
@@ -138,13 +138,9 @@ _IntEnum._convert_(
     "SSLErrorNumber", __name__, lambda name: name.startswith("SSL_ERROR_"), source=_ssl
 )
 
-_IntFlag._convert_(
-    "VerifyFlags", __name__, lambda name: name.startswith("VERIFY_"), source=_ssl
-)
+_IntFlag._convert_("VerifyFlags", __name__, lambda name: name.startswith("VERIFY_"), source=_ssl)
 
-_IntEnum._convert_(
-    "VerifyMode", __name__, lambda name: name.startswith("CERT_"), source=_ssl
-)
+_IntEnum._convert_("VerifyMode", __name__, lambda name: name.startswith("CERT_"), source=_ssl)
 
 PROTOCOL_SSLv23 = _SSLMethod.PROTOCOL_SSLv23 = _SSLMethod.PROTOCOL_TLS  # noqa: F821
 _PROTOCOL_NAMES = {value: name for name, value in _SSLMethod.__members__.items()}  # noqa: F821
@@ -259,7 +255,6 @@ if sys.platform == "win32":
 import base64  # for DER-to-PEM translation
 import errno
 import socket as _socket
-import warnings
 from socket import (
     _GLOBAL_DEFAULT_TIMEOUT,
     SO_TYPE,
@@ -268,6 +263,7 @@ from socket import (
     create_connection,
     socket,
 )
+import warnings
 
 socket_error = OSError  # keep that public name in module namespace
 
@@ -306,21 +302,15 @@ def _dnsname_match(dn, hostname):
 
     if "*" in dn_remainder:
         # Only match wildcard in leftmost segment.
-        raise CertificateError(
-            f"wildcard can only be present in the leftmost label: {dn!r}."
-        )
+        raise CertificateError(f"wildcard can only be present in the leftmost label: {dn!r}.")
 
     if not sep:
         # no right side
-        raise CertificateError(
-            f"sole wildcard without additional labels are not support: {dn!r}."
-        )
+        raise CertificateError(f"sole wildcard without additional labels are not support: {dn!r}.")
 
     if dn_leftmost != "*":
         # no partial wildcard matching
-        raise CertificateError(
-            f"partial wildcards in leftmost label are not supported: {dn!r}."
-        )
+        raise CertificateError(f"partial wildcards in leftmost label are not supported: {dn!r}.")
 
     hostname_leftmost, sep, hostname_remainder = hostname.partition(".")
     if not hostname_leftmost or not sep:
@@ -469,9 +459,7 @@ class SSLContext(_SSLContext):
             session=session,
         )
 
-    def wrap_bio(
-        self, incoming, outgoing, server_side=False, server_hostname=None, session=None
-    ):
+    def wrap_bio(self, incoming, outgoing, server_side=False, server_hostname=None, session=None):
         # Need to encode server_hostname here because _wrap_bio() can only
         # handle ASCII str.
         return self.sslobject_class._create(
@@ -484,9 +472,7 @@ class SSLContext(_SSLContext):
         )
 
     def set_npn_protocols(self, npn_protocols):
-        warnings.warn(
-            "ssl NPN is deprecated, use ALPN instead", DeprecationWarning, stacklevel=2
-        )
+        warnings.warn("ssl NPN is deprecated, use ALPN instead", DeprecationWarning, stacklevel=2)
         protos = bytearray()
         for protocol in npn_protocols:
             b = bytes(protocol, "ascii")
@@ -530,9 +516,7 @@ class SSLContext(_SSLContext):
                         try:
                             self.load_verify_locations(cadata=cert)
                         except SSLError as exc:
-                            warnings.warn(
-                                f"Bad certificate in Windows certificate store: {exc!s}"
-                            )
+                            warnings.warn(f"Bad certificate in Windows certificate store: {exc!s}")
         except PermissionError:
             warnings.warn("unable to enumerate Windows certificate store")
 
@@ -692,9 +676,7 @@ class SSLContext(_SSLContext):
         super(SSLContext, SSLContext).verify_mode.__set__(self, value)
 
 
-def create_default_context(
-    purpose=Purpose.SERVER_AUTH, *, cafile=None, capath=None, cadata=None
-):
+def create_default_context(purpose=Purpose.SERVER_AUTH, *, cafile=None, capath=None, cadata=None):
     """Create a SSLContext object with default settings.
 
     NOTE: The protocol and settings may change anytime without prior
@@ -914,9 +896,7 @@ class SSLObject:
         """Return the currently selected NPN protocol as a string, or ``None``
         if a next protocol was not negotiated or if NPN is not supported by one
         of the peers."""
-        warnings.warn(
-            "ssl NPN is deprecated, use ALPN instead", DeprecationWarning, stacklevel=2
-        )
+        warnings.warn("ssl NPN is deprecated, use ALPN instead", DeprecationWarning, stacklevel=2)
 
     def selected_alpn_protocol(self):
         """Return the currently selected ALPN protocol as a string, or ``None``
@@ -1174,9 +1154,7 @@ class SSLSocket(socket):
     @_sslcopydoc
     def selected_npn_protocol(self):
         self._checkClosed()
-        warnings.warn(
-            "ssl NPN is deprecated, use ALPN instead", DeprecationWarning, stacklevel=2
-        )
+        warnings.warn("ssl NPN is deprecated, use ALPN instead", DeprecationWarning, stacklevel=2)
 
     @_sslcopydoc
     def selected_alpn_protocol(self):
@@ -1233,9 +1211,7 @@ class SSLSocket(socket):
     def sendmsg(self, *args, **kwargs):
         # Ensure programs don't send data unencrypted if they try to
         # use this method.
-        raise NotImplementedError(
-            f"sendmsg not allowed on instances of {self.__class__}"
-        )
+        raise NotImplementedError(f"sendmsg not allowed on instances of {self.__class__}")
 
     def sendall(self, data, flags=0):
         self._checkClosed()
@@ -1303,21 +1279,15 @@ class SSLSocket(socket):
     def recvfrom_into(self, buffer, nbytes=None, flags=0):
         self._checkClosed()
         if self._sslobj is not None:
-            raise ValueError(
-                f"recvfrom_into not allowed on instances of {self.__class__}"
-            )
+            raise ValueError(f"recvfrom_into not allowed on instances of {self.__class__}")
         else:
             return super().recvfrom_into(buffer, nbytes, flags)
 
     def recvmsg(self, *args, **kwargs):
-        raise NotImplementedError(
-            f"recvmsg not allowed on instances of {self.__class__}"
-        )
+        raise NotImplementedError(f"recvmsg not allowed on instances of {self.__class__}")
 
     def recvmsg_into(self, *args, **kwargs):
-        raise NotImplementedError(
-            f"recvmsg_into not allowed on instances of {self.__class__}"
-        )
+        raise NotImplementedError(f"recvmsg_into not allowed on instances of {self.__class__}")
 
     @_sslcopydoc
     def pending(self):
@@ -1468,9 +1438,7 @@ def cert_time_to_seconds(cert_time):
     try:
         month_number = months.index(cert_time[:3].title()) + 1
     except ValueError:
-        raise ValueError(
-            f'time data {cert_time!r} does not match format "%b{time_format}"'
-        )
+        raise ValueError(f'time data {cert_time!r} does not match format "%b{time_format}"')
     else:
         # found valid month
         tt = strptime(cert_time[3:], time_format)

@@ -6,6 +6,7 @@ ccbench, a Python concurrency benchmark.
 """
 
 import itertools
+from optparse import SUPPRESS_HELP, OptionParser
 import os
 import platform
 import socket
@@ -13,7 +14,6 @@ import subprocess
 import sys
 import threading
 import time
-from optparse import SUPPRESS_HELP, OptionParser
 
 # Compatibility
 try:
@@ -352,9 +352,7 @@ def run_latency_test(func, args, nthreads):
     # Run the client and wait for the first ping(s) to arrive before
     # unblocking the background threads.
     chunks = []
-    process = run_latency_client(
-        addr=sock.getsockname(), nb_pings=nb_pings, interval=interval
-    )
+    process = run_latency_client(addr=sock.getsockname(), nb_pings=nb_pings, interval=interval)
     s = _recv(sock, 4096)
     _time = time.time
 
@@ -491,9 +489,7 @@ def run_bandwidth_test(func, args, nthreads):
 
         # Run the client and wait for the first packet to arrive before
         # unblocking the background threads.
-        process = run_bandwidth_client(
-            addr=addr, packet_size=packet_size, duration=duration
-        )
+        process = run_bandwidth_client(addr=addr, packet_size=packet_size, duration=duration)
         _time = time.time
         # This will also wait for the parent to be ready
         s = _recv(sock, packet_size)

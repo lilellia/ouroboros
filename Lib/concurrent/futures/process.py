@@ -45,21 +45,21 @@ Process #1..n:
 
 __author__ = "Brian Quinlan (brian@sweetapp.com)"
 
+from concurrent.futures import _base
+from functools import partial
 import itertools
 import multiprocessing as mp
 
 # This import is required to load the multiprocessing.connection submodule
 # so that it can be accessed later as `mp.connection`
 import multiprocessing.connection
+from multiprocessing.queues import Queue
 import os
 import queue
 import sys
 import threading
-import weakref
-from concurrent.futures import _base
-from functools import partial
-from multiprocessing.queues import Queue
 from traceback import format_exception
+import weakref
 
 _threads_wakeups = weakref.WeakKeyDictionary()
 _global_shutdown = False
@@ -273,13 +273,9 @@ def _process_worker(call_queue, result_queue, initializer, initargs, max_tasks=N
             r = call_item.fn(*call_item.args, **call_item.kwargs)
         except BaseException as e:  # noqa: BLE001
             exc = _ExceptionWithTraceback(e, e.__traceback__)
-            _sendback_result(
-                result_queue, call_item.work_id, exception=exc, exit_pid=exit_pid
-            )
+            _sendback_result(result_queue, call_item.work_id, exception=exc, exit_pid=exit_pid)
         else:
-            _sendback_result(
-                result_queue, call_item.work_id, result=r, exit_pid=exit_pid
-            )
+            _sendback_result(result_queue, call_item.work_id, result=r, exit_pid=exit_pid)
             del r
 
         # Liberate the resource as soon as possible, to avoid holding onto
@@ -317,9 +313,7 @@ class _ExecutorManagerThread(threading.Thread):
         # will wake up the queue management thread so that it can terminate
         # if there is no pending work item.
         def weakref_cb(_, thread_wakeup=self.thread_wakeup):
-            mp.util.debug(
-                "Executor collected: triggering callback for QueueManager wakeup"
-            )
+            mp.util.debug("Executor collected: triggering callback for QueueManager wakeup")
             thread_wakeup.wakeup()
 
         self.executor_reference = weakref.ref(executor, weakref_cb)
@@ -414,9 +408,7 @@ class _ExecutorManagerThread(threading.Thread):
 
                 if work_item.future.set_running_or_notify_cancel():
                     self.call_queue.put(
-                        _CallItem(
-                            work_id, work_item.fn, work_item.args, work_item.kwargs
-                        ),
+                        _CallItem(work_id, work_item.fn, work_item.args, work_item.kwargs),
                         block=True,
                     )
                 else:
@@ -494,9 +486,7 @@ class _ExecutorManagerThread(threading.Thread):
         executor = self.executor_reference()
         if executor is not None:
             executor._broken = (
-                "A child process terminated "
-                "abruptly, the process pool is not "
-                "usable anymore"
+                "A child process terminated abruptly, the process pool is not usable anymore"
             )
             executor._shutdown_thread = True
             executor = None
@@ -784,9 +774,7 @@ class ProcessPoolExecutor(_base.Executor):
                 self._launch_processes()
             self._executor_manager_thread = _ExecutorManagerThread(self)
             self._executor_manager_thread.start()
-            _threads_wakeups[self._executor_manager_thread] = (
-                self._executor_manager_thread_wakeup
-            )
+            _threads_wakeups[self._executor_manager_thread] = self._executor_manager_thread_wakeup
 
     def _adjust_process_count(self):
         # if there's an idle process, we don't need to spawn a new one.
@@ -833,9 +821,7 @@ class ProcessPoolExecutor(_base.Executor):
             if self._shutdown_thread:
                 raise RuntimeError("cannot schedule new futures after shutdown")
             if _global_shutdown:
-                raise RuntimeError(
-                    "cannot schedule new futures after interpreter shutdown"
-                )
+                raise RuntimeError("cannot schedule new futures after interpreter shutdown")
 
             f = _base.Future()
             w = _WorkItem(f, fn, args, kwargs)

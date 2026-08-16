@@ -12,8 +12,8 @@ For EditorWindows, <<toggle-code-context>> is bound to CodeContext(self).
 toggle_code_context_event.
 """
 
-import re
 from idlelib.config import idleConf
+import re
 from sys import maxsize as INFINITY
 from tkinter import Frame, TclError, Text
 from tkinter.constants import NSEW, SUNKEN
@@ -120,11 +120,7 @@ class CodeContext:
             padx = 0
             border = 0
             for widget in widgets:
-                info = (
-                    widget.grid_info()
-                    if widget is self.editwin.text
-                    else widget.pack_info()
-                )
+                info = widget.grid_info() if widget is self.editwin.text else widget.pack_info()
                 padx += widget.tk.getint(info["padx"])
                 padx += widget.tk.getint(widget.cget("padx"))
                 border += widget.tk.getint(widget.cget("border"))
@@ -146,12 +142,8 @@ class CodeContext:
             # Grid the context widget above the text widget.
             context.grid(row=0, column=1, sticky=NSEW)
 
-            line_number_colors = idleConf.GetHighlight(
-                idleConf.CurrentTheme(), "linenumber"
-            )
-            self.cell00 = Frame(
-                self.editwin.text_frame, bg=line_number_colors["background"]
-            )
+            line_number_colors = idleConf.GetHighlight(idleConf.CurrentTheme(), "linenumber")
+            self.cell00 = Frame(self.editwin.text_frame, bg=line_number_colors["background"])
             self.cell00.grid(row=0, column=0, sticky=NSEW)
             menu_status = "Hide"
         else:
@@ -221,9 +213,7 @@ class CodeContext:
             while self.info[-1][0] >= new_topvisible:
                 stopindent = self.info[-1][1]
                 del self.info[-1]
-            lines, lastindent = self.get_context(
-                new_topvisible, self.info[-1][0] + 1, stopindent
-            )
+            lines, lastindent = self.get_context(new_topvisible, self.info[-1][0] + 1, stopindent)
         self.info.extend(lines)
         self.topvisible = new_topvisible
         # Last context_depth context lines.
@@ -275,9 +265,7 @@ class CodeContext:
             self.context["foreground"] = colors["foreground"]
 
         if self.cell00 is not None:
-            line_number_colors = idleConf.GetHighlight(
-                idleConf.CurrentTheme(), "linenumber"
-            )
+            line_number_colors = idleConf.GetHighlight(idleConf.CurrentTheme(), "linenumber")
             self.cell00.config(bg=line_number_colors["background"])
 
 

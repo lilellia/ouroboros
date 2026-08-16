@@ -13,8 +13,6 @@ from c_parser.match import (
 
 from . import (
     analyze as _analyze,
-)
-from . import (
     datafiles as _datafiles,
 )
 from .info import Analysis

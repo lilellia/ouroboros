@@ -16,12 +16,12 @@ Python, however, can easily fill in the gap.
 
 __author__ = "Steve Dower <steve.dower@microsoft.com>"
 
-import csv
-import re
-import sys
 from collections import defaultdict
+import csv
 from itertools import chain, zip_longest
 from pathlib import PureWindowsPath
+import re
+import sys
 from uuid import uuid1
 
 ID_CHAR_SUBS = {
@@ -74,13 +74,9 @@ def main(file_source, install_target):
                 f'            <Directory Id="{dir_parent}_{make_id(dir_name)}" Name="{dir_name}" />'
             )
         lines.append("        </DirectoryRef>")
-    for dir_parent in (
-        make_id(d) for group in cache_directories.values() for d in group
-    ):
+    for dir_parent in (make_id(d) for group in cache_directories.values() for d in group):
         lines.append(f'        <DirectoryRef Id="{dir_parent}">')
-        lines.append(
-            f'            <Directory Id="{dir_parent}___pycache__" Name="__pycache__" />'
-        )
+        lines.append(f'            <Directory Id="{dir_parent}___pycache__" Name="__pycache__" />')
         lines.append("        </DirectoryRef>")
     lines.append("    </Fragment>")
 
@@ -110,9 +106,7 @@ def main(file_source, install_target):
 
         create_folders = {make_id(p) + "___pycache__" for p in cache_directories[group]}
         remove_folders = {
-            make_id(p2)
-            for p1 in cache_directories[group]
-            for p2 in chain((p1,), p1.parents)
+            make_id(p2) for p1 in cache_directories[group] for p2 in chain((p1,), p1.parents)
         }
         create_folders.discard(".")
         remove_folders.discard(".")
@@ -121,8 +115,7 @@ def main(file_source, install_target):
                 f'            <Component Id="{group}__pycache__folders" Directory="TARGETDIR" Guid="{uuid1()}">'
             )
             lines.extend(
-                f'                <CreateFolder Directory="{p}" />'
-                for p in create_folders
+                f'                <CreateFolder Directory="{p}" />' for p in create_folders
             )
             lines.extend(
                 f'                <RemoveFile Id="Remove_{p}_files" Name="*" On="uninstall" Directory="{p}" />'

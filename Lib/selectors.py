@@ -4,12 +4,12 @@ This module allows high-level and efficient I/O multiplexing, built upon the
 `select` module primitives.
 """
 
-import math
-import select
-import sys
 from abc import ABCMeta, abstractmethod
 from collections import namedtuple
 from collections.abc import Mapping
+import math
+import select
+import sys
 
 # generic events, that must be mapped to implementation-specific ones
 EVENT_READ = 1 << 0
@@ -522,9 +522,7 @@ if hasattr(select, "kqueue"):
                     self._selector.control([kev], 0, 0)
                     self._max_events += 1
                 if events & EVENT_WRITE:
-                    kev = select.kevent(
-                        key.fd, select.KQ_FILTER_WRITE, select.KQ_EV_ADD
-                    )
+                    kev = select.kevent(key.fd, select.KQ_FILTER_WRITE, select.KQ_EV_ADD)
                     self._selector.control([kev], 0, 0)
                     self._max_events += 1
             except:

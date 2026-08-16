@@ -16,14 +16,14 @@ __all__ = ["BaseManager", "BaseProxy", "SyncManager", "Token"]
 
 import array
 import os
+from os import getpid
 import queue
 import signal
 import sys
 import threading
 import time
-import types
-from os import getpid
 from traceback import format_exc
+import types
 
 from . import connection, get_context, pool, process, util
 from .context import ProcessError, get_spawning_popen, reduction
@@ -106,9 +106,7 @@ def convert_to_error(kind, result):
         return result
     elif kind in ("#TRACEBACK", "#UNSERIALIZABLE"):
         if not isinstance(result, str):
-            raise TypeError(
-                f"Result {result!r} (kind '{kind}') type is {type(result)}, not str"
-            )
+            raise TypeError(f"Result {result!r} (kind '{kind}') type is {type(result)}, not str")
         if kind == "#UNSERIALIZABLE":
             return RemoteError(f"Unserializable message: {result}\n")
         else:
@@ -262,9 +260,7 @@ class Server:
         """
         Handle requests from the proxies in a particular process/thread
         """
-        util.debug(
-            "starting server thread to service %r", threading.current_thread().name
-        )
+        util.debug("starting server thread to service %r", threading.current_thread().name)
 
         recv = conn.recv
         send = conn.send
@@ -330,9 +326,7 @@ class Server:
                 except Exception:  # noqa: BLE001
                     send(("#UNSERIALIZABLE", format_exc()))
             except Exception as e:  # noqa: BLE001
-                util.info(
-                    "exception in thread serving %r", threading.current_thread().name
-                )
+                util.info("exception in thread serving %r", threading.current_thread().name)
                 util.info(" ... message was %r", msg)
                 util.info(" ... exception was %r", e)
                 conn.close()
@@ -402,9 +396,7 @@ class Server:
 
             if callable is None:
                 if kwds or (len(args) != 1):
-                    raise ValueError(
-                        "Without callable, must have one non-keyword argument"
-                    )
+                    raise ValueError("Without callable, must have one non-keyword argument")
                 obj = args[0]
             else:
                 obj = callable(*args, **kwds)
@@ -763,9 +755,7 @@ class BaseManager:
 
         exposed = exposed or getattr(proxytype, "_exposed_", None)
 
-        method_to_typeid = method_to_typeid or getattr(
-            proxytype, "_method_to_typeid_", None
-        )
+        method_to_typeid = method_to_typeid or getattr(proxytype, "_method_to_typeid_", None)
 
         if method_to_typeid:
             for key, value in list(method_to_typeid.items()):  # isinstance?
@@ -894,9 +884,7 @@ class BaseProxy:
         try:
             conn = self._tls.connection
         except AttributeError:
-            util.debug(
-                "thread %r does not own a connection", threading.current_thread().name
-            )
+            util.debug("thread %r does not own a connection", threading.current_thread().name)
             self._connect()
             conn = self._tls.connection
 
@@ -1486,9 +1474,7 @@ if HAS_SHMEM:
             # The address of Linux abstract namespaces can be bytes
             if isinstance(address, bytes):
                 address = os.fsdecode(address)
-            self.shared_memory_context = _SharedMemoryTracker(
-                f"shm_{address}_{getpid()}"
-            )
+            self.shared_memory_context = _SharedMemoryTracker(f"shm_{address}_{getpid()}")
             util.debug(f"SharedMemoryServer started by pid {getpid()}")
 
         def create(self, c, typeid, /, *args, **kwargs):
@@ -1557,9 +1543,7 @@ if HAS_SHMEM:
                     raise ProcessError("SharedMemoryManager has shut down")
                 else:
                     raise ProcessError(f"Unknown state {self._state.value!r}")
-            return self._Server(
-                self._registry, self._address, self._authkey, self._serializer
-            )
+            return self._Server(self._registry, self._address, self._authkey, self._serializer)
 
         def SharedMemory(self, size):
             """Returns a new SharedMemory instance with the specified size in

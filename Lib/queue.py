@@ -1,10 +1,10 @@
 """A multi-producer, multi-consumer queue."""
 
-import threading
-import types
 from collections import deque
 from heapq import heappop, heappush
+import threading
 from time import monotonic as time
+import types
 
 try:
     from _queue import SimpleQueue

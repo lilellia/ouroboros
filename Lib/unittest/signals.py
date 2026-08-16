@@ -1,6 +1,6 @@
+from functools import wraps
 import signal
 import weakref
-from functools import wraps
 
 __unittest = True
 

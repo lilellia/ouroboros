@@ -62,9 +62,7 @@ class ScrollableTextFrame(Frame):
         self.grid_columnconfigure(0, weight=1)
 
         # vertical scrollbar
-        self.yscroll = AutoHideScrollbar(
-            self, orient=VERTICAL, takefocus=False, command=text.yview
-        )
+        self.yscroll = AutoHideScrollbar(self, orient=VERTICAL, takefocus=False, command=text.yview)
         self.yscroll.grid(row=0, column=1, sticky=NS)
         text["yscrollcommand"] = self.yscroll.set
 
@@ -103,9 +101,7 @@ class ViewFrame(Frame):
         color_config(text)
         text.focus_set()
 
-        self.button_ok = button_ok = Button(
-            self, text="Close", command=self.ok, takefocus=False
-        )
+        self.button_ok = button_ok = Button(self, text="Close", command=self.ok, takefocus=False)
         self.textframe.pack(side="top", expand=True, fill="both")
         button_ok.pack(side="bottom")
 

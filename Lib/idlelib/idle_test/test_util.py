@@ -1,7 +1,7 @@
 """Test util, coverage 100%"""
 
-import unittest
 from idlelib import util
+import unittest
 
 
 class UtilTest(unittest.TestCase):

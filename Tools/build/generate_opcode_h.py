@@ -143,11 +143,7 @@ def main(
                 if op == MIN_PSEUDO_OPCODE:
                     fobj.write(DEFINE.format("MIN_PSEUDO_OPCODE", MIN_PSEUDO_OPCODE))
                 if op == MIN_INSTRUMENTED_OPCODE:
-                    fobj.write(
-                        DEFINE.format(
-                            "MIN_INSTRUMENTED_OPCODE", MIN_INSTRUMENTED_OPCODE
-                        )
-                    )
+                    fobj.write(DEFINE.format("MIN_INSTRUMENTED_OPCODE", MIN_INSTRUMENTED_OPCODE))
 
                 fobj.write(DEFINE.format(name, op))
 
@@ -161,9 +157,7 @@ def main(
         iobj.write("\nextern const uint8_t _PyOpcode_Caches[256];\n")
         iobj.write("\nextern const uint8_t _PyOpcode_Deopt[256];\n")
         iobj.write("\n#ifdef NEED_OPCODE_TABLES\n")
-        write_int_array_from_ops(
-            "_PyOpcode_Jump", opcode["hasjrel"] + opcode["hasjabs"], iobj
-        )
+        write_int_array_from_ops("_PyOpcode_Jump", opcode["hasjrel"] + opcode["hasjabs"], iobj)
 
         iobj.write("\nconst uint8_t _PyOpcode_Caches[256] = {\n")
         for i, entries in enumerate(opcode["_inline_cache_entries"]):
@@ -179,16 +173,12 @@ def main(
             for specialized in family:
                 deoptcodes[specialized] = basic
         iobj.write("\nconst uint8_t _PyOpcode_Deopt[256] = {\n")
-        iobj.writelines(
-            f"    [{opt}] = {deopt},\n" for opt, deopt in sorted(deoptcodes.items())
-        )
+        iobj.writelines(f"    [{opt}] = {deopt},\n" for opt, deopt in sorted(deoptcodes.items()))
         iobj.write("};\n")
         iobj.write("#endif   // NEED_OPCODE_TABLES\n")
 
         fobj.write("\n")
-        fobj.write(
-            "#define HAS_ARG(op) ((((op) >= HAVE_ARGUMENT) && (!IS_PSEUDO_OPCODE(op)))\\"
-        )
+        fobj.write("#define HAS_ARG(op) ((((op) >= HAVE_ARGUMENT) && (!IS_PSEUDO_OPCODE(op)))\\")
         for op in _pseudo_ops:
             if opmap[op] in hasarg:
                 fobj.write(f"\n    || ((op) == {op}) \\")

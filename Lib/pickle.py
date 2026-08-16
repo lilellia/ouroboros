@@ -25,9 +25,6 @@ Misc variables:
 
 import _compat_pickle
 import codecs
-import io
-import re
-import sys
 from copyreg import (
     _extension_cache,
     _extension_registry,
@@ -35,8 +32,11 @@ from copyreg import (
     dispatch_table,
 )
 from functools import partial
+import io
 from itertools import islice
+import re
 from struct import pack, unpack
+import sys
 from sys import maxsize
 from types import FunctionType
 
@@ -318,9 +318,7 @@ class _Unframer:
 
     def load_frame(self, frame_size):
         if self.current_frame and self.current_frame.read() != b"":
-            raise UnpicklingError(
-                "beginning of a new frame before end of current frame"
-            )
+            raise UnpicklingError("beginning of a new frame before end of current frame")
         self.current_frame = io.BytesIO(self.file_read(frame_size))
 
 
@@ -491,8 +489,7 @@ class _Pickler:
         # only needed to mimic the behavior of _pickle.Pickler.dump().
         if not hasattr(self, "_file_write"):
             raise PicklingError(
-                "Pickler.__init__() was not called by "
-                f"{self.__class__.__name__}.__init__()"
+                f"Pickler.__init__() was not called by {self.__class__.__name__}.__init__()"
             )
         if self.proto >= 2:
             self.write(PROTO + pack("<B", self.proto))
@@ -596,9 +593,7 @@ class _Pickler:
                     if reduce is not None:
                         rv = reduce()
                     else:
-                        raise PicklingError(
-                            f"Can't pickle {t.__name__!r} object: {obj!r}"
-                        )
+                        raise PicklingError(f"Can't pickle {t.__name__!r} object: {obj!r}")
 
         # Check for string returned by reduce(), meaning "save as global"
         if isinstance(rv, str):
@@ -612,9 +607,7 @@ class _Pickler:
         # Assert that it returned an appropriately sized tuple
         l = len(rv)
         if not (2 <= l <= 6):
-            raise PicklingError(
-                f"Tuple returned by {reduce} must have two to six elements"
-            )
+            raise PicklingError(f"Tuple returned by {reduce} must have two to six elements")
 
         # Save the reduce() output and finally memoize the object
         self.save_reduce(obj=obj, *rv)  # noqa: B026
@@ -632,9 +625,7 @@ class _Pickler:
             try:
                 self.write(PERSID + str(pid).encode("ascii") + b"\n")
             except UnicodeEncodeError:
-                raise PicklingError(
-                    "persistent IDs in protocol 0 must be ASCII strings"
-                )
+                raise PicklingError("persistent IDs in protocol 0 must be ASCII strings")
 
     def save_reduce(
         self,
@@ -663,9 +654,7 @@ class _Pickler:
             if not hasattr(cls, "__new__"):
                 raise PicklingError(f"args[0] from {func_name} args has no __new__")
             if obj is not None and cls is not obj.__class__:
-                raise PicklingError(
-                    f"args[0] from {func_name} args has the wrong class"
-                )
+                raise PicklingError(f"args[0] from {func_name} args has the wrong class")
             if self.proto >= 4:
                 save(cls)
                 save(args)
@@ -867,14 +856,11 @@ class _Pickler:
 
         def save_picklebuffer(self, obj):
             if self.proto < 5:
-                raise PicklingError(
-                    "PickleBuffer can only be pickled with protocol >= 5"
-                )
+                raise PicklingError("PickleBuffer can only be pickled with protocol >= 5")
             with obj.raw() as m:
                 if not m.contiguous:
                     raise PicklingError(
-                        "PickleBuffer can not be pickled when "
-                        "pointing to a non-contiguous buffer"
+                        "PickleBuffer can not be pickled when pointing to a non-contiguous buffer"
                     )
                 in_band = True
                 if self._buffer_callback is not None:
@@ -1182,13 +1168,7 @@ class _Pickler:
     def _save_toplevel_by_name(self, module_name, name):
         if self.proto >= 3:
             # Non-ASCII identifiers are supported only with protocols >= 3.
-            self.write(
-                GLOBAL
-                + bytes(module_name, "utf-8")
-                + b"\n"
-                + bytes(name, "utf-8")
-                + b"\n"
-            )
+            self.write(GLOBAL + bytes(module_name, "utf-8") + b"\n" + bytes(name, "utf-8") + b"\n")
         else:
             if self.fix_imports:
                 r_name_mapping = _compat_pickle.REVERSE_NAME_MAPPING
@@ -1199,11 +1179,7 @@ class _Pickler:
                     module_name = r_import_mapping[module_name]
             try:
                 self.write(
-                    GLOBAL
-                    + bytes(module_name, "ascii")
-                    + b"\n"
-                    + bytes(name, "ascii")
-                    + b"\n"
+                    GLOBAL + bytes(module_name, "ascii") + b"\n" + bytes(name, "ascii") + b"\n"
                 )
             except UnicodeEncodeError:
                 raise PicklingError(
@@ -1228,9 +1204,7 @@ class _Pickler:
 
 
 class _Unpickler:
-    def __init__(
-        self, file, *, fix_imports=True, encoding="ASCII", errors="strict", buffers=None
-    ):
+    def __init__(self, file, *, fix_imports=True, encoding="ASCII", errors="strict", buffers=None):
         """This takes a binary file for reading a pickle data stream.
 
         The protocol version of the pickle is detected automatically, so
@@ -1286,8 +1260,7 @@ class _Unpickler:
         # only needed to mimic the behavior of _pickle.Unpickler.dump().
         if not hasattr(self, "_file_read"):
             raise UnpicklingError(
-                "Unpickler.__init__() was not called by "
-                f"{self.__class__.__name__}.__init__()"
+                f"Unpickler.__init__() was not called by {self.__class__.__name__}.__init__()"
             )
         self._unframer = _Unframer(self._file_read, self._file_readline)
         self.read = self._unframer.read
@@ -1519,8 +1492,7 @@ class _Unpickler:
     def load_next_buffer(self):
         if self._buffers is None:
             raise UnpicklingError(
-                "pickle stream refers to out-of-band data "
-                "but no *buffers* argument was given"
+                "pickle stream refers to out-of-band data but no *buffers* argument was given"
             )
         try:
             buf = next(self._buffers)
@@ -1917,16 +1889,12 @@ class _Unpickler:
 
 
 def _dump(obj, file, protocol=None, *, fix_imports=True, buffer_callback=None):
-    _Pickler(
-        file, protocol, fix_imports=fix_imports, buffer_callback=buffer_callback
-    ).dump(obj)
+    _Pickler(file, protocol, fix_imports=fix_imports, buffer_callback=buffer_callback).dump(obj)
 
 
 def _dumps(obj, protocol=None, *, fix_imports=True, buffer_callback=None):
     f = io.BytesIO()
-    _Pickler(
-        f, protocol, fix_imports=fix_imports, buffer_callback=buffer_callback
-    ).dump(obj)
+    _Pickler(f, protocol, fix_imports=fix_imports, buffer_callback=buffer_callback).dump(obj)
     res = f.getvalue()
     assert isinstance(res, bytes_types)
     return res
@@ -1978,9 +1946,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="display contents of the pickle files")
     parser.add_argument("pickle_file", nargs="*", help="the pickle file")
     parser.add_argument("-t", "--test", action="store_true", help="run self-test suite")
-    parser.add_argument(
-        "-v", action="store_true", help="run verbosely; only affects self-test run"
-    )
+    parser.add_argument("-v", action="store_true", help="run verbosely; only affects self-test run")
     args = parser.parse_args()
     if args.test:
         _test()

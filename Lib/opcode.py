@@ -465,9 +465,7 @@ _specializations = {
         "SEND_GEN",
     ],
 }
-_specialized_instructions = [
-    opcode for family in _specializations.values() for opcode in family
-]
+_specialized_instructions = [opcode for family in _specializations.values() for opcode in family]
 
 _cache_format = {
     "LOAD_GLOBAL": {

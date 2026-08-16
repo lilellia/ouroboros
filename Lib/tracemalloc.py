@@ -1,13 +1,12 @@
-import fnmatch
-import linecache
-import os.path
-import pickle
-
 # Import types and functions implemented in C
 from _tracemalloc import *
 from _tracemalloc import _get_object_traceback, _get_traces
 from collections.abc import Iterable, Sequence
+import fnmatch
 from functools import total_ordering
+import linecache
+import os.path
+import pickle
 
 
 def _format_size(size, sign):
@@ -89,9 +88,7 @@ class StatisticDiff:
         self.count_diff = count_diff
 
     def __hash__(self):
-        return hash(
-            (self.traceback, self.size, self.size_diff, self.count, self.count_diff)
-        )
+        return hash((self.traceback, self.size, self.size_diff, self.count, self.count_diff))
 
     def __eq__(self, other):
         if not isinstance(other, StatisticDiff):
@@ -149,9 +146,7 @@ def _compare_grouped_stats(old_group, new_group):
                 stat.count - previous.count,
             )
         else:
-            stat = StatisticDiff(
-                traceback, stat.size, stat.size, stat.count, stat.count
-            )
+            stat = StatisticDiff(traceback, stat.size, stat.size, stat.count, stat.count)
         statistics.append(stat)
 
     for traceback, stat in old_group.items():
@@ -375,9 +370,7 @@ class BaseFilter:
 
 
 class Filter(BaseFilter):
-    def __init__(
-        self, inclusive, filename_pattern, lineno=None, all_frames=False, domain=None
-    ):
+    def __init__(self, inclusive, filename_pattern, lineno=None, all_frames=False, domain=None):
         super().__init__(inclusive)
         self.inclusive = inclusive
         self._filename_pattern = _normalize_filename(filename_pattern)
@@ -403,10 +396,7 @@ class Filter(BaseFilter):
 
     def _match_traceback(self, traceback):
         if self.all_frames:
-            if any(
-                self._match_frame_impl(filename, lineno)
-                for filename, lineno in traceback
-            ):
+            if any(self._match_frame_impl(filename, lineno) for filename, lineno in traceback):
                 return self.inclusive
             else:
                 return not self.inclusive
@@ -481,9 +471,7 @@ class Snapshot:
         list, return a new Snapshot instance with a copy of the traces.
         """
         if not isinstance(filters, Iterable):
-            raise TypeError(
-                f"filters must be a list of filters, not {type(filters).__name__}"
-            )
+            raise TypeError(f"filters must be a list of filters, not {type(filters).__name__}")
         if filters:
             include_filters = []
             exclude_filters = []
@@ -505,9 +493,7 @@ class Snapshot:
         if key_type not in ("traceback", "filename", "lineno"):
             raise ValueError(f"unknown key_type: {key_type!r}")
         if cumulative and key_type not in ("lineno", "filename"):
-            raise ValueError(
-                f"cumulative mode cannot by used with key type {key_type!r}"
-            )
+            raise ValueError(f"cumulative mode cannot by used with key type {key_type!r}")
 
         stats = {}
         tracebacks = {}
@@ -582,8 +568,7 @@ def take_snapshot():
     """
     if not is_tracing():
         raise RuntimeError(
-            "the tracemalloc module must be tracing memory "
-            "allocations to take a snapshot"
+            "the tracemalloc module must be tracing memory allocations to take a snapshot"
         )
     traces = _get_traces()
     traceback_limit = get_traceback_limit()

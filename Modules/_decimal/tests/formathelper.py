@@ -33,9 +33,9 @@ import locale
 import os
 import platform
 import random
+from shutil import which
 import subprocess
 import sys
-from shutil import which
 
 from test.support.import_helper import import_fresh_module
 
@@ -187,9 +187,7 @@ else:
         with open("/var/lib/locales/supported.d/local") as f:
             locale_list = [loc.split()[0] for loc in f if not loc.startswith("#")]
     elif which("locale"):
-        locale_list = subprocess.Popen(
-            ["locale", "-a"], stdout=subprocess.PIPE
-        ).communicate()[0]
+        locale_list = subprocess.Popen(["locale", "-a"], stdout=subprocess.PIPE).communicate()[0]
         try:
             locale_list = locale_list.decode()
         except UnicodeDecodeError:
@@ -342,9 +340,7 @@ def all_format_sep():
                     for width in [""] + [str(y) for y in range(1, 15)] + ["101"]:
                         for prec in [""] + ["." + str(y) for y in range(15)]:
                             # for type in ('', 'E', 'e', 'G', 'g', 'F', 'f', '%'):
-                            type = random.choice(
-                                ("", "E", "e", "G", "g", "F", "f", "%")
-                            )
+                            type = random.choice(("", "E", "e", "G", "g", "F", "f", "%"))
                             yield f"{fill}{align}{sign}{zeropad}{width},{prec}{type}"
 
 

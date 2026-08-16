@@ -4,12 +4,12 @@ default stats folders.
 
 import argparse
 import collections
+from datetime import date
 import itertools
 import json
 import opcode
 import os.path
 import sys
-from datetime import date
 
 if os.name == "nt":
     DEFAULT_DIR = "c:\\temp\\py_stats\\"
@@ -171,9 +171,7 @@ def print_specialization_stats(name, family_stats, defines):
             emit_table(("Failure kind", "Count:", "Ratio:"), rows)
 
 
-def print_comparative_specialization_stats(
-    name, base_family_stats, head_family_stats, defines
-):
+def print_comparative_specialization_stats(name, base_family_stats, head_family_stats, defines):
     if "specializable" not in base_family_stats:
         return
 
@@ -193,15 +191,9 @@ def print_comparative_specialization_stats(
         rows = join_rows(base_rows, head_rows)
         if rows:
             print_title("Specialization attempts", 4)
-            emit_table(
-                ("", "Base Count:", "Base Ratio:", "Head Count:", "Head Ratio:"), rows
-            )
-            base_rows = calculate_specialization_failure_kinds(
-                name, base_family_stats, defines
-            )
-            head_rows = calculate_specialization_failure_kinds(
-                name, head_family_stats, defines
-            )
+            emit_table(("", "Base Count:", "Base Ratio:", "Head Count:", "Head Ratio:"), rows)
+            base_rows = calculate_specialization_failure_kinds(name, base_family_stats, defines)
+            head_rows = calculate_specialization_failure_kinds(name, head_family_stats, defines)
             emit_table(
                 (
                     "Failure kind",
@@ -290,9 +282,7 @@ def categorized_counts(opcode_stats):
     basic = 0
     specialized = 0
     not_specialized = 0
-    specialized_instructions = {
-        op for op in opcode._specialized_instructions if "__" not in op
-    }
+    specialized_instructions = {op for op in opcode._specialized_instructions if "__" not in op}
     for i, opcode_stat in enumerate(opcode_stats):
         if "execution_count" not in opcode_stat:
             continue
@@ -399,9 +389,7 @@ def emit_execution_counts(opcode_stats, total):
         emit_table(("Name", "Count:", "Self:", "Cumulative:", "Miss ratio:"), rows)
 
 
-def emit_comparative_execution_counts(
-    base_opcode_stats, base_total, head_opcode_stats, head_total
-):
+def emit_comparative_execution_counts(base_opcode_stats, base_total, head_opcode_stats, head_total):
     with Section("Execution counts", summary="execution counts for all instructions"):
         base_rows = calculate_execution_counts(base_opcode_stats, base_total)
         head_rows = calculate_execution_counts(head_opcode_stats, head_total)
@@ -482,8 +470,7 @@ def emit_specialization_overview(opcode_stats, total):
             if total:
                 with Section(f"{title} by instruction", 3):
                     rows = [
-                        (name, count, format_ratio(count, total))
-                        for (count, name) in counts[:10]
+                        (name, count, format_ratio(count, total)) for (count, name) in counts[:10]
                     ]
                     emit_table(("Name", "Count:", "Ratio:"), rows)
 
@@ -492,12 +479,8 @@ def emit_comparative_specialization_overview(
     base_opcode_stats, base_total, head_opcode_stats, head_total
 ):
     with Section("Specialization effectiveness"):
-        base_rows = calculate_specialization_effectiveness(
-            base_opcode_stats, base_total
-        )
-        head_rows = calculate_specialization_effectiveness(
-            head_opcode_stats, head_total
-        )
+        base_rows = calculate_specialization_effectiveness(base_opcode_stats, base_total)
+        head_rows = calculate_specialization_effectiveness(head_opcode_stats, head_total)
         emit_table(
             (
                 "Instructions",
@@ -550,9 +533,7 @@ def emit_comparative_call_stats(base_stats, head_stats):
         head_rows = calculate_call_stats(head_stats)
         rows = join_rows(base_rows, head_rows)
         rows.sort(key=lambda x: -float(x[-1][:-1]))
-        emit_table(
-            ("", "Base Count:", "Base Ratio:", "Head Count:", "Head Ratio:"), rows
-        )
+        emit_table(("", "Base Count:", "Base Ratio:", "Head Count:", "Head Ratio:"), rows)
 
 
 def calculate_object_stats(stats):
@@ -560,12 +541,8 @@ def calculate_object_stats(stats):
     total_allocations = stats.get("Object allocations") + stats.get(
         "Object allocations from freelist"
     )
-    total_increfs = stats.get("Object interpreter increfs") + stats.get(
-        "Object increfs"
-    )
-    total_decrefs = stats.get("Object interpreter decrefs") + stats.get(
-        "Object decrefs"
-    )
+    total_increfs = stats.get("Object interpreter increfs") + stats.get("Object increfs")
+    total_decrefs = stats.get("Object interpreter decrefs") + stats.get("Object decrefs")
     rows = []
     for key, value in stats.items():
         if key.startswith("Object"):
@@ -690,9 +667,7 @@ def output_comparative_stats(base_stats, head_stats):
     head_opcode_stats = extract_opcode_stats(head_stats)
     head_total = get_total(head_opcode_stats)
 
-    emit_comparative_execution_counts(
-        base_opcode_stats, base_total, head_opcode_stats, head_total
-    )
+    emit_comparative_execution_counts(base_opcode_stats, base_total, head_opcode_stats, head_total)
     emit_comparative_specialization_stats(base_opcode_stats, head_opcode_stats)
     emit_comparative_specialization_overview(
         base_opcode_stats, base_total, head_opcode_stats, head_total

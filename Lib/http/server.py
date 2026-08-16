@@ -94,6 +94,7 @@ import copy
 import datetime
 import email.utils
 import html
+from http import HTTPStatus
 import http.client
 import io
 import itertools
@@ -107,7 +108,6 @@ import socketserver
 import sys
 import time
 import urllib.parse
-from http import HTTPStatus
 
 # Default error message template
 DEFAULT_ERROR_MESSAGE = """\
@@ -310,9 +310,7 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
                     raise ValueError("unreasonable length http version")
                 version_number = int(version_number[0]), int(version_number[1])
             except (ValueError, IndexError):
-                self.send_error(
-                    HTTPStatus.BAD_REQUEST, f"Bad request version ({version!r})"
-                )
+                self.send_error(HTTPStatus.BAD_REQUEST, f"Bad request version ({version!r})")
                 return False
             if version_number >= (1, 1) and self.protocol_version >= "HTTP/1.1":
                 self.close_connection = False
@@ -325,17 +323,13 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
             self.request_version = version
 
         if not 2 <= len(words) <= 3:
-            self.send_error(
-                HTTPStatus.BAD_REQUEST, f"Bad request syntax ({requestline!r})"
-            )
+            self.send_error(HTTPStatus.BAD_REQUEST, f"Bad request syntax ({requestline!r})")
             return False
         command, path = words[:2]
         if len(words) == 2:
             self.close_connection = True
             if command != "GET":
-                self.send_error(
-                    HTTPStatus.BAD_REQUEST, f"Bad HTTP/0.9 request type ({command!r})"
-                )
+                self.send_error(HTTPStatus.BAD_REQUEST, f"Bad HTTP/0.9 request type ({command!r})")
                 return False
         self.command, self.path = command, path
 
@@ -348,13 +342,9 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
 
         # Examine the headers and look for a Connection directive.
         try:
-            self.headers = http.client.parse_headers(
-                self.rfile, _class=self.MessageClass
-            )
+            self.headers = http.client.parse_headers(self.rfile, _class=self.MessageClass)
         except http.client.LineTooLong as err:
-            self.send_error(
-                HTTPStatus.REQUEST_HEADER_FIELDS_TOO_LARGE, "Line too long", str(err)
-            )
+            self.send_error(HTTPStatus.REQUEST_HEADER_FIELDS_TOO_LARGE, "Line too long", str(err))
             return False
         except http.client.HTTPException as err:
             self.send_error(
@@ -529,9 +519,7 @@ class BaseHTTPRequestHandler(socketserver.StreamRequestHandler):
         if self.request_version != "HTTP/0.9":
             if not hasattr(self, "_headers_buffer"):
                 self._headers_buffer = []
-            self._headers_buffer.append(
-                (f"{keyword}: {value}\r\n").encode("latin-1", "strict")
-            )
+            self._headers_buffer.append((f"{keyword}: {value}\r\n").encode("latin-1", "strict"))
 
         if keyword.lower() == "connection":
             if value.lower() == "close":
@@ -756,15 +744,10 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         try:
             fs = os.fstat(f.fileno())
             # Use browser cache if possible
-            if (
-                "If-Modified-Since" in self.headers
-                and "If-None-Match" not in self.headers
-            ):
+            if "If-Modified-Since" in self.headers and "If-None-Match" not in self.headers:
                 # compare If-Modified-Since and time of last file modification
                 try:
-                    ims = email.utils.parsedate_to_datetime(
-                        self.headers["If-Modified-Since"]
-                    )
+                    ims = email.utils.parsedate_to_datetime(self.headers["If-Modified-Since"])
                 except (TypeError, IndexError, OverflowError, ValueError):
                     # ignore ill-formed values
                     pass
@@ -772,11 +755,11 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                     if ims.tzinfo is None:
                         # obsolete format with no timezone, cf.
                         # https://tools.ietf.org/html/rfc7231#section-7.1.1.1
-                        ims = ims.replace(tzinfo=datetime.timezone.utc)
-                    if ims.tzinfo is datetime.timezone.utc:
+                        ims = ims.replace(tzinfo=datetime.UTC)
+                    if ims.tzinfo is datetime.UTC:
                         # compare to UTC datetime of last modification
                         last_modif = datetime.datetime.fromtimestamp(
-                            fs.st_mtime, datetime.timezone.utc
+                            fs.st_mtime, datetime.UTC
                         )
                         # remove microseconds, like in If-Modified-Since
                         last_modif = last_modif.replace(microsecond=0)
@@ -1100,9 +1083,7 @@ class CGIHTTPRequestHandler(SimpleHTTPRequestHandler):
         scriptname = dir + "/" + script
         scriptfile = self.translate_path(scriptname)
         if not os.path.exists(scriptfile):
-            self.send_error(
-                HTTPStatus.NOT_FOUND, f"No such CGI script ({scriptname!r})"
-            )
+            self.send_error(HTTPStatus.NOT_FOUND, f"No such CGI script ({scriptname!r})")
             return
         if not os.path.isfile(scriptfile):
             self.send_error(
@@ -1143,9 +1124,7 @@ class CGIHTTPRequestHandler(SimpleHTTPRequestHandler):
                 if authorization[0].lower() == "basic":
                     try:
                         authorization = authorization[1].encode("ascii")
-                        authorization = base64.decodebytes(authorization).decode(
-                            "ascii"
-                        )
+                        authorization = base64.decodebytes(authorization).decode("ascii")
                     except (binascii.Error, UnicodeError):
                         pass
                     else:
@@ -1361,9 +1340,7 @@ if __name__ == "__main__":
             return super().server_bind()
 
         def finish_request(self, request, client_address):
-            self.RequestHandlerClass(
-                request, client_address, self, directory=args.directory
-            )
+            self.RequestHandlerClass(request, client_address, self, directory=args.directory)
 
     test(
         HandlerClass=handler_class,

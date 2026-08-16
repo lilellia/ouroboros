@@ -274,9 +274,7 @@ class BaseHandler:
             for name, val in headers:
                 name = self._convert_string_type(name, "Header name")
                 val = self._convert_string_type(val, "Header value")
-                assert not is_hop_by_hop(name), (
-                    f"Hop-by-hop header, '{name}: {val}', not allowed"
-                )
+                assert not is_hop_by_hop(name), f"Hop-by-hop header, '{name}: {val}', not allowed"
 
         return self.write
 
@@ -300,19 +298,11 @@ class BaseHandler:
         """Transmit version/status/date/server, via self._write()"""
         if self.origin_server:
             if self.client_is_modern():
-                self._write(
-                    (f"HTTP/{self.http_version} {self.status}\r\n").encode("iso-8859-1")
-                )
+                self._write((f"HTTP/{self.http_version} {self.status}\r\n").encode("iso-8859-1"))
                 if "Date" not in self.headers:
-                    self._write(
-                        (f"Date: {format_date_time(time.time())}\r\n").encode(
-                            "iso-8859-1"
-                        )
-                    )
+                    self._write((f"Date: {format_date_time(time.time())}\r\n").encode("iso-8859-1"))
                 if self.server_software and "Server" not in self.headers:
-                    self._write(
-                        (f"Server: {self.server_software}\r\n").encode("iso-8859-1")
-                    )
+                    self._write((f"Server: {self.server_software}\r\n").encode("iso-8859-1"))
         else:
             self._write((f"Status: {self.status}\r\n").encode("iso-8859-1"))
 
@@ -404,9 +394,7 @@ class BaseHandler:
             from traceback import print_exception
 
             stderr = self.get_stderr()
-            print_exception(
-                exc_info[0], exc_info[1], exc_info[2], self.traceback_limit, stderr
-            )
+            print_exception(exc_info[0], exc_info[1], exc_info[2], self.traceback_limit, stderr)
             stderr.flush()
         finally:
             exc_info = None
@@ -480,9 +468,7 @@ class SimpleHandler(BaseHandler):
         )
         handler.run(app)"""
 
-    def __init__(
-        self, stdin, stdout, stderr, environ, multithread=True, multiprocess=False
-    ):
+    def __init__(self, stdin, stdout, stderr, environ, multithread=True, multiprocess=False):
         self.stdin = stdin
         self.stdout = stdout
         self.stderr = stderr

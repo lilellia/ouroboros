@@ -6,11 +6,11 @@ Sunday as the last (the European convention). Use setfirstweekday() to
 set the first day of the week (0=Monday, 6=Sunday)."""
 
 import datetime
+from enum import IntEnum, global_enum
+from itertools import repeat
 import locale as _locale
 import sys
 import warnings
-from enum import IntEnum, global_enum
-from itertools import repeat
 
 __all__ = [
     "APRIL",  # noqa: F822
@@ -560,9 +560,7 @@ class HTMLCalendar(Calendar):
         """
         v = []
         a = v.append
-        a(
-            f'<table border="0" cellpadding="0" cellspacing="0" class="{self.cssclass_month}">'
-        )
+        a(f'<table border="0" cellpadding="0" cellspacing="0" class="{self.cssclass_month}">')
         a("\n")
         a(self.formatmonthname(theyear, themonth, withyear=withyear))
         a("\n")
@@ -582,9 +580,7 @@ class HTMLCalendar(Calendar):
         v = []
         a = v.append
         width = max(width, 1)
-        a(
-            f'<table border="0" cellpadding="0" cellspacing="0" class="{self.cssclass_year}">'
-        )
+        a(f'<table border="0" cellpadding="0" cellspacing="0" class="{self.cssclass_year}">')
         a("\n")
         a(
             '<tr><th colspan="%d" class="%s">%s</th></tr>'  # noqa: UP031
@@ -616,9 +612,7 @@ class HTMLCalendar(Calendar):
         )
         a("<html>\n")
         a("<head>\n")
-        a(
-            f'<meta http-equiv="Content-Type" content="text/html; charset={encoding}" />\n'
-        )
+        a(f'<meta http-equiv="Content-Type" content="text/html; charset={encoding}" />\n')
         if css is not None:
             a(f'<link rel="stylesheet" type="text/css" href="{css}" />\n')
         a("<title>Calendar for %d</title>\n" % theyear)  # noqa: UP031
@@ -772,18 +766,12 @@ def main(args):
         default=6,
         help="spacing between months (default 6)",
     )
-    textgroup.add_argument(
-        "-m", "--months", type=int, default=3, help="months per row (default 3)"
-    )
-    htmlgroup.add_argument(
-        "-c", "--css", default="calendar.css", help="CSS to use for page"
-    )
+    textgroup.add_argument("-m", "--months", type=int, default=3, help="months per row (default 3)")
+    htmlgroup.add_argument("-c", "--css", default="calendar.css", help="CSS to use for page")
     parser.add_argument(
         "-L", "--locale", default=None, help="locale to use for month and weekday names"
     )
-    parser.add_argument(
-        "-e", "--encoding", default=None, help="encoding to use for output"
-    )
+    parser.add_argument("-e", "--encoding", default=None, help="encoding to use for output")
     parser.add_argument(
         "-t",
         "--type",
@@ -792,9 +780,7 @@ def main(args):
         help="output type (text or html)",
     )
     parser.add_argument("year", nargs="?", type=int, help="year number")
-    parser.add_argument(
-        "month", nargs="?", type=int, help="month number (1-12, text only)"
-    )
+    parser.add_argument("month", nargs="?", type=int, help="month number (1-12, text only)")
 
     options = parser.parse_args(args[1:])
 

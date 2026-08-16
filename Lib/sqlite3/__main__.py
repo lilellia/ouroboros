@@ -5,10 +5,10 @@ this module implements the REPL as a thin wrapper around
 the InteractiveConsole class from the 'code' stdlib module.
 """
 
-import sqlite3
-import sys
 from argparse import ArgumentParser
 from code import InteractiveConsole
+import sqlite3
+import sys
 from textwrap import dedent
 
 

@@ -1,9 +1,9 @@
 "Test hyperparser, coverage 98%."
 
-import unittest
 from idlelib.editor import EditorWindow
 from idlelib.hyperparser import HyperParser
 from tkinter import Text, Tk
+import unittest
 
 from test.support import requires
 

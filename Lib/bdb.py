@@ -1,10 +1,10 @@
 """Debugger basics"""
 
+from contextlib import contextmanager
 import fnmatch
+from inspect import CO_ASYNC_GENERATOR, CO_COROUTINE, CO_GENERATOR
 import os
 import sys
-from contextlib import contextmanager
-from inspect import CO_ASYNC_GENERATOR, CO_COROUTINE, CO_GENERATOR
 
 __all__ = ["Bdb", "BdbQuit", "Breakpoint"]
 
@@ -312,11 +312,7 @@ class Bdb:
         # for performance reasons) when returning from the current frame, unless
         # the caller is the botframe.
         caller_frame = current_frame.f_back
-        if (
-            caller_frame
-            and not caller_frame.f_trace
-            and caller_frame is not self.botframe
-        ):
+        if caller_frame and not caller_frame.f_trace and caller_frame is not self.botframe:
             caller_frame.f_trace = self.trace_dispatch
 
     # Derived classes and clients can call the following methods

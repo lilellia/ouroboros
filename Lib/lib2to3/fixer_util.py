@@ -87,9 +87,7 @@ def Number(n, prefix=None):
 
 def Subscript(index_node):
     """A numeric or string subscript"""
-    return Node(
-        syms.trailer, [Leaf(token.LBRACE, "["), index_node, Leaf(token.RBRACE, "]")]
-    )
+    return Node(syms.trailer, [Leaf(token.LBRACE, "["), index_node, Leaf(token.RBRACE, "]")])
 
 
 def String(string, prefix=None):
@@ -302,10 +300,7 @@ def is_probably_builtin(node):
         return False
     if parent.type == syms.parameters or (  # noqa: SIM103
         parent.type == syms.typedargslist
-        and (
-            (prev is not None and prev.type == token.COMMA)
-            or parent.children[0] is node
-        )
+        and ((prev is not None and prev.type == token.COMMA) or parent.children[0] is node)
     ):
         # The name of an argument.
         return False
@@ -367,11 +362,7 @@ def touch_import(package, name, node):
     if it was not imported."""
 
     def is_import_stmt(node):
-        return (
-            node.type == syms.simple_stmt
-            and node.children
-            and is_import(node.children[0])
-        )
+        return node.type == syms.simple_stmt and node.children and is_import(node.children[0])
 
     root = find_root(node)
 
@@ -442,9 +433,7 @@ def find_binding(name, node, package=None):
                 for i, kid in enumerate(child.children[3:]):
                     if kid.type == token.COLON and kid.value == ":":
                         # i+3 is the colon, i+4 is the suite
-                        n = find_binding(
-                            name, make_suite(child.children[i + 4]), package
-                        )
+                        n = find_binding(name, make_suite(child.children[i + 4]), package)
                         if n:
                             ret = n
         elif (
@@ -516,8 +505,6 @@ def _is_import_binding(node, name, package=None):
             child = n.children[2]
             if child.type == token.NAME and child.value == name:
                 return node
-        elif (
-            n.type == token.NAME and n.value == name or package and n.type == token.STAR
-        ):
+        elif n.type == token.NAME and n.value == name or package and n.type == token.STAR:
             return node
     return None

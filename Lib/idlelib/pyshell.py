@@ -19,17 +19,6 @@ if sys.platform == "win32":
 
     fix_win_hidpi()
 
-import itertools
-import linecache
-import os
-import os.path
-import re
-import socket
-import subprocess
-import threading
-import time
-import tokenize
-import warnings
 from code import InteractiveInterpreter
 from idlelib import debugger, debugger_r, replace, rpc
 from idlelib.colorizer import ColorDelegator
@@ -40,9 +29,20 @@ from idlelib.filelist import FileList
 from idlelib.outwin import OutputWindow
 from idlelib.run import StdInputFile, StdOutputFile, idle_formatwarning
 from idlelib.undo import UndoDelegator
+import itertools
+import linecache
+import os
+import os.path
 from platform import python_version
+import re
+import socket
+import subprocess
 from textwrap import TextWrapper
+import threading
+import time
 from tkinter import messagebox
+import tokenize
+import warnings
 
 # Default for testing; defaults to True in main() for running.
 use_subprocess = False
@@ -461,9 +461,7 @@ class ModifiedInterpreter(InteractiveInterpreter):
             # V1, 18.6),  set SO_REUSEADDR.  Note that this can be problematic
             # on Windows since the implementation allows two active sockets on
             # the same address!
-            self.rpcclt.listening_sock.setsockopt(
-                socket.SOL_SOCKET, socket.SO_REUSEADDR, 1
-            )
+            self.rpcclt.listening_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.spawn_subprocess()
         # time.sleep(20) # test to simulate GUI not accepting connection
         # Accept the connection from the Python execution server
@@ -873,13 +871,9 @@ class PyShell(OutputWindow):
         ("Squeeze", "<<squeeze-current-text>>"),
     ]
     _idx = 1 + len(
-        list(
-            itertools.takewhile(lambda rmenu_item: rmenu_item[0] != "Copy", rmenu_specs)
-        )
+        list(itertools.takewhile(lambda rmenu_item: rmenu_item[0] != "Copy", rmenu_specs))
     )
-    rmenu_specs.insert(
-        _idx, ("Copy with prompts", "<<copy-with-prompts>>", "rmenu_check_copy")
-    )
+    rmenu_specs.insert(_idx, ("Copy with prompts", "<<copy-with-prompts>>", "rmenu_check_copy"))
     del _idx
 
     allow_line_numbers = False
@@ -995,9 +989,7 @@ class PyShell(OutputWindow):
         """Return text between first and last with prompts added."""
         text = self.text.get(first, last)
         lineno_range = range(int(float(first)), int(float(last)))
-        prompts = [
-            self.shell_sidebar.line_prompts.get(lineno) for lineno in lineno_range
-        ]
+        prompts = [self.shell_sidebar.line_prompts.get(lineno) for lineno in lineno_range]
         return (
             "\n".join(
                 line if prompt is None else f"{prompt} {line}"
@@ -1161,9 +1153,7 @@ class PyShell(OutputWindow):
             )
             sys.displayhook = rpc.displayhook
 
-        self.write(
-            f"Python {sys.version} on {sys.platform}\n{self.SPLASHLINE}\n{nosub}"
-        )
+        self.write(f"Python {sys.version} on {sys.platform}\n{self.SPLASHLINE}\n{nosub}")
         self.text.focus_force()
         self.showprompt()
         # User code should use separate default Tk root window
@@ -1352,9 +1342,7 @@ class PyShell(OutputWindow):
                     if line.startswith(orig_base_indent):
                         # replace orig base indentation with new indentation
                         line = new_base_indent + line[len(orig_base_indent) :]
-                    self.text.insert(
-                        "insert", "\n" + line.rstrip(), self.user_input_insert_tags
-                    )
+                    self.text.insert("insert", "\n" + line.rstrip(), self.user_input_insert_tags)
         finally:
             self.text.see("insert")
             self.text.undo_block_stop()
@@ -1471,8 +1459,7 @@ def fix_x11_paste(root):
             root.bind_class(
                 cls,
                 "<<Paste>>",
-                "catch {%W delete sel.first sel.last}\n"
-                + root.bind_class(cls, "<<Paste>>"),
+                "catch {%W delete sel.first sel.last}\n" + root.bind_class(cls, "<<Paste>>"),
             )
 
 

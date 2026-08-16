@@ -240,18 +240,14 @@ class _SendfileFallbackProtocol(protocols.Protocol):
         await fut
 
     def connection_made(self, transport):
-        raise RuntimeError(
-            "Invalid state: connection should have been established already."
-        )
+        raise RuntimeError("Invalid state: connection should have been established already.")
 
     def connection_lost(self, exc):
         if self._write_ready_fut is not None:
             # Never happens if peer disconnects after sending the whole content
             # Thus disconnection is always an exception from user perspective
             if exc is None:
-                self._write_ready_fut.set_exception(
-                    ConnectionError("Connection is closed by peer")
-                )
+                self._write_ready_fut.set_exception(ConnectionError("Connection is closed by peer"))
             else:
                 self._write_ready_fut.set_exception(exc)
         self._proto.connection_lost(exc)
@@ -368,10 +364,7 @@ class Server(events.AbstractServer):
 
         self._serving = False
 
-        if (
-            self._serving_forever_fut is not None
-            and not self._serving_forever_fut.done()
-        ):
+        if self._serving_forever_fut is not None and not self._serving_forever_fut.done():
             self._serving_forever_fut.cancel()
             self._serving_forever_fut = None
 
@@ -386,9 +379,7 @@ class Server(events.AbstractServer):
 
     async def serve_forever(self):
         if self._serving_forever_fut is not None:
-            raise RuntimeError(
-                f"server {self!r} is already being awaited on serve_forever()"
-            )
+            raise RuntimeError(f"server {self!r} is already being awaited on serve_forever()")
         if self._sockets is None:
             raise RuntimeError(f"server {self!r} is closed")
 
@@ -519,9 +510,7 @@ class BaseEventLoop(events.AbstractEventLoop):
         """Return a task factory, or None if the default one is in use."""
         return self._task_factory
 
-    def _make_socket_transport(
-        self, sock, protocol, waiter=None, *, extra=None, server=None
-    ):
+    def _make_socket_transport(self, sock, protocol, waiter=None, *, extra=None, server=None):
         """Create socket transport."""
         raise NotImplementedError
 
@@ -543,9 +532,7 @@ class BaseEventLoop(events.AbstractEventLoop):
         """Create SSL transport."""
         raise NotImplementedError
 
-    def _make_datagram_transport(
-        self, sock, protocol, address=None, waiter=None, extra=None
-    ):
+    def _make_datagram_transport(self, sock, protocol, address=None, waiter=None, extra=None):
         """Create datagram transport."""
         raise NotImplementedError
 
@@ -621,9 +608,7 @@ class BaseEventLoop(events.AbstractEventLoop):
         closing_agens = list(self._asyncgens)
         self._asyncgens.clear()
 
-        results = await tasks.gather(
-            *[ag.aclose() for ag in closing_agens], return_exceptions=True
-        )
+        results = await tasks.gather(*[ag.aclose() for ag in closing_agens], return_exceptions=True)
 
         for result, agen in zip(results, closing_agens):
             if isinstance(result, Exception):
@@ -654,8 +639,7 @@ class BaseEventLoop(events.AbstractEventLoop):
                 await future
         except TimeoutError:
             warnings.warn(
-                "The executor did not finishing joining "
-                f"its threads within {timeout} seconds.",
+                f"The executor did not finishing joining its threads within {timeout} seconds.",
                 RuntimeWarning,
                 stacklevel=2,
             )
@@ -667,9 +651,7 @@ class BaseEventLoop(events.AbstractEventLoop):
         try:
             self._default_executor.shutdown(wait=True)
             if not self.is_closed():
-                self.call_soon_threadsafe(
-                    futures._set_result_unless_cancelled, future, None
-                )
+                self.call_soon_threadsafe(futures._set_result_unless_cancelled, future, None)
         except Exception as ex:  # noqa: BLE001
             if not self.is_closed() and not future.cancelled():
                 self.call_soon_threadsafe(future.set_exception, ex)
@@ -678,9 +660,7 @@ class BaseEventLoop(events.AbstractEventLoop):
         if self.is_running():
             raise RuntimeError("This event loop is already running")
         if events._get_running_loop() is not None:
-            raise RuntimeError(
-                "Cannot run the event loop while another loop is running"
-            )
+            raise RuntimeError("Cannot run the event loop while another loop is running")
 
     def run_forever(self):
         """Run until stop() is called."""
@@ -864,9 +844,7 @@ class BaseEventLoop(events.AbstractEventLoop):
         if coroutines.iscoroutine(callback) or coroutines.iscoroutinefunction(callback):
             raise TypeError(f"coroutines cannot be used with {method}()")
         if not callable(callback):
-            raise TypeError(
-                f"a callable object was expected by {method}(), got {callback!r}"
-            )
+            raise TypeError(f"a callable object was expected by {method}(), got {callback!r}")
 
     def _call_soon(self, callback, args, context):
         handle = events.Handle(callback, args, self, context)
@@ -889,8 +867,7 @@ class BaseEventLoop(events.AbstractEventLoop):
         thread_id = threading.get_ident()
         if thread_id != self._thread_id:
             raise RuntimeError(
-                "Non-thread-safe operation invoked on an event loop other "
-                "than the current one"
+                "Non-thread-safe operation invoked on an event loop other than the current one"
             )
 
     def call_soon_threadsafe(self, callback, *args, context=None):
@@ -913,9 +890,7 @@ class BaseEventLoop(events.AbstractEventLoop):
             # Only check when the default executor is being used
             self._check_default_executor()
             if executor is None:
-                executor = concurrent.futures.ThreadPoolExecutor(
-                    thread_name_prefix="asyncio"
-                )
+                executor = concurrent.futures.ThreadPoolExecutor(thread_name_prefix="asyncio")
                 self._default_executor = executor
         return futures.wrap_future(executor.submit(func, *args), loop=self)
 
@@ -977,8 +952,7 @@ class BaseEventLoop(events.AbstractEventLoop):
         # NB: sendfile syscall is not supported for SSL sockets and
         # non-mmap files even if sendfile is supported by OS
         raise exceptions.SendfileNotAvailableError(
-            f"syscall sendfile is not available for socket {sock!r} "
-            f"and file {file!r} combination"
+            f"syscall sendfile is not available for socket {sock!r} and file {file!r} combination"
         )
 
     async def _sock_sendfile_fallback(self, sock, file, offset, count):
@@ -1111,9 +1085,7 @@ class BaseEventLoop(events.AbstractEventLoop):
             # create a certificate for a specific IP address, so we
             # don't judge it here.)
             if not host:
-                raise ValueError(
-                    "You must set server_hostname when using ssl without a host"
-                )
+                raise ValueError("You must set server_hostname when using ssl without a host")
             server_hostname = host
 
         if ssl_handshake_timeout is not None and not ssl:
@@ -1131,9 +1103,7 @@ class BaseEventLoop(events.AbstractEventLoop):
 
         if host is not None or port is not None:
             if sock is not None:
-                raise ValueError(
-                    "host/port and sock can not be specified at the same time"
-                )
+                raise ValueError("host/port and sock can not be specified at the same time")
 
             infos = await self._ensure_resolved(
                 (host, port),
@@ -1168,9 +1138,7 @@ class BaseEventLoop(events.AbstractEventLoop):
                 # not using happy eyeballs
                 for addrinfo in infos:
                     try:
-                        sock = await self._connect_sock(
-                            exceptions, addrinfo, laddr_infos
-                        )
+                        sock = await self._connect_sock(exceptions, addrinfo, laddr_infos)
                         break
                     except OSError:
                         continue
@@ -1194,7 +1162,7 @@ class BaseEventLoop(events.AbstractEventLoop):
                 exceptions = [exc for sub in exceptions for exc in sub]
                 try:
                     if all_errors:
-                        raise ExceptionGroup("create_connection failed", exceptions)  # noqa: F821
+                        raise ExceptionGroup("create_connection failed", exceptions)
                     if len(exceptions) == 1:
                         raise exceptions[0]
                     else:
@@ -1214,9 +1182,7 @@ class BaseEventLoop(events.AbstractEventLoop):
 
         else:
             if sock is None:
-                raise ValueError(
-                    "host and port was not specified and no sock specified"
-                )
+                raise ValueError("host and port was not specified and no sock specified")
             if sock.type != socket.SOCK_STREAM:
                 # We allow AF_INET, AF_INET6, AF_UNIX as long as they
                 # are SOCK_STREAM.
@@ -1238,9 +1204,7 @@ class BaseEventLoop(events.AbstractEventLoop):
             # Get the socket from the transport because SSL transport closes
             # the old socket and creates a new SSL socket
             sock = transport.get_extra_info("socket")
-            logger.debug(
-                "%r connected to %s:%r: (%r, %r)", sock, host, port, transport, protocol
-            )
+            logger.debug("%r connected to %s:%r: (%r, %r)", sock, host, port, transport, protocol)
         return transport, protocol
 
     async def _create_connection_transport(
@@ -1306,9 +1270,7 @@ class BaseEventLoop(events.AbstractEventLoop):
         """
         if transport.is_closing():
             raise RuntimeError("Transport is closing")
-        mode = getattr(
-            transport, "_sendfile_compatible", constants._SendfileMode.UNSUPPORTED
-        )
+        mode = getattr(transport, "_sendfile_compatible", constants._SendfileMode.UNSUPPORTED)
         if mode is constants._SendfileMode.UNSUPPORTED:
             raise RuntimeError(f"sendfile is not supported for transport {transport!r}")
         if mode is constants._SendfileMode.TRY_NATIVE:
@@ -1375,8 +1337,7 @@ class BaseEventLoop(events.AbstractEventLoop):
 
         if not isinstance(sslcontext, ssl.SSLContext):
             raise TypeError(
-                f"sslcontext is expected to be an instance of ssl.SSLContext, "
-                f"got {sslcontext!r}"
+                f"sslcontext is expected to be an instance of ssl.SSLContext, got {sslcontext!r}"
             )
 
         if not getattr(transport, "_start_tls_compatible", False):
@@ -1525,9 +1486,7 @@ class BaseEventLoop(events.AbstractEventLoop):
                 sock = None
                 r_addr = None
                 try:
-                    sock = socket.socket(
-                        family=family, type=socket.SOCK_DGRAM, proto=proto
-                    )
+                    sock = socket.socket(family=family, type=socket.SOCK_DGRAM, proto=proto)
                     if reuse_port:
                         _set_reuseport(sock)
                     if allow_broadcast:
@@ -1648,18 +1607,14 @@ class BaseEventLoop(events.AbstractEventLoop):
 
         if host is not None or port is not None:
             if sock is not None:
-                raise ValueError(
-                    "host/port and sock can not be specified at the same time"
-                )
+                raise ValueError("host/port and sock can not be specified at the same time")
 
             if reuse_address is None:
                 reuse_address = os.name == "posix" and sys.platform != "cygwin"
             sockets = []
             if host == "":
                 hosts = [None]
-            elif isinstance(host, str) or not isinstance(
-                host, collections.abc.Iterable
-            ):
+            elif isinstance(host, str) or not isinstance(host, collections.abc.Iterable):
                 hosts = [host]
             else:
                 hosts = host
@@ -1681,8 +1636,7 @@ class BaseEventLoop(events.AbstractEventLoop):
                         # Assume it's a bad family/type/protocol combination.
                         if self._debug:
                             logger.warning(
-                                "create_server() failed to create "
-                                "socket.socket(%r, %r, %r)",
+                                "create_server() failed to create socket.socket(%r, %r, %r)",
                                 af,
                                 socktype,
                                 proto,
@@ -1699,16 +1653,14 @@ class BaseEventLoop(events.AbstractEventLoop):
                     # Disable IPv4/IPv6 dual stack support (enabled by
                     # default on Linux) which makes a single socket
                     # listen on both address families.
-                    if (
-                        _HAS_IPv6
-                        and af == socket.AF_INET6
-                        and hasattr(socket, "IPPROTO_IPV6")
-                    ):
+                    if _HAS_IPv6 and af == socket.AF_INET6 and hasattr(socket, "IPPROTO_IPV6"):
                         sock.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, True)
                     try:
                         sock.bind(sa)
                     except OSError as err:
-                        msg = f"error while attempting to bind on address {sa!r}: {str(err).lower()}"
+                        msg = (
+                            f"error while attempting to bind on address {sa!r}: {str(err).lower()}"
+                        )
                         if err.errno == errno.EADDRNOTAVAIL:
                             # Assume the family is not enabled (bpo-30945)
                             sockets.pop()
@@ -1806,9 +1758,7 @@ class BaseEventLoop(events.AbstractEventLoop):
             raise
 
         if self._debug:
-            logger.debug(
-                "Read pipe %r connected: (%r, %r)", pipe.fileno(), transport, protocol
-            )
+            logger.debug("Read pipe %r connected: (%r, %r)", pipe.fileno(), transport, protocol)
         return transport, protocol
 
     async def connect_write_pipe(self, protocol_factory, pipe):
@@ -1823,9 +1773,7 @@ class BaseEventLoop(events.AbstractEventLoop):
             raise
 
         if self._debug:
-            logger.debug(
-                "Write pipe %r connected: (%r, %r)", pipe.fileno(), transport, protocol
-            )
+            logger.debug("Write pipe %r connected: (%r, %r)", pipe.fileno(), transport, protocol)
         return transport, protocol
 
     def _log_subprocess(self, msg, stdin, stdout, stderr):
@@ -2102,8 +2050,7 @@ class BaseEventLoop(events.AbstractEventLoop):
         sched_count = len(self._scheduled)
         if (
             sched_count > _MIN_SCHEDULED_TIMER_HANDLES
-            and self._timer_cancelled_count / sched_count
-            > _MIN_CANCELLED_TIMER_HANDLES_FRACTION
+            and self._timer_cancelled_count / sched_count > _MIN_CANCELLED_TIMER_HANDLES_FRACTION
         ):
             # Remove delayed calls that were cancelled if their number
             # is too high
@@ -2165,9 +2112,7 @@ class BaseEventLoop(events.AbstractEventLoop):
                     handle._run()
                     dt = self.time() - t0
                     if dt >= self.slow_callback_duration:
-                        logger.warning(
-                            "Executing %s took %.3f seconds", _format_handle(handle), dt
-                        )
+                        logger.warning("Executing %s took %.3f seconds", _format_handle(handle), dt)
                 finally:
                     self._current_handle = None
             else:
@@ -2179,14 +2124,10 @@ class BaseEventLoop(events.AbstractEventLoop):
             return
 
         if enabled:
-            self._coroutine_origin_tracking_saved_depth = (
-                sys.get_coroutine_origin_tracking_depth()
-            )
+            self._coroutine_origin_tracking_saved_depth = sys.get_coroutine_origin_tracking_depth()
             sys.set_coroutine_origin_tracking_depth(constants.DEBUG_STACK_DEPTH)
         else:
-            sys.set_coroutine_origin_tracking_depth(
-                self._coroutine_origin_tracking_saved_depth
-            )
+            sys.set_coroutine_origin_tracking_depth(self._coroutine_origin_tracking_saved_depth)
 
         self._coroutine_origin_tracking_enabled = enabled
 

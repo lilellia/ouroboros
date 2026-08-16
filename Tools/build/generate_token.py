@@ -105,9 +105,7 @@ def make_h(infile, outfile="Include/internal/pycore_token.h"):
     for value, name in enumerate(tok_names[: ERRORTOKEN + 1]):
         defines.append("#define %-15s %d\n" % (name, value))  # noqa: UP031
 
-    if update_file(
-        outfile, token_h_template % ("".join(defines), len(tok_names), NT_OFFSET)
-    ):
+    if update_file(outfile, token_h_template % ("".join(defines), len(tok_names), NT_OFFSET)):
         print(f"{outfile} regenerated from {infile}")
 
 

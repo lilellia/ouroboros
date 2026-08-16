@@ -6,8 +6,8 @@ comment, uncomment, tabify, and untabify.
 File renamed from paragraph.py with functions added from editor.py.
 """
 
-import re
 from idlelib.config import idleConf
+import re
 from tkinter.messagebox import askyesno
 from tkinter.simpledialog import askinteger
 
@@ -61,9 +61,7 @@ class FormatParagraph:
             data = text.get(first, last)
             comment_header = get_comment_header(data)
         else:
-            first, last, comment_header, data = find_paragraph(
-                text, text.index("insert")
-            )
+            first, last, comment_header, data = find_paragraph(text, text.index("insert"))
         if comment_header:
             newdata = reformat_comment(data, limit, comment_header)
         else:

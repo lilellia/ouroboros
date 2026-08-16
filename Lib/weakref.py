@@ -10,8 +10,6 @@ https://peps.python.org/pep-0205/
 # the module-global ref() function imported from _weakref.
 
 import _collections_abc  # Import after _weakref to avoid circular import.
-import itertools
-import sys
 from _weakref import (
     CallableProxyType,
     ProxyType,
@@ -23,6 +21,8 @@ from _weakref import (
     ref,
 )
 from _weakrefset import WeakSet, _IterationGuard
+import itertools
+import sys
 
 ProxyTypes = (ProxyType, CallableProxyType)
 
@@ -59,9 +59,7 @@ class WeakMethod(ref):
             obj = meth.__self__
             func = meth.__func__
         except AttributeError:
-            raise TypeError(
-                f"argument should be a bound method, not {type(meth)}"
-            ) from None
+            raise TypeError(f"argument should be a bound method, not {type(meth)}") from None
 
         def _cb(arg):
             # The self-weakref trick is needed to avoid creating a reference

@@ -30,8 +30,12 @@ from idlelib.colorizer import color_config
 from idlelib.config import idleConf
 from os.path import abspath, dirname, isfile, join
 from platform import python_version
-from tkinter import Menu, Text, Toplevel
-from tkinter import font as tkfont
+from tkinter import (
+    Menu,
+    Text,
+    Toplevel,
+    font as tkfont,
+)
 from tkinter.ttk import Frame, Menubutton, Scrollbar, Style
 
 ## About IDLE ##
@@ -184,9 +188,7 @@ class HelpText(Text):
         self.tag_configure("h3", font=(normalfont, 15, "bold"))
         self.tag_configure("pre", font=(fixedfont, 12))
         preback = self["selectbackground"]
-        self.tag_configure(
-            "preblock", font=(fixedfont, 10), lmargin1=25, background=preback
-        )
+        self.tag_configure("preblock", font=(fixedfont, 10), lmargin1=25, background=preback)
         self.tag_configure("l1", lmargin1=25, lmargin2=25)
         self.tag_configure("l2", lmargin1=50, lmargin2=50)
         self.tag_configure("l3", lmargin1=75, lmargin2=75)

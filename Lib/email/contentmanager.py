@@ -1,8 +1,8 @@
 import binascii
+from email import quoprimime
 import email.charset
 import email.errors
 import email.message
-from email import quoprimime
 
 
 class ContentManager:
@@ -106,19 +106,14 @@ def _prepare_set(msg, maintype, subtype, headers):
     if headers:
         if not hasattr(headers[0], "name"):
             mp = msg.policy
-            headers = [
-                mp.header_factory(*mp.header_source_parse([header]))
-                for header in headers
-            ]
+            headers = [mp.header_factory(*mp.header_source_parse([header])) for header in headers]
         try:
             for header in headers:
                 if header.defects:
                     raise header.defects[0]
                 msg[header.name] = header
         except email.errors.HeaderDefect as exc:
-            raise ValueError(
-                f"Invalid header: {header.fold(policy=msg.policy)}"
-            ) from exc
+            raise ValueError(f"Invalid header: {header.fold(policy=msg.policy)}") from exc
 
 
 def _finalize_set(msg, disposition, filename, cid, params):
@@ -168,9 +163,7 @@ def _encode_text(string, charset, cte, policy):
             if policy.cte_type == "8bit":
                 return "8bit", normal_body(lines).decode("ascii", "surrogateescape")
         sniff = embedded_body(lines[:10])
-        sniff_qp = quoprimime.body_encode(
-            sniff.decode("latin-1"), policy.max_line_length
-        )
+        sniff_qp = quoprimime.body_encode(sniff.decode("latin-1"), policy.max_line_length)
         sniff_base64 = binascii.b2a_base64(sniff)
         # This is a little unfair to qp; it includes lineseps, base64 doesn't.
         if len(sniff_qp) > len(sniff_base64):
@@ -184,9 +177,7 @@ def _encode_text(string, charset, cte, policy):
     elif cte == "8bit":
         data = normal_body(lines).decode("ascii", "surrogateescape")
     elif cte == "quoted-printable":
-        data = quoprimime.body_encode(
-            normal_body(lines).decode("latin-1"), policy.max_line_length
-        )
+        data = quoprimime.body_encode(normal_body(lines).decode("latin-1"), policy.max_line_length)
     elif cte == "base64":
         data = _encode_base64(embedded_body(lines), policy.max_line_length)
     else:

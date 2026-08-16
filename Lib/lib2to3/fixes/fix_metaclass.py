@@ -218,8 +218,7 @@ class FixMetaclass(fixer_base.BaseFix):
             node.append_child(Leaf(token.NEWLINE, "\n"))
 
         elif len(suite.children) > 1 and (
-            suite.children[-2].type == token.INDENT
-            and suite.children[-1].type == token.DEDENT
+            suite.children[-2].type == token.INDENT and suite.children[-1].type == token.DEDENT
         ):
             # there was only one line in the class body and it was __metaclass__
             pass_leaf = Leaf(text_type, "pass")

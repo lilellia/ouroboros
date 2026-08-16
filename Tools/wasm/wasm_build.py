@@ -23,6 +23,7 @@ changes.
 """
 
 import argparse
+from collections.abc import Callable, Iterable
 import dataclasses
 import enum
 import logging
@@ -37,12 +38,11 @@ import sys
 import sysconfig
 import tempfile
 import time
-import warnings
-import webbrowser
-from collections.abc import Callable, Iterable
 
 # for Python 3.8
 from typing import Any
+import warnings
+import webbrowser
 
 logger = logging.getLogger("wasm_build")
 
@@ -264,10 +264,7 @@ def _check_emscripten():
     if broken is not None:
         raise ConditionError(
             os.fspath(version_txt),
-            (
-                f"Emscripten SDK {version} in '{EMSCRIPTEN_ROOT}' has known "
-                f"bugs, see {broken}."
-            ),
+            (f"Emscripten SDK {version} in '{EMSCRIPTEN_ROOT}' has known bugs, see {broken}."),
         )
     if os.environ.get("PKG_CONFIG_PATH"):
         warnings.warn(
@@ -580,9 +577,7 @@ class BuildProfile:
     def run_py(self, *args):
         """Run Python with hostrunner"""
         self._check_execute()
-        self.run_make(
-            "--eval", f"run: all; $(HOSTRUNNER) ./$(PYTHON) {shlex.join(args)}", "run"
-        )
+        self.run_make("--eval", f"run: all; $(HOSTRUNNER) ./$(PYTHON) {shlex.join(args)}", "run")
 
     def run_browser(self, bind="127.0.0.1", port=8000):
         """Run WASM webserver and open build in browser"""
@@ -793,10 +788,7 @@ parser.add_argument(
 
 parser.add_argument(
     "--testopts",
-    help=(
-        "Additional test options for 'test' and 'hostrunnertest', e.g. "
-        "--testopts='-v test_os'."
-    ),
+    help=("Additional test options for 'test' and 'hostrunnertest', e.g. --testopts='-v test_os'."),
     default=None,
 )
 

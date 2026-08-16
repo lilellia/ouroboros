@@ -13,8 +13,8 @@ __all__ = [
     "WSGIEnvironment",
 ]
 
-_ExcInfo: TypeAlias = tuple[type[BaseException], BaseException, TracebackType]
-_OptExcInfo: TypeAlias = _ExcInfo | tuple[None, None, None]
+_ExcInfo: TypeAlias = tuple[type[BaseException], BaseException, TracebackType]  # noqa: UP040
+_OptExcInfo: TypeAlias = _ExcInfo | tuple[None, None, None]  # noqa: UP040
 
 
 class StartResponse(Protocol):
@@ -29,8 +29,8 @@ class StartResponse(Protocol):
     ) -> Callable[[bytes], object]: ...
 
 
-WSGIEnvironment: TypeAlias = dict[str, Any]
-WSGIApplication: TypeAlias = Callable[[WSGIEnvironment, StartResponse], Iterable[bytes]]
+WSGIEnvironment: TypeAlias = dict[str, Any]  # noqa: UP040
+WSGIApplication: TypeAlias = Callable[[WSGIEnvironment, StartResponse], Iterable[bytes]]  # noqa: UP040
 
 
 class InputStream(Protocol):

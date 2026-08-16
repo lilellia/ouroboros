@@ -70,7 +70,8 @@ def arbitrary_address(family):
         return tempfile.mktemp(prefix="listener-", dir=util.get_temp_dir())
     elif family == "AF_PIPE":
         return tempfile.mktemp(
-            prefix=r"\\.\pipe\pyc-%d-%d-" % (os.getpid(), next(_mmap_counter)), dir=""  # noqa: UP031
+            prefix=r"\\.\pipe\pyc-%d-%d-" % (os.getpid(), next(_mmap_counter)),  # noqa: UP031
+            dir="",
         )
     else:
         raise ValueError("unrecognized family")
@@ -286,9 +287,7 @@ if _winapi:
             self._send_ov = ov
             try:
                 if err == _winapi.ERROR_IO_PENDING:
-                    waitres = _winapi.WaitForMultipleObjects(
-                        [ov.event], False, INFINITE
-                    )
+                    waitres = _winapi.WaitForMultipleObjects([ov.event], False, INFINITE)
                     assert waitres == WAIT_OBJECT_0
             except:
                 ov.cancel()
@@ -314,9 +313,7 @@ if _winapi:
                     ov, err = _winapi.ReadFile(self._handle, bsize, overlapped=True)
                     try:
                         if err == _winapi.ERROR_IO_PENDING:
-                            waitres = _winapi.WaitForMultipleObjects(
-                                [ov.event], False, INFINITE
-                            )
+                            waitres = _winapi.WaitForMultipleObjects([ov.event], False, INFINITE)
                             assert waitres == WAIT_OBJECT_0
                     except:
                         ov.cancel()
@@ -566,12 +563,8 @@ else:
 
         h1 = _winapi.CreateNamedPipe(
             address,
-            openmode
-            | _winapi.FILE_FLAG_OVERLAPPED
-            | _winapi.FILE_FLAG_FIRST_PIPE_INSTANCE,
-            _winapi.PIPE_TYPE_MESSAGE
-            | _winapi.PIPE_READMODE_MESSAGE
-            | _winapi.PIPE_WAIT,
+            openmode | _winapi.FILE_FLAG_OVERLAPPED | _winapi.FILE_FLAG_FIRST_PIPE_INSTANCE,
+            _winapi.PIPE_TYPE_MESSAGE | _winapi.PIPE_READMODE_MESSAGE | _winapi.PIPE_WAIT,
             1,
             obsize,
             ibsize,
@@ -627,9 +620,7 @@ class SocketListener:
 
         if family == "AF_UNIX" and not util.is_abstract_socket_namespace(address):
             # Linux abstract socket namespaces do not need to be explicitly unlinked
-            self._unlink = util.Finalize(
-                self, os.unlink, args=(address,), exitpriority=0
-            )
+            self._unlink = util.Finalize(self, os.unlink, args=(address,), exitpriority=0)
         else:
             self._unlink = None
 
@@ -690,9 +681,7 @@ if sys.platform == "win32":
             return _winapi.CreateNamedPipe(
                 self._address,
                 flags,
-                _winapi.PIPE_TYPE_MESSAGE
-                | _winapi.PIPE_READMODE_MESSAGE
-                | _winapi.PIPE_WAIT,
+                _winapi.PIPE_TYPE_MESSAGE | _winapi.PIPE_READMODE_MESSAGE | _winapi.PIPE_WAIT,
                 _winapi.PIPE_UNLIMITED_INSTANCES,
                 BUFSIZE,
                 BUFSIZE,
@@ -883,17 +872,13 @@ def _get_digest_name_and_payload(message):  # type: (bytes) -> tuple[str, bytes]
         # HMAC-MD5 response. All messages using the modern protocol will
         # be longer than either of these lengths.
         return "", message
-    if (
-        message.startswith(b"{")
-        and (curly := message.find(b"}", 1, _MAX_DIGEST_LEN + 2)) > 0
-    ):
+    if message.startswith(b"{") and (curly := message.find(b"}", 1, _MAX_DIGEST_LEN + 2)) > 0:
         digest = message[1:curly]
         if digest in _ALLOWED_DIGESTS:
             payload = message[curly + 1 :]
             return digest.decode("ascii"), payload
     raise AuthenticationError(
-        "unsupported message length, missing digest prefix, "
-        f"or unsupported digest: {message=}"
+        f"unsupported message length, missing digest prefix, or unsupported digest: {message=}"
     )
 
 
@@ -946,8 +931,7 @@ def _verify_challenge(authkey, message, response):
         raise AuthenticationError(f"{response_digest=} unsupported")
     if len(expected) != len(response_mac):
         raise AuthenticationError(
-            f"expected {response_digest!r} of length {len(expected)} "
-            f"got {len(response_mac)}"
+            f"expected {response_digest!r} of length {len(expected)} got {len(response_mac)}"
         )
     if not hmac.compare_digest(expected, response_mac):
         raise AuthenticationError("digest received was wrong")

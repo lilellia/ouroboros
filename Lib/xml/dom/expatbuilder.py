@@ -241,12 +241,8 @@ class ExpatBuilder:
             subset = extractor.getSubset()
             self.document.doctype.internalSubset = subset
 
-    def start_doctype_decl_handler(
-        self, doctypeName, systemId, publicId, has_internal_subset
-    ):
-        doctype = self.document.implementation.createDocumentType(
-            doctypeName, publicId, systemId
-        )
+    def start_doctype_decl_handler(self, doctypeName, systemId, publicId, has_internal_subset):
+        doctype = self.document.implementation.createDocumentType(doctypeName, publicId, systemId)
         doctype.ownerDocument = self.document
         _append_child(self.document, doctype)
         self.document.doctype = doctype
@@ -322,9 +318,7 @@ class ExpatBuilder:
             return
         if not self._options.entities:
             return
-        node = self.document._create_entity(
-            entityName, publicId, systemId, notationName
-        )
+        node = self.document._create_entity(entityName, publicId, systemId, notationName)
         if value is not None:
             # internal entity
             # node *should* be readonly, but we'll cheat
@@ -481,9 +475,7 @@ class FilterVisibilityController:
             if val == FILTER_INTERRUPT:
                 raise ParseEscape
             if val not in _ALLOWED_FILTER_RETURNS:
-                raise ValueError(
-                    "startContainer() returned illegal value: " + repr(val)
-                )
+                raise ValueError("startContainer() returned illegal value: " + repr(val))
             return val
         else:
             return FILTER_ACCEPT
@@ -590,9 +582,7 @@ class Skipper(FilterCrutch):
 # framework document used by the fragment builder.
 # Takes a string for the doctype, subset string, and namespace attrs string.
 
-_FRAGMENT_BUILDER_INTERNAL_SYSTEM_ID = (
-    "http://xml.python.org/entities/fragment-builder/internal"
-)
+_FRAGMENT_BUILDER_INTERNAL_SYSTEM_ID = "http://xml.python.org/entities/fragment-builder/internal"
 
 _FRAGMENT_BUILDER_TEMPLATE = f"""\
 <!DOCTYPE wrapper
@@ -715,9 +705,7 @@ class FragmentBuilder(ExpatBuilder):
                 self._source = None
             return -1
         else:
-            return ExpatBuilder.external_entity_ref_handler(
-                self, context, base, systemId, publicId
-            )
+            return ExpatBuilder.external_entity_ref_handler(self, context, base, systemId, publicId)
 
 
 class Namespaces:
@@ -809,9 +797,7 @@ class Namespaces:
                     and curNode.prefix == prefix
                 ), "element stack messed up! (namespace)"
             else:
-                assert curNode.nodeName == name, (
-                    "element stack messed up - bad nodeName"
-                )
+                assert curNode.nodeName == name, "element stack messed up - bad nodeName"
                 assert curNode.namespaceURI == EMPTY_NAMESPACE, (
                     "element stack messed up - bad namespaceURI"
                 )

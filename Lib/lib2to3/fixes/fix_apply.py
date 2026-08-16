@@ -42,9 +42,7 @@ class FixApply(fixer_base.BaseFix):
                 "*",
             }:
                 return  # Make no change.
-        if kwds and (
-            kwds.type == self.syms.argument and kwds.children[0].value == "**"
-        ):
+        if kwds and (kwds.type == self.syms.argument and kwds.children[0].value == "**"):
             return  # Make no change.
         prefix = node.prefix
         func = func.clone()

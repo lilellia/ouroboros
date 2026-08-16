@@ -13,15 +13,14 @@ Usage::
 
 import argparse
 import json
-import sys
 from pathlib import Path
+import sys
 
 
 def main():
     prog = "python -m json.tool"
     description = (
-        "A simple command line interface for json module "
-        "to validate and pretty-print JSON objects."
+        "A simple command line interface for json module to validate and pretty-print JSON objects."
     )
     parser = argparse.ArgumentParser(prog=prog, description=description)
     parser.add_argument(
@@ -62,8 +61,7 @@ def main():
         "--indent",
         default=4,
         type=int,
-        help="separate items with newlines and use this number "
-        "of spaces for indentation",
+        help="separate items with newlines and use this number of spaces for indentation",
     )
     group.add_argument(
         "--tab",

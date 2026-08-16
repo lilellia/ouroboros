@@ -11,23 +11,21 @@ FUNCTIONS:
 
 """
 
-import calendar
-import locale
-import time
 from _thread import allocate_lock as _thread_allocate_lock
+import calendar
 from datetime import (
     date as datetime_date,
-)
-from datetime import (
     timedelta as datetime_timedelta,
-)
-from datetime import (
     timezone as datetime_timezone,
 )
-from re import IGNORECASE
-from re import compile as re_compile
-from re import escape as re_escape
-from re import sub as re_sub
+import locale
+from re import (
+    IGNORECASE,
+    compile as re_compile,
+    escape as re_escape,
+    sub as re_sub,
+)
+import time
 
 __all__ = []
 
@@ -633,13 +631,9 @@ def _strptime(data_string, format="%a %b %d %H:%M:%S %Y"):
     if julian is None and weekday is not None:
         if week_of_year is not None:
             week_starts_Mon = week_of_year_start == 0
-            julian = _calc_julian_from_U_or_W(
-                year, week_of_year, weekday, week_starts_Mon
-            )
+            julian = _calc_julian_from_U_or_W(year, week_of_year, weekday, week_starts_Mon)
         elif iso_year is not None and iso_week is not None:
-            datetime_result = datetime_date.fromisocalendar(
-                iso_year, iso_week, weekday + 1
-            )
+            datetime_result = datetime_date.fromisocalendar(iso_year, iso_week, weekday + 1)
             year = datetime_result.year
             month = datetime_result.month
             day = datetime_result.day
@@ -654,9 +648,7 @@ def _strptime(data_string, format="%a %b %d %H:%M:%S %Y"):
         # the week calculation.
         # Need to add 1 to result since first day of the year is 1, not 0.
         julian = (
-            datetime_date(year, month, day).toordinal()
-            - datetime_date(year, 1, 1).toordinal()
-            + 1
+            datetime_date(year, month, day).toordinal() - datetime_date(year, 1, 1).toordinal() + 1
         )
     else:  # Assume that if they bothered to include Julian day (or if it was
         # calculated above with year/week/weekday) it will be accurate.

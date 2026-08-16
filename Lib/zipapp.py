@@ -73,9 +73,7 @@ def _copy_archive(archive, new_archive, interpreter=None):
         os.chmod(new_archive, os.stat(new_archive).st_mode | stat.S_IEXEC)
 
 
-def create_archive(
-    source, target=None, interpreter=None, main=None, filter=None, compressed=False
-):
+def create_archive(source, target=None, interpreter=None, main=None, filter=None, compressed=False):
     """Create an application archive from SOURCE.
 
     The SOURCE can be the name of a directory, or a filename or a file-like
@@ -178,15 +176,13 @@ def main(args=None):
         "--main",
         "-m",
         default=None,
-        help="The main function of the application "
-        "(default: use an existing __main__.py).",
+        help="The main function of the application (default: use an existing __main__.py).",
     )
     parser.add_argument(
         "--compress",
         "-c",
         action="store_true",
-        help="Compress files with the deflate method. "
-        "Files are stored uncompressed by default.",
+        help="Compress files with the deflate method. Files are stored uncompressed by default.",
     )
     parser.add_argument(
         "--info",

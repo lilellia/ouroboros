@@ -24,9 +24,9 @@ Please keep this script compatible with Python 2.7, and 3.4 to 3.7.
 """
 
 import argparse
+from datetime import datetime
 import logging
 import os
-from datetime import datetime
 
 try:
     from urllib.error import HTTPError
@@ -118,9 +118,7 @@ parser.add_argument(
         "all and runs the test suite."
     ),
 )
-parser.add_argument(
-    "--system", default="", help="Override the automatic system type detection."
-)
+parser.add_argument("--system", default="", help="Override the automatic system type detection.")
 parser.add_argument(
     "--force", action="store_true", dest="force", help="Force build and installation."
 )
@@ -411,9 +409,7 @@ class BuildOpenSSL(AbstractBuilder):
 
 class BuildLibreSSL(AbstractBuilder):
     library = "LibreSSL"
-    url_templates = (
-        "https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-{v}.tar.gz",
-    )
+    url_templates = ("https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-{v}.tar.gz",)
     src_template = "libressl-{}.tar.gz"
     build_template = "libressl-{}"
 
@@ -421,9 +417,7 @@ class BuildLibreSSL(AbstractBuilder):
 def configure_make():
     if not os.path.isfile("Makefile"):
         log.info("Running ./configure")
-        subprocess.check_call(
-            ["./configure", "--config-cache", "--quiet", "--with-pydebug"]
-        )
+        subprocess.check_call(["./configure", "--config-cache", "--quiet", "--with-pydebug"])
 
     log.info("Running make")
     subprocess.check_call(["make", "--quiet"])

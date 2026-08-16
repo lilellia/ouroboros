@@ -1,8 +1,8 @@
+from abc import abstractmethod
 import ast
+from collections.abc import Iterable, Iterator
 import contextlib
 import re
-from abc import abstractmethod
-from collections.abc import Iterable, Iterator
 from typing import (  # noqa: UP035
     IO,
     AbstractSet,
@@ -35,9 +35,7 @@ from pegen.grammar import (
 class RuleCollectorVisitor(GrammarVisitor):
     """Visitor that invokes a provieded callmaker visitor with just the NamedItem nodes"""
 
-    def __init__(
-        self, rules: dict[str, Rule], callmakervisitor: GrammarVisitor
-    ) -> None:
+    def __init__(self, rules: dict[str, Rule], callmakervisitor: GrammarVisitor) -> None:
         self.rulses = rules
         self.callmaker = callmakervisitor
 
@@ -51,9 +49,7 @@ class RuleCollectorVisitor(GrammarVisitor):
 class KeywordCollectorVisitor(GrammarVisitor):
     """Visitor that collects all the keywods and soft keywords in the Grammar"""
 
-    def __init__(
-        self, gen: "ParserGenerator", keywords: dict[str, int], soft_keywords: set[str]
-    ):
+    def __init__(self, gen: "ParserGenerator", keywords: dict[str, int], soft_keywords: set[str]):
         self.generator = gen
         self.keywords = keywords
         self.soft_keywords = soft_keywords
@@ -78,9 +74,7 @@ class RuleCheckingVisitor(GrammarVisitor):
 
     def visit_NamedItem(self, node: NamedItem) -> None:
         if node.name and node.name.startswith("_"):
-            raise GrammarError(
-                f"Variable names cannot start with underscore: '{node.name}'"
-            )
+            raise GrammarError(f"Variable names cannot start with underscore: '{node.name}'")
         self.visit(node.item)
 
 
@@ -146,9 +140,7 @@ class ParserGenerator:
             self.print(line)
 
     def collect_rules(self) -> None:
-        keyword_collector = KeywordCollectorVisitor(
-            self, self.keywords, self.soft_keywords
-        )
+        keyword_collector = KeywordCollectorVisitor(self, self.keywords, self.soft_keywords)
         for rule in self.all_rules.values():
             keyword_collector.visit(rule)
 

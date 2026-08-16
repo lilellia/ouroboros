@@ -15,11 +15,11 @@ __all__ = [
 
 __author__ = "Nadeem Vawda <nadeem.vawda@gmail.com>"
 
+from _bz2 import BZ2Compressor, BZ2Decompressor
 import _compression
+from builtins import open as _builtin_open
 import io
 import os
-from _bz2 import BZ2Compressor, BZ2Decompressor
-from builtins import open as _builtin_open
 
 _MODE_CLOSED = 0
 _MODE_READ = 1
@@ -91,9 +91,7 @@ class BZ2File(_compression.BaseStream):
             raise TypeError("filename must be a str, bytes, file or PathLike object")
 
         if self._mode == _MODE_READ:
-            raw = _compression.DecompressReader(
-                self._fp, BZ2Decompressor, trailing_error=OSError
-            )
+            raw = _compression.DecompressReader(self._fp, BZ2Decompressor, trailing_error=OSError)
             self._buffer = io.BufferedReader(raw)
         else:
             self._pos = 0
@@ -272,9 +270,7 @@ class BZ2File(_compression.BaseStream):
         return self._pos
 
 
-def open(
-    filename, mode="rb", compresslevel=9, encoding=None, errors=None, newline=None
-):
+def open(filename, mode="rb", compresslevel=9, encoding=None, errors=None, newline=None):
     """Open a bzip2-compressed file in binary or text mode.
 
     The filename argument can be an actual filename (a str, bytes, or
@@ -343,8 +339,6 @@ def decompress(data):
                 raise  # Error on the first iteration; bail out.
         results.append(res)
         if not decomp.eof:
-            raise ValueError(
-                "Compressed data ended before the end-of-stream marker was reached"
-            )
+            raise ValueError("Compressed data ended before the end-of-stream marker was reached")
         data = decomp.unused_data
     return b"".join(results)

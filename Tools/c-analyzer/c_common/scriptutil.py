@@ -6,8 +6,12 @@ import os.path
 import shutil
 import sys
 
-from . import fsutil, iterutil, strutil
-from . import logging as loggingutil
+from . import (
+    fsutil,
+    iterutil,
+    logging as loggingutil,
+    strutil,
+)
 
 _NOT_SET = object()
 
@@ -326,9 +330,7 @@ def _parse_files(filenames):
 
 
 def add_progress_cli(parser, *, threshold=VERBOSITY, **kwargs):
-    parser.add_argument(
-        "--progress", dest="track_progress", action="store_const", const=True
-    )
+    parser.add_argument("--progress", dest="track_progress", action="store_const", const=True)
     parser.add_argument("--no-progress", dest="track_progress", action="store_false")
     parser.set_defaults(track_progress=True)
 
@@ -563,9 +565,7 @@ def filter_filenames(filenames, process_filenames=None, relroot=fsutil.USE_CWD):
 
 def main_for_filenames(filenames, process_filenames=None, relroot=fsutil.USE_CWD):
     filenames, relroot = fsutil.fix_filenames(filenames, relroot=relroot)
-    for filename, relfile, check, show in _iter_filenames(
-        filenames, process_filenames, relroot
-    ):
+    for filename, relfile, check, show in _iter_filenames(filenames, process_filenames, relroot):
         if show:
             print()
             print(relfile)

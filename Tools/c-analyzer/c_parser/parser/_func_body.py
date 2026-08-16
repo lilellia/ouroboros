@@ -9,8 +9,6 @@ from ._common import (
 from ._compound_decl_body import DECL_BODY_PARSERS
 from ._regexes import (
     LOCAL as _LOCAL,
-)
-from ._regexes import (
     LOCAL_STATICS as _LOCAL_STATICS,
 )
 
@@ -250,9 +248,7 @@ def _parse_next_local_static(m, srcinfo, anon_name, func, depth):
 
         # un-inline the decl.  Note that it might not actually be inline.
         # We handle the case in the "maybe_inline_actual" branch.
-        srcinfo.nest(
-            remainder, f"{inline_leading or ''} {inline_pre or ''} {kind} {name}"
-        )
+        srcinfo.nest(remainder, f"{inline_leading or ''} {inline_pre or ''} {kind} {name}")
 
         def parse_body(source):
             _parse_body = DECL_BODY_PARSERS[kind]

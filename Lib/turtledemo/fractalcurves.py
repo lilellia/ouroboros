@@ -12,8 +12,10 @@ methods are taken from the PythonCard example
 scripts for turtle-graphics.
 """
 
-from time import perf_counter as clock
-from time import sleep
+from time import (
+    perf_counter as clock,
+    sleep,
+)
 from turtle import *
 
 

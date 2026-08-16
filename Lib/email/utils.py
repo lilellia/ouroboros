@@ -23,17 +23,23 @@ __all__ = [
 ]
 
 import datetime
+from email._parseaddr import (
+    AddressList as _AddressList,
+    _parsedate_tz,
+    mktime_tz,
+    parsedate,
+    parsedate_tz,
+    quote,
+)
+
+# Intrapackage imports
+from email.charset import Charset
 import os
 import random
 import re
 import socket
 import time
 import urllib.parse
-from email._parseaddr import AddressList as _AddressList
-from email._parseaddr import _parsedate_tz, mktime_tz, parsedate, parsedate_tz, quote
-
-# Intrapackage imports
-from email.charset import Charset
 
 COMMASPACE = ", "
 EMPTYSTRING = ""
@@ -274,7 +280,7 @@ def formatdate(timeval=None, localtime=False, usegmt=False):
     # 2822 requires that day and month names be the English abbreviations.
     if timeval is None:
         timeval = time.time()
-    dt = datetime.datetime.fromtimestamp(timeval, datetime.timezone.utc)
+    dt = datetime.datetime.fromtimestamp(timeval, datetime.UTC)
 
     if localtime:
         dt = dt.astimezone()
@@ -293,7 +299,7 @@ def format_datetime(dt, usegmt=False):
     """
     now = dt.timetuple()
     if usegmt:
-        if dt.tzinfo is None or dt.tzinfo != datetime.timezone.utc:
+        if dt.tzinfo is None or dt.tzinfo != datetime.UTC:
             raise ValueError("usegmt option requires a UTC datetime")
         zone = "GMT"
     elif dt.tzinfo is None:
@@ -333,9 +339,7 @@ def parsedate_to_datetime(data):
     *dtuple, tz = parsed_date_tz
     if tz is None:
         return datetime.datetime(*dtuple[:6])  # noqa: DTZ001
-    return datetime.datetime(
-        *dtuple[:6], tzinfo=datetime.timezone(datetime.timedelta(seconds=tz))
-    )
+    return datetime.datetime(*dtuple[:6], tzinfo=datetime.timezone(datetime.timedelta(seconds=tz)))
 
 
 def parseaddr(addr, *, strict=True):

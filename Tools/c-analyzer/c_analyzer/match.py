@@ -2,8 +2,6 @@ import os.path
 
 from c_parser import (
     info as _info,
-)
-from c_parser import (
     match as _match,
 )
 

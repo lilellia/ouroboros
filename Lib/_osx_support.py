@@ -88,11 +88,7 @@ def _read_output(commandstring, capture_stderr=False):
 
 def _find_build_tool(toolname):
     """Find a build tool on current path or using xcrun"""
-    return (
-        _find_executable(toolname)
-        or _read_output(f"/usr/bin/xcrun -find {toolname}")
-        or ""
-    )
+    return _find_executable(toolname) or _read_output(f"/usr/bin/xcrun -find {toolname}") or ""
 
 
 _SYSTEM_VERSION = None
@@ -426,9 +422,7 @@ def compiler_fixup(compiler_so, cc_args):
 
     if stripSysroot:
         while True:
-            indices = [
-                i for i, x in enumerate(compiler_so) if x.startswith("-isysroot")
-            ]
+            indices = [i for i, x in enumerate(compiler_so) if x.startswith("-isysroot")]
             if not indices:
                 break
             index = indices[0]
@@ -458,9 +452,7 @@ def compiler_fixup(compiler_so, cc_args):
             break
 
     if sysroot and not os.path.isdir(sysroot):
-        sys.stderr.write(
-            f"Compiling with an SDK that doesn't seem to exist: {sysroot}\n"
-        )
+        sys.stderr.write(f"Compiling with an SDK that doesn't seem to exist: {sysroot}\n")
         sys.stderr.write("Please check your Xcode installation\n")
         sys.stderr.flush()
 

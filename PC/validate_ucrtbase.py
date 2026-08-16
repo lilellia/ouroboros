@@ -3,9 +3,9 @@ This script gets the version number from ucrtbased.dll and checks
 whether it is a version with a known issue.
 """
 
-import sys
 from ctypes import POINTER, Structure, WinDLL, byref, c_buffer, create_unicode_buffer
 from ctypes.wintypes import DWORD, HANDLE
+import sys
 
 
 class VS_FIXEDFILEINFO(Structure):

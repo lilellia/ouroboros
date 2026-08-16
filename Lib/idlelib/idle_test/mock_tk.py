@@ -4,8 +4,8 @@ A gui object is anything with a master or parent parameter, which is
 typically required in spite of what the doc strings say.
 """
 
-import re
 from _tkinter import TclError
+import re
 
 
 class Event:
@@ -249,13 +249,9 @@ class Text:
             # restricting end position to insert position excludes terminal \n
 
         if startline == endline and startchar < endchar:
-            self.data[startline] = (
-                self.data[startline][:startchar] + self.data[startline][endchar:]
-            )
+            self.data[startline] = self.data[startline][:startchar] + self.data[startline][endchar:]
         elif startline < endline:
-            self.data[startline] = (
-                self.data[startline][:startchar] + self.data[endline][endchar:]
-            )
+            self.data[startline] = self.data[startline][:startchar] + self.data[endline][endchar:]
             startline += 1
             for i in range(startline, endline + 1):
                 del self.data[startline]

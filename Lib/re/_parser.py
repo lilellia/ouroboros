@@ -303,9 +303,7 @@ class Tokenizer:
             if c is None:
                 if not result:
                     raise self.error("missing " + name)
-                raise self.error(
-                    f"missing {terminator}, unterminated name", len(result)
-                )
+                raise self.error(f"missing {terminator}, unterminated name", len(result))
             if c == terminator:
                 if not result:
                     raise self.error("missing " + name, 1)
@@ -457,11 +455,7 @@ def _escape(source, escape, state):
             # octal escape *or* decimal group reference (sigh)
             if source.next in DIGITS:
                 escape += source.get()
-                if (
-                    escape[1] in OCTDIGITS
-                    and escape[2] in OCTDIGITS
-                    and source.next in OCTDIGITS
-                ):
+                if escape[1] in OCTDIGITS and escape[2] in OCTDIGITS and source.next in OCTDIGITS:
                     # got three octal digits; this is an octal escape
                     escape += source.get()
                     c = int(escape[1:], 8)
@@ -500,9 +494,7 @@ def _parse_sub(source, state, verbose, nested):
     sourcematch = source.match
     source.tell()
     while True:
-        itemsappend(
-            _parse(source, state, verbose, nested + 1, not nested and not items)
-        )
+        itemsappend(_parse(source, state, verbose, nested + 1, not nested and not items))
         if not sourcematch("|"):
             break
         if not nested:
@@ -611,9 +603,7 @@ def _parse(source, state, verbose, nested, first=False):
             while True:
                 this = sourceget()
                 if this is None:
-                    raise source.error(
-                        "unterminated character set", source.tell() - here
-                    )
+                    raise source.error("unterminated character set", source.tell() - here)
                 if this == "]" and set:
                     break
                 elif this[0] == "\\":
@@ -642,9 +632,7 @@ def _parse(source, state, verbose, nested, first=False):
                     # potential range
                     that = sourceget()
                     if that is None:
-                        raise source.error(
-                            "unterminated character set", source.tell() - here
-                        )
+                        raise source.error("unterminated character set", source.tell() - here)
                     if that == "]":
                         if code1[0] is IN:
                             code1 = code1[1][0]
@@ -742,9 +730,7 @@ def _parse(source, state, verbose, nested, first=False):
             else:
                 item = None
             if not item or item[0][0] is AT:
-                raise source.error(
-                    "nothing to repeat", source.tell() - here + len(this)
-                )
+                raise source.error("nothing to repeat", source.tell() - here + len(this))
             if item[0][0] in _REPEATCODES:
                 raise source.error("multiple repeat", source.tell() - here + len(this))
             if item[0][0] is SUBPATTERN:
@@ -791,9 +777,7 @@ def _parse(source, state, verbose, nested, first=False):
                             msg = f"unknown group name {name!r}"
                             raise source.error(msg, len(name) + 1)
                         if not state.checkgroup(gid):
-                            raise source.error(
-                                "cannot refer to an open group", len(name) + 1
-                            )
+                            raise source.error("cannot refer to an open group", len(name) + 1)
                         state.checklookbehindgroup(gid, source)
                         subpatternappend((GROUPREF, gid))
                         continue
@@ -825,9 +809,7 @@ def _parse(source, state, verbose, nested, first=False):
                         if char is None:
                             raise source.error("unexpected end of pattern")
                         if char not in "=!":
-                            raise source.error(
-                                "unknown extension ?<" + char, len(char) + 2
-                            )
+                            raise source.error("unknown extension ?<" + char, len(char) + 2)
                         dir = -1  # lookbehind
                         lookbehindgroups = state.lookbehindgroups
                         if lookbehindgroups is None:
@@ -862,18 +844,14 @@ def _parse(source, state, verbose, nested, first=False):
                             msg = "invalid group reference %d" % condgroup  # noqa: UP031
                             raise source.error(msg, len(condname) + 1)
                         if condgroup not in state.grouprefpos:
-                            state.grouprefpos[condgroup] = (
-                                source.tell() - len(condname) - 1
-                            )
+                            state.grouprefpos[condgroup] = source.tell() - len(condname) - 1
                         if not (condname.isdecimal() and condname.isascii()):
                             import warnings
 
                             warnings.warn(
                                 "bad character in group name %s at position %d"  # noqa: UP031
                                 % (
-                                    repr(condname)
-                                    if source.istext
-                                    else ascii(condname),
+                                    repr(condname) if source.istext else ascii(condname),
                                     source.tell() - len(condname) - 1,
                                 ),
                                 DeprecationWarning,
@@ -884,9 +862,7 @@ def _parse(source, state, verbose, nested, first=False):
                     if source.match("|"):
                         item_no = _parse(source, state, verbose, nested + 1)
                         if source.next == "|":
-                            raise source.error(
-                                "conditional backref with more than two branches"
-                            )
+                            raise source.error("conditional backref with more than two branches")
                     else:
                         item_no = None
                     if not source.match(")"):
@@ -930,9 +906,7 @@ def _parse(source, state, verbose, nested, first=False):
             )
             p = _parse_sub(source, state, sub_verbose, nested + 1)
             if not source.match(")"):
-                raise source.error(
-                    "missing ), unterminated subpattern", source.tell() - start
-                )
+                raise source.error("missing ), unterminated subpattern", source.tell() - start)
             if group is not None:
                 state.closegroup(group, p)
             if atomic:
@@ -1113,7 +1087,8 @@ def parse_template(source, pattern):
                     index = int(name)
                     if index >= MAXGROUPS:
                         raise s.error(
-                            "invalid group reference %d" % index, len(name) + 1  # noqa: UP031
+                            "invalid group reference %d" % index,  # noqa: UP031
+                            len(name) + 1,
                         )
                     if not (name.isdecimal() and name.isascii()):
                         import warnings

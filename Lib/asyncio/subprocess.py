@@ -143,9 +143,7 @@ class Process:
             if input is not None:
                 self.stdin.write(input)
                 if debug:
-                    logger.debug(
-                        "%r communicate: feed stdin (%s bytes)", self, len(input)
-                    )
+                    logger.debug("%r communicate: feed stdin (%s bytes)", self, len(input))
 
             await self.stdin.drain()
         except (BrokenPipeError, ConnectionResetError) as exc:

@@ -14,9 +14,9 @@
 # - keep track of object ids to allow more careful cleaning
 # - optimize tree redraw after expand of subnode
 
-import os
 from idlelib import zoomheight
 from idlelib.config import idleConf
+import os
 from tkinter import *
 from tkinter.ttk import Frame, Scrollbar
 
@@ -246,11 +246,7 @@ class TreeNode:
 
     def drawicon(self):
         if self.selected:
-            imagename = (
-                self.item.GetSelectedIconName()
-                or self.item.GetIconName()
-                or "openfolder"
-            )
+            imagename = self.item.GetSelectedIconName() or self.item.GetIconName() or "openfolder"
         else:
             imagename = self.item.GetIconName() or "folder"
         image = self.geticonimage(imagename)

@@ -9,10 +9,10 @@ unnecessary work in GHA, and saves CI resources.
 
 from __future__ import annotations
 
-import os
-import subprocess
 from dataclasses import dataclass
+import os
 from pathlib import Path
+import subprocess
 
 TYPE_CHECKING = False
 if TYPE_CHECKING:
@@ -98,9 +98,7 @@ def git_refs() -> tuple[str, str]:
     return f"origin/{target_ref}", head_ref
 
 
-def get_changed_files(
-    ref_a: str = GITHUB_DEFAULT_BRANCH, ref_b: str = "HEAD"
-) -> AbstractSet[Path]:
+def get_changed_files(ref_a: str = GITHUB_DEFAULT_BRANCH, ref_b: str = "HEAD") -> AbstractSet[Path]:
     """List the files changed between two Git refs, filtered by change type."""
     args = ("git", "diff", "--name-only", f"{ref_a}...{ref_b}", "--")
     print(*args)
@@ -129,9 +127,7 @@ def process_changed_files(changed_files: AbstractSet[Path]) -> Outputs:
                 run_docs = True
 
         if not (
-            doc_file
-            or file == GITHUB_CODEOWNERS_PATH
-            or file.name in CONFIGURATION_FILE_NAMES
+            doc_file or file == GITHUB_CODEOWNERS_PATH or file.name in CONFIGURATION_FILE_NAMES
         ):
             run_tests = True
 

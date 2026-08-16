@@ -196,8 +196,7 @@ def addpackage(sitedir, name, known_paths):
 
         pth_content = pth_content.decode(locale.getencoding())
         _trace(
-            f"Cannot read {fullname!r} as UTF-8. "
-            f"Using fallback encoding {locale.getencoding()!r}"
+            f"Cannot read {fullname!r} as UTF-8. Using fallback encoding {locale.getencoding()!r}"
         )
 
     for n, line in enumerate(pth_content.splitlines(), 1):
@@ -245,9 +244,7 @@ def addsitedir(sitedir, known_paths=None):
         names = os.listdir(sitedir)
     except OSError:
         return
-    names = [
-        name for name in names if name.endswith(".pth") and not name.startswith(".")
-    ]
+    names = [name for name in names if name.endswith(".pth") and not name.startswith(".")]
     for name in sorted(names):
         addpackage(sitedir, name, known_paths)
     if reset:

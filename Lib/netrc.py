@@ -140,9 +140,7 @@ class netrc:
                 elif tt == "password":
                     password = lexer.get_token()
                 else:
-                    raise NetrcParseError(
-                        f"bad follower token {tt!r}", file, lexer.lineno
-                    )
+                    raise NetrcParseError(f"bad follower token {tt!r}", file, lexer.lineno)
             self._security_check(fp, default_netrc, self.hosts[entryname][0])
 
     def _security_check(self, fp, default_netrc, login):
@@ -160,8 +158,7 @@ class netrc:
                 except KeyError:
                     user = f"uid {os.getuid()}"
                 raise NetrcParseError(
-                    f"~/.netrc file owner ({fowner}, {user}) does not match"
-                    " current user"
+                    f"~/.netrc file owner ({fowner}, {user}) does not match current user"
                 )
             if prop.st_mode & (stat.S_IRWXG | stat.S_IRWXO):
                 raise NetrcParseError(

@@ -74,9 +74,7 @@ else:
     _modifier_masks = (MC_CONTROL, MC_ALT, MC_SHIFT, MC_META)
 
 # a dictionary to map a modifier name into its number
-_modifier_names = {
-    name: number for number in range(len(_modifiers)) for name in _modifiers[number]
-}
+_modifier_names = {name: number for number in range(len(_modifiers)) for name in _modifiers[number]}
 
 # In 3.4, if no shell window is ever open, the underlying Tk widget is
 # destroyed before .__del__ methods here are called.  The following
@@ -141,8 +139,7 @@ class _SimpleBinder:
 # number of modifiers is the state - the most specific state comes first.
 _states = range(1 << len(_modifiers))
 _state_names = [
-    "".join(m[0] + "-" for i, m in enumerate(_modifiers) if (1 << i) & s)
-    for s in _states
+    "".join(m[0] + "-" for i, m in enumerate(_modifiers) if (1 << i) & s) for s in _states
 ]
 
 
@@ -241,9 +238,7 @@ class _ComplexBinder:
             lists = [self.bindedfuncs[None][i] for i in _state_subsets[s]]
             handler = self.__create_handler(lists, type, _state_codes[s])
             seq = "<" + _state_names[s] + self.typename + ">"
-            self.handlerids.append(
-                (seq, self.widget.bind(self.widgetinst, seq, handler))
-            )
+            self.handlerids.append((seq, self.widget.bind(self.widgetinst, seq, handler)))
 
     def bind(self, triplet, func):
         if triplet[2] not in self.bindedfuncs:
@@ -256,9 +251,7 @@ class _ComplexBinder:
                 ]
                 handler = self.__create_handler(lists, self.type, _state_codes[s])
                 seq = f"<{_state_names[s]}{self.typename}-{triplet[2]}>"
-                self.handlerids.append(
-                    (seq, self.widget.bind(self.widgetinst, seq, handler))
-                )
+                self.handlerids.append((seq, self.widget.bind(self.widgetinst, seq, handler)))
         doit = lambda: self.bindedfuncs[triplet[2]][triplet[0]].append(func)
         if not self.ishandlerrunning:
             doit()
@@ -361,14 +354,7 @@ def _parse_sequence(sequence):
 
 def _triplet_to_sequence(triplet):
     if triplet[2]:
-        return (
-            "<"
-            + _state_names[triplet[0]]
-            + _types[triplet[1]][0]
-            + "-"
-            + triplet[2]
-            + ">"
-        )
+        return "<" + _state_names[triplet[0]] + _types[triplet[1]][0] + "-" + triplet[2] + ">"
     else:
         return "<" + _state_names[triplet[0]] + _types[triplet[1]][0] + ">"
 
@@ -393,9 +379,7 @@ def MultiCallCreator(widget):
             #  0. the function binded
             #  1. a list of triplets - the sequences it is binded to
             self.__eventinfo = {}
-            self.__binders = [
-                _binder_classes[i](i, widget, self) for i in range(len(_types))
-            ]
+            self.__binders = [_binder_classes[i](i, widget, self) for i in range(len(_types))]
 
         def bind(self, sequence=None, func=None, add=None):
             # print("bind(%s, %s, %s)" % (sequence, func, add),

@@ -139,14 +139,9 @@ def decode(in_file, out_file=None, mode=None, quiet=False):
             if (
                 out_file.startswith(os.sep)
                 or f"..{os.sep}" in out_file
-                or (
-                    os.altsep
-                    and (out_file.startswith(os.altsep) or f"..{os.altsep}" in out_file)
-                )
+                or (os.altsep and (out_file.startswith(os.altsep) or f"..{os.altsep}" in out_file))
             ):
-                raise Error(
-                    f"Refusing to write to {out_file} due to directory traversal"
-                )
+                raise Error(f"Refusing to write to {out_file} due to directory traversal")
         if mode is None:
             mode = int(hdrfields[1], 8)
         #

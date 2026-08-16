@@ -48,9 +48,7 @@ async def open_connection(host=None, port=None, *, limit=_DEFAULT_LIMIT, **kwds)
     return reader, writer
 
 
-async def start_server(
-    client_connected_cb, host=None, port=None, *, limit=_DEFAULT_LIMIT, **kwds
-):
+async def start_server(client_connected_cb, host=None, port=None, *, limit=_DEFAULT_LIMIT, **kwds):
     """Start a socket server, call back for each client connected.
 
     The first parameter, `client_connected_cb`, takes two parameters:
@@ -94,9 +92,7 @@ if hasattr(socket, "AF_UNIX"):
         writer = StreamWriter(transport, protocol, reader, loop)
         return reader, writer
 
-    async def start_unix_server(
-        client_connected_cb, path=None, *, limit=_DEFAULT_LIMIT, **kwds
-    ):
+    async def start_unix_server(client_connected_cb, path=None, *, limit=_DEFAULT_LIMIT, **kwds):
         """Similar to `start_server` but works with UNIX Domain Sockets."""
         loop = events.get_running_loop()
 
@@ -508,11 +504,7 @@ class StreamReader:
         self._buffer.extend(data)
         self._wakeup_waiter()
 
-        if (
-            self._transport is not None
-            and not self._paused
-            and len(self._buffer) > 2 * self._limit
-        ):
+        if self._transport is not None and not self._paused and len(self._buffer) > 2 * self._limit:
             try:
                 self._transport.pause_reading()
             except NotImplementedError:
@@ -534,8 +526,7 @@ class StreamReader:
         # which coroutine would get the next data.
         if self._waiter is not None:
             raise RuntimeError(
-                f"{func_name}() called while another coroutine is "
-                f"already waiting for incoming data"
+                f"{func_name}() called while another coroutine is already waiting for incoming data"
             )
 
         assert not self._eof, "_wait_for_data after EOF"

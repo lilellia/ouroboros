@@ -1,9 +1,9 @@
 "Test runscript, coverage 16%."
 
-import unittest
 from idlelib import runscript
 from idlelib.editor import EditorWindow
 from tkinter import Tk
+import unittest
 
 from test.support import requires
 

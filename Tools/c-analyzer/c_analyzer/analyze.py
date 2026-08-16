@@ -29,9 +29,7 @@ def get_typespecs(typedecls):
     return typespecs
 
 
-def analyze_decl(
-    decl, typespecs, knowntypespecs, types, knowntypes, *, analyze_resolved=None
-):
+def analyze_decl(decl, typespecs, knowntypespecs, types, knowntypes, *, analyze_resolved=None):
     resolved = resolve_decl(decl, typespecs, knowntypespecs, types)
     if resolved is None:
         # The decl is supposed to be skipped or ignored.
@@ -248,9 +246,7 @@ def _dump_unresolved(decl, types, analyze_decl):
     elif type(decl) is tuple:
         filename, typespec = decl
         if "-" in typespec:
-            found = [
-                d for d in types if d.shortkey == typespec and d.filename == filename
-            ]
+            found = [d for d in types if d.shortkey == typespec and d.filename == filename]
             # if not found:
             #    raise NotImplementedError(decl)
             (decl,) = found
@@ -282,8 +278,7 @@ def _dump_unresolved(decl, types, analyze_decl):
                     (mtype,) = [
                         d
                         for d in types
-                        if d.shortkey == member.vartype.typespec
-                        and d.filename == decl.filename
+                        if d.shortkey == member.vartype.typespec and d.filename == decl.filename
                     ]
                 else:
                     found = [d for d in types if d.shortkey == typespec]

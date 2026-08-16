@@ -26,18 +26,17 @@ __credits__ = (
     "Skip Montanaro, Raymond Hettinger, Trent Nelson, "
     "Michael Foord"
 )
+import _tokenize
+from builtins import open as _builtin_open
+from codecs import BOM_UTF8, lookup
 import collections
 import functools
+from io import TextIOWrapper
 import itertools as _itertools
 import re
 import sys
-from builtins import open as _builtin_open
-from codecs import BOM_UTF8, lookup
-from io import TextIOWrapper
 from token import *
 from token import EXACT_TOKEN_TYPES
-
-import _tokenize
 
 cookie_re = re.compile(r"^[ \t\f]*#.*?coding[:=][ \t]*([-\w.]+)", re.ASCII)
 blank_re = re.compile(rb"^[ \t\f]*(?:[#\r\n]|$)", re.ASCII)
@@ -57,10 +56,8 @@ del token
 class TokenInfo(collections.namedtuple("TokenInfo", "type string start end line")):
     def __repr__(self):
         annotated_type = "%d (%s)" % (self.type, tok_name[self.type])  # noqa: UP031
-        return (
-            "TokenInfo(type={}, string={!r}, start={!r}, end={!r}, line={!r})".format(
-                *self._replace(type=annotated_type)
-            )
+        return "TokenInfo(type={}, string={!r}, start={!r}, end={!r}, line={!r})".format(
+            *self._replace(type=annotated_type)
         )
 
     @property
@@ -96,9 +93,9 @@ Octnumber = r"0[oO](?:_?[0-7])+"
 Decnumber = r"(?:0(?:_?0)*|[1-9](?:_?[0-9])*)"
 Intnumber = group(Hexnumber, Binnumber, Octnumber, Decnumber)
 Exponent = r"[eE][-+]?[0-9](?:_?[0-9])*"
-Pointfloat = group(
-    r"[0-9](?:_?[0-9])*\.(?:[0-9](?:_?[0-9])*)?", r"\.[0-9](?:_?[0-9])*"
-) + maybe(Exponent)
+Pointfloat = group(r"[0-9](?:_?[0-9])*\.(?:[0-9](?:_?[0-9])*)?", r"\.[0-9](?:_?[0-9])*") + maybe(
+    Exponent
+)
 Expfloat = r"[0-9](?:_?[0-9])*" + Exponent
 Floatnumber = group(Pointfloat, Expfloat)
 Imagnumber = group(r"[0-9](?:_?[0-9])*[jJ]", Floatnumber + r"[jJ]")
@@ -343,12 +340,7 @@ class Untokenizer:
                 tokval = self.escape_brackets(tokval)
 
             # Insert a space between two consecutive brackets if we are in an f-string
-            if (
-                tokval in {"{", "}"}
-                and self.tokens
-                and self.tokens[-1] == tokval
-                and in_fstring
-            ):
+            if tokval in {"{", "}"} and self.tokens and self.tokens[-1] == tokval and in_fstring:
                 tokval = " " + tokval
 
             # Insert a space between two consecutive f-strings
@@ -531,9 +523,7 @@ def tokenize(readline):
             # BOM will already have been stripped.
             encoding = "utf-8"
         yield TokenInfo(ENCODING, encoding, (0, 0), (0, 0), "")
-    yield from _generate_tokens_from_c_tokenizer(
-        rl_gen.__next__, encoding, extra_tokens=True
-    )
+    yield from _generate_tokens_from_c_tokenizer(rl_gen.__next__, encoding, extra_tokens=True)
 
 
 def generate_tokens(readline):
@@ -588,9 +578,7 @@ def main():
                 tokens = list(tokenize(f.readline))
         else:
             filename = "<stdin>"
-            tokens = _generate_tokens_from_c_tokenizer(
-                sys.stdin.readline, extra_tokens=True
-            )
+            tokens = _generate_tokens_from_c_tokenizer(sys.stdin.readline, extra_tokens=True)
 
         # Output the tokenization
         for token in tokens:
@@ -632,9 +620,7 @@ def _generate_tokens_from_c_tokenizer(source, encoding=None, extra_tokens=False)
     if encoding is None:
         it = _tokenize.TokenizerIter(source, extra_tokens=extra_tokens)
     else:
-        it = _tokenize.TokenizerIter(
-            source, encoding=encoding, extra_tokens=extra_tokens
-        )
+        it = _tokenize.TokenizerIter(source, encoding=encoding, extra_tokens=extra_tokens)
     try:
         for info in it:
             yield TokenInfo._make(info)

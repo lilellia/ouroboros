@@ -83,9 +83,7 @@ class DOMBuilder:
             try:
                 settings = self._settings[(_name_xform(name), state)]
             except KeyError:
-                raise xml.dom.NotSupportedErr(
-                    f"unsupported feature: {name!r}"
-                ) from None
+                raise xml.dom.NotSupportedErr(f"unsupported feature: {name!r}") from None
             else:
                 for name, value in settings:  # noqa: PLR1704
                     setattr(self._options, name, value)
@@ -350,9 +348,7 @@ class DocumentLS:
 
     def _set_async(self, flag):
         if flag:
-            raise xml.dom.NotSupportedErr(
-                "asynchronous document loading is not supported"
-            )
+            raise xml.dom.NotSupportedErr("asynchronous document loading is not supported")
 
     def abort(self):
         # What does it mean to "clear" a document?  Does the

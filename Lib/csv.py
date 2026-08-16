@@ -2,8 +2,6 @@
 csv.py - read/write/investigate CSV files
 """
 
-import re
-import types
 from _csv import (
     QUOTE_ALL,
     QUOTE_MINIMAL,
@@ -11,6 +9,7 @@ from _csv import (
     QUOTE_NONNUMERIC,
     QUOTE_NOTNULL,
     QUOTE_STRINGS,
+    Dialect as _Dialect,
     Error,
     __doc__,
     __version__,
@@ -22,8 +21,9 @@ from _csv import (
     unregister_dialect,
     writer,
 )
-from _csv import Dialect as _Dialect
 from io import StringIO
+import re
+import types
 
 __all__ = [
     "QUOTE_ALL",
@@ -201,9 +201,7 @@ class DictWriter:
         self.restval = restval  # for writing short dicts
         extrasaction = extrasaction.lower()
         if extrasaction not in ("raise", "ignore"):
-            raise ValueError(
-                f"extrasaction ({extrasaction}) must be 'raise' or 'ignore'"
-            )
+            raise ValueError(f"extrasaction ({extrasaction}) must be 'raise' or 'ignore'")
         self.extrasaction = extrasaction
         self.writer = writer(f, dialect, *args, **kwds)
 
@@ -247,8 +245,8 @@ class Sniffer:
 
         sample = sample.replace("\r\n", "\n").replace("\r", "\n")
 
-        quotechar, doublequote, delimiter, skipinitialspace = (
-            self._guess_quote_and_delimiter(sample, delimiters)
+        quotechar, doublequote, delimiter, skipinitialspace = self._guess_quote_and_delimiter(
+            sample, delimiters
         )
         if not delimiter:
             delimiter, skipinitialspace = self._guess_delimiter(sample, delimiters)

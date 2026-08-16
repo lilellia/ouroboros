@@ -11,7 +11,7 @@ P = TypeVar("P", bound="Parser")
 N = TypeVar("N", bound="Node")
 
 
-def contextual(func: Callable[[P], N | None]) -> Callable[[P], N | None]:
+def contextual(func: Callable[[P], N | None]) -> Callable[[P], N | None]:  # noqa: UP047
     # Decorator to wrap grammar methods.
     # Resets position if `func` returns None.
     def contextual_wrapper(self: P) -> N | None:
@@ -338,9 +338,7 @@ class Parser(PLexer):
                     try:
                         size = int(num.text)
                     except ValueError:
-                        raise self.make_syntax_error(
-                            f"Expected integer, got {num.text!r}"
-                        )
+                        raise self.make_syntax_error(f"Expected integer, got {num.text!r}")
                     else:
                         return CacheEffect(tkn.text, size)
                 raise self.make_syntax_error("Expected integer")
@@ -362,9 +360,7 @@ class Parser(PLexer):
                                 raise self.make_syntax_error("Expected {")
                             if members := self.members():  # noqa: SIM102
                                 if self.expect(lx.RBRACE) and self.expect(lx.SEMI):
-                                    return Family(
-                                        tkn.text, size.text if size else "", members
-                                    )
+                                    return Family(tkn.text, size.text if size else "", members)
         return None
 
     def members(self) -> list[str] | None:

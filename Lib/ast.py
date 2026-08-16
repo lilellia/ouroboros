@@ -25,11 +25,11 @@ that work tightly with the python syntax (template engines for example).
 :license: Python License.
 """
 
-import re
-import sys
 from _ast import *
 from contextlib import contextmanager, nullcontext
 from enum import IntEnum, _simple_enum, auto
+import re
+import sys
 
 
 def parse(
@@ -183,9 +183,7 @@ def dump(node, annotate_fields=True, include_attributes=False, *, indent=None):
                     allsimple = allsimple and simple
                     args.append(f"{name}={value}")
             if allsimple and len(args) <= 3:
-                return "{}({})".format(
-                    node.__class__.__name__, ", ".join(args)
-                ), not args
+                return "{}({})".format(node.__class__.__name__, ", ".join(args)), not args
             return f"{node.__class__.__name__}({prefix}{sep.join(args)})", False
         elif isinstance(node, list):
             if not node:
@@ -210,9 +208,7 @@ def copy_location(new_node, old_node):
             value = getattr(old_node, attr, None)
             # end_lineno and end_col_offset are optional attributes, and they
             # should be copied whether the value is None or not.
-            if value is not None or (
-                hasattr(old_node, attr) and attr.startswith("end_")
-            ):
+            if value is not None or (hasattr(old_node, attr) and attr.startswith("end_")):
                 setattr(new_node, attr, value)
     return new_node
 
@@ -460,9 +456,7 @@ class NodeVisitor:
             else:
                 import warnings
 
-                warnings.warn(
-                    f"{method} is deprecated; add visit_Constant", DeprecationWarning, 2
-                )
+                warnings.warn(f"{method} is deprecated; add visit_Constant", DeprecationWarning, 2)
                 return visitor(node)
         return self.generic_visit(node)
 
@@ -530,8 +524,7 @@ _DEPRECATED_VALUE_ALIAS_MESSAGE = (
     "{name} is deprecated and will be removed in Python {remove}; use value instead"
 )
 _DEPRECATED_CLASS_MESSAGE = (
-    "{name} is deprecated and will be removed in Python {remove}; "
-    "use ast.Constant instead"
+    "{name} is deprecated and will be removed in Python {remove}; use ast.Constant instead"
 )
 
 
@@ -544,34 +537,26 @@ if not hasattr(Constant, "n"):
         """Deprecated. Use value instead."""
         import warnings
 
-        warnings._deprecated(
-            "Attribute n", message=_DEPRECATED_VALUE_ALIAS_MESSAGE, remove=(3, 14)
-        )
+        warnings._deprecated("Attribute n", message=_DEPRECATED_VALUE_ALIAS_MESSAGE, remove=(3, 14))
         return self.value
 
     def _n_setter(self, value):
         import warnings
 
-        warnings._deprecated(
-            "Attribute n", message=_DEPRECATED_VALUE_ALIAS_MESSAGE, remove=(3, 14)
-        )
+        warnings._deprecated("Attribute n", message=_DEPRECATED_VALUE_ALIAS_MESSAGE, remove=(3, 14))
         self.value = value
 
     def _s_getter(self):
         """Deprecated. Use value instead."""
         import warnings
 
-        warnings._deprecated(
-            "Attribute s", message=_DEPRECATED_VALUE_ALIAS_MESSAGE, remove=(3, 14)
-        )
+        warnings._deprecated("Attribute s", message=_DEPRECATED_VALUE_ALIAS_MESSAGE, remove=(3, 14))
         return self.value
 
     def _s_setter(self, value):
         import warnings
 
-        warnings._deprecated(
-            "Attribute s", message=_DEPRECATED_VALUE_ALIAS_MESSAGE, remove=(3, 14)
-        )
+        warnings._deprecated("Attribute s", message=_DEPRECATED_VALUE_ALIAS_MESSAGE, remove=(3, 14))
         self.value = value
 
     Constant.n = property(_n_getter, _n_setter)
@@ -649,9 +634,7 @@ class Ellipsis(Constant, metaclass=_ABC):
         if cls is _ast_Ellipsis:
             import warnings
 
-            warnings._deprecated(
-                "ast.Ellipsis", message=_DEPRECATED_CLASS_MESSAGE, remove=(3, 14)
-            )
+            warnings._deprecated("ast.Ellipsis", message=_DEPRECATED_CLASS_MESSAGE, remove=(3, 14))
             return Constant(..., *args, **kwargs)
         return Constant.__new__(cls, *args, **kwargs)
 
@@ -922,9 +905,7 @@ class _Unparser(NodeVisitor):
             self.traverse(node.body)
 
     def visit_Module(self, node):
-        self._type_ignores = {
-            ignore.lineno: f"ignore{ignore.tag}" for ignore in node.type_ignores
-        }
+        self._type_ignores = {ignore.lineno: f"ignore{ignore.tag}" for ignore in node.type_ignores}
         self._write_docstring_and_traverse_body(node)
         self._type_ignores.clear()
 
@@ -977,9 +958,7 @@ class _Unparser(NodeVisitor):
 
     def visit_AnnAssign(self, node):
         self.fill()
-        with self.delimit_if(
-            "(", ")", not node.simple and isinstance(node.target, Name)
-        ):
+        with self.delimit_if("(", ")", not node.simple and isinstance(node.target, Name)):
             self.traverse(node.target)
         self.write(": ")
         self.traverse(node.annotation)
@@ -1376,11 +1355,7 @@ class _Unparser(NodeVisitor):
         if isinstance(value, (float, complex)):
             # Substitute overflowing decimal literal for AST infinities,
             # and inf - inf for NaNs.
-            self.write(
-                repr(value)
-                .replace("inf", _INFSTR)
-                .replace("nan", f"({_INFSTR}-{_INFSTR})")
-            )
+            self.write(repr(value).replace("inf", _INFSTR).replace("nan", f"({_INFSTR}-{_INFSTR})"))
         elif self._avoid_backslashes and isinstance(value, str):
             self._write_str_avoiding_backslashes(value)
         else:
@@ -1479,9 +1454,7 @@ class _Unparser(NodeVisitor):
                 write_key_value_pair(k, v)
 
         with self.delimit("{", "}"):
-            self.interleave(
-                lambda: self.write(", "), write_item, zip(node.keys, node.values)
-            )
+            self.interleave(lambda: self.write(", "), write_item, zip(node.keys, node.values))
 
     def visit_Tuple(self, node):
         with self.delimit_if(
@@ -1598,9 +1571,7 @@ class _Unparser(NodeVisitor):
 
         with self.require_parens(operator_precedence, node):
             s = f" {operator} "
-            self.interleave(
-                lambda: self.write(s), increasing_level_traverse, node.values
-            )
+            self.interleave(lambda: self.write(s), increasing_level_traverse, node.values)
 
     def visit_Attribute(self, node):
         self.set_precedence(_Precedence.ATOM, node.value)
@@ -1848,8 +1819,7 @@ def unparse(ast_obj):
 
 
 _deprecated_globals = {
-    name: globals().pop(name)
-    for name in ("Num", "Str", "Bytes", "NameConstant", "Ellipsis")
+    name: globals().pop(name) for name in ("Num", "Str", "Bytes", "NameConstant", "Ellipsis")
 }
 
 
@@ -1858,9 +1828,7 @@ def __getattr__(name):
         globals()[name] = value = _deprecated_globals[name]
         import warnings
 
-        warnings._deprecated(
-            f"ast.{name}", message=_DEPRECATED_CLASS_MESSAGE, remove=(3, 14)
-        )
+        warnings._deprecated(f"ast.{name}", message=_DEPRECATED_CLASS_MESSAGE, remove=(3, 14))
         return value
     raise AttributeError(f"module 'ast' has no attribute '{name}'")
 
@@ -1906,9 +1874,7 @@ def main():
 
     with args.infile as infile:
         source = infile.read()
-    tree = parse(
-        source, args.infile.name, args.mode, type_comments=args.no_type_comments
-    )
+    tree = parse(source, args.infile.name, args.mode, type_comments=args.no_type_comments)
     print(dump(tree, include_attributes=args.include_attributes, indent=args.indent))
 
 

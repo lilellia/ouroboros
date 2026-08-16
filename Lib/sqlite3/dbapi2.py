@@ -20,11 +20,11 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
+from _sqlite3 import *
+from _sqlite3 import _deprecated_version
 import collections.abc
 import datetime
 import time
-from _sqlite3 import *
-from _sqlite3 import _deprecated_version
 
 _deprecated_names = frozenset({"version", "version_info"})
 

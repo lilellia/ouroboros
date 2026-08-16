@@ -18,8 +18,12 @@ mouse over the scrollbar of the canvas.
 
 """
 
-from turtle import Shape, Turtle, mainloop
-from turtle import Vec2D as Vec
+from turtle import (
+    Shape,
+    Turtle,
+    Vec2D as Vec,
+    mainloop,
+)
 
 G = 8
 

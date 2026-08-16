@@ -10,8 +10,6 @@ Refer to comments in EditorWindow autoindent code for details.
 
 """
 
-import re
-import tkinter.font as tkfont
 from idlelib import macosx
 from idlelib.autocomplete import AutoComplete
 from idlelib.codecontext import CodeContext
@@ -23,6 +21,7 @@ from idlelib.parenmatch import ParenMatch
 from idlelib.query import HelpSource, SectionName
 from idlelib.squeezer import Squeezer
 from idlelib.textview import ScrollableTextFrame, view_text
+import re
 from tkinter import (
     ACTIVE,
     ANCHOR,
@@ -57,6 +56,7 @@ from tkinter import (
     colorchooser,
     messagebox,
 )
+import tkinter.font as tkfont
 from tkinter.ttk import (
     Button,
     Checkbutton,
@@ -368,9 +368,7 @@ class FontPage(Frame):
         self.font_bold = tracers.add(BooleanVar(self), self.var_changed_font)
 
         # Define frames and widgets.
-        frame_font = LabelFrame(
-            self, borderwidth=2, relief=GROOVE, text=" Shell/Editor Font "
-        )
+        frame_font = LabelFrame(self, borderwidth=2, relief=GROOVE, text=" Shell/Editor Font ")
         frame_sample = LabelFrame(
             self, borderwidth=2, relief=GROOVE, text=" Font Sample (Editable) "
         )
@@ -378,9 +376,7 @@ class FontPage(Frame):
         frame_font_name = Frame(frame_font)
         frame_font_param = Frame(frame_font)
         font_name_title = Label(frame_font_name, justify=LEFT, text="Font Face :")
-        self.fontlist = Listbox(
-            frame_font_name, height=15, takefocus=True, exportselection=FALSE
-        )
+        self.fontlist = Listbox(frame_font_name, height=15, takefocus=True, exportselection=FALSE)
         self.fontlist.bind("<ButtonRelease-1>", self.on_fontlist_select)
         self.fontlist.bind("<KeyRelease-Up>", self.on_fontlist_select)
         self.fontlist.bind("<KeyRelease-Down>", self.on_fontlist_select)
@@ -659,18 +655,12 @@ class HighPage(Frame):
         self.fg_bg_toggle = BooleanVar(self)
         self.color = tracers.add(StringVar(self), self.var_changed_color)
         self.theme_source = tracers.add(BooleanVar(self), self.var_changed_theme_source)
-        self.highlight_target = tracers.add(
-            StringVar(self), self.var_changed_highlight_target
-        )
+        self.highlight_target = tracers.add(StringVar(self), self.var_changed_highlight_target)
 
         # Create widgets:
         # body frame and section frames.
-        frame_custom = LabelFrame(
-            self, borderwidth=2, relief=GROOVE, text=" Custom Highlighting "
-        )
-        frame_theme = LabelFrame(
-            self, borderwidth=2, relief=GROOVE, text=" Highlighting Theme "
-        )
+        frame_custom = LabelFrame(self, borderwidth=2, relief=GROOVE, text=" Custom Highlighting ")
+        frame_theme = LabelFrame(self, borderwidth=2, relief=GROOVE, text=" Highlighting Theme ")
         # frame_custom.
         sample_frame = ScrollableTextFrame(frame_custom, relief=SOLID, borderwidth=1)
         text = self.highlight_sample = sample_frame.text
@@ -780,12 +770,8 @@ class HighPage(Frame):
             command=self.set_theme_type,
             text="a Custom Theme",
         )
-        self.builtinlist = DynOptionMenu(
-            frame_theme, self.builtin_name, None, command=None
-        )
-        self.customlist = DynOptionMenu(
-            frame_theme, self.custom_name, None, command=None
-        )
+        self.builtinlist = DynOptionMenu(frame_theme, self.builtin_name, None, command=None)
+        self.customlist = DynOptionMenu(frame_theme, self.custom_name, None, command=None)
         self.button_delete_custom = Button(
             frame_theme, text="Delete Custom Theme", command=self.delete_custom
         )
@@ -995,9 +981,9 @@ class HighPage(Frame):
 
     def get_new_theme_name(self, message):
         "Return name of new theme from query popup."
-        used_names = idleConf.GetSectionList(
-            "user", "highlight"
-        ) + idleConf.GetSectionList("default", "highlight")
+        used_names = idleConf.GetSectionList("user", "highlight") + idleConf.GetSectionList(
+            "default", "highlight"
+        )
         new_theme = SectionName(self, "New Custom Theme", message, used_names).result
         return new_theme
 
@@ -1134,9 +1120,7 @@ class HighPage(Frame):
             element = self.theme_elements[element_title]
             colors = idleConf.GetHighlight(theme, element)
             if element == "cursor":  # Cursor sample needs special painting.
-                colors["background"] = idleConf.GetHighlight(theme, "normal")[
-                    "background"
-                ]
+                colors["background"] = idleConf.GetHighlight(theme, "normal")["background"]
             # Handle any unsaved changes to this theme.
             if theme in changes["highlight"]:
                 theme_dict = changes["highlight"][theme]
@@ -1301,27 +1285,19 @@ class KeysPage(Frame):
         """
         self.builtin_name = tracers.add(StringVar(self), self.var_changed_builtin_name)
         self.custom_name = tracers.add(StringVar(self), self.var_changed_custom_name)
-        self.keyset_source = tracers.add(
-            BooleanVar(self), self.var_changed_keyset_source
-        )
+        self.keyset_source = tracers.add(BooleanVar(self), self.var_changed_keyset_source)
         self.keybinding = tracers.add(StringVar(self), self.var_changed_keybinding)
 
         # Create widgets:
         # body and section frames.
-        frame_custom = LabelFrame(
-            self, borderwidth=2, relief=GROOVE, text=" Custom Key Bindings "
-        )
-        frame_key_sets = LabelFrame(
-            self, borderwidth=2, relief=GROOVE, text=" Key Set "
-        )
+        frame_custom = LabelFrame(self, borderwidth=2, relief=GROOVE, text=" Custom Key Bindings ")
+        frame_key_sets = LabelFrame(self, borderwidth=2, relief=GROOVE, text=" Key Set ")
         # frame_custom.
         frame_target = Frame(frame_custom)
         target_title = Label(frame_target, text="Action - Key(s)")
         scroll_target_y = Scrollbar(frame_target)
         scroll_target_x = Scrollbar(frame_target, orient=HORIZONTAL)
-        self.bindingslist = Listbox(
-            frame_target, takefocus=FALSE, exportselection=FALSE
-        )
+        self.bindingslist = Listbox(frame_target, takefocus=FALSE, exportselection=FALSE)
         self.bindingslist.bind("<ButtonRelease-1>", self.on_bindingslist_select)
         scroll_target_y["command"] = self.bindingslist.yview
         scroll_target_x["command"] = self.bindingslist.xview
@@ -1349,9 +1325,7 @@ class KeysPage(Frame):
             command=self.set_keys_type,
             text="Use a Custom Key Set",
         )
-        self.builtinlist = DynOptionMenu(
-            frames[0], self.builtin_name, None, command=None
-        )
+        self.builtinlist = DynOptionMenu(frames[0], self.builtin_name, None, command=None)
         self.customlist = DynOptionMenu(frames[0], self.custom_name, None, command=None)
         self.button_delete_custom_keys = Button(
             frames[1], text="Delete Custom Key Set", command=self.delete_custom_keys
@@ -1502,9 +1476,7 @@ class KeysPage(Frame):
             for event in key_set_changes:
                 current_bindings[event] = key_set_changes[event].split()
         current_key_sequences = list(current_bindings.values())
-        new_keys = GetKeysWindow(
-            self, "Get New Keys", bind_name, current_key_sequences
-        ).result
+        new_keys = GetKeysWindow(self, "Get New Keys", bind_name, current_key_sequences).result
         if new_keys:
             if self.keyset_source.get():  # Current key set is a built-in.
                 message = (
@@ -1717,39 +1689,23 @@ class WinPage(Frame):
                     format_width_int: Entry > format_width
         """
         # Integer values need StringVar because int('') raises.
-        self.startup_edit = tracers.add(
-            IntVar(self), ("main", "General", "editor-on-startup")
-        )
+        self.startup_edit = tracers.add(IntVar(self), ("main", "General", "editor-on-startup"))
         self.win_width = tracers.add(StringVar(self), ("main", "EditorWindow", "width"))
-        self.win_height = tracers.add(
-            StringVar(self), ("main", "EditorWindow", "height")
-        )
-        self.indent_spaces = tracers.add(
-            StringVar(self), ("main", "Indent", "num-spaces")
-        )
-        self.cursor_blink = tracers.add(
-            BooleanVar(self), ("main", "EditorWindow", "cursor-blink")
-        )
+        self.win_height = tracers.add(StringVar(self), ("main", "EditorWindow", "height"))
+        self.indent_spaces = tracers.add(StringVar(self), ("main", "Indent", "num-spaces"))
+        self.cursor_blink = tracers.add(BooleanVar(self), ("main", "EditorWindow", "cursor-blink"))
         self.autocomplete_wait = tracers.add(
             StringVar(self), ("extensions", "AutoComplete", "popupwait")
         )
-        self.paren_style = tracers.add(
-            StringVar(self), ("extensions", "ParenMatch", "style")
-        )
-        self.flash_delay = tracers.add(
-            StringVar(self), ("extensions", "ParenMatch", "flash-delay")
-        )
-        self.paren_bell = tracers.add(
-            BooleanVar(self), ("extensions", "ParenMatch", "bell")
-        )
+        self.paren_style = tracers.add(StringVar(self), ("extensions", "ParenMatch", "style"))
+        self.flash_delay = tracers.add(StringVar(self), ("extensions", "ParenMatch", "flash-delay"))
+        self.paren_bell = tracers.add(BooleanVar(self), ("extensions", "ParenMatch", "bell"))
         self.format_width = tracers.add(
             StringVar(self), ("extensions", "FormatParagraph", "max-width")
         )
 
         # Create widgets:
-        frame_window = LabelFrame(
-            self, borderwidth=2, relief=GROOVE, text=" Window Preferences"
-        )
+        frame_window = LabelFrame(self, borderwidth=2, relief=GROOVE, text=" Window Preferences")
 
         frame_run = Frame(frame_window, borderwidth=0)
         startup_title = Label(frame_run, text="At Startup")
@@ -1761,9 +1717,7 @@ class WinPage(Frame):
         )
 
         frame_win_size = Frame(frame_window, borderwidth=0)
-        win_size_title = Label(
-            frame_win_size, text="Initial Window Size  (in characters)"
-        )
+        win_size_title = Label(frame_win_size, text="Initial Window Size  (in characters)")
         win_width_title = Label(frame_win_size, text="Width")
         self.win_width_int = Entry(
             frame_win_size,
@@ -1810,9 +1764,7 @@ class WinPage(Frame):
             frame_window,
             borderwidth=0,
         )
-        auto_wait_title = Label(
-            frame_autocomplete, text="Completions Popup Wait (milliseconds)"
-        )
+        auto_wait_title = Label(frame_autocomplete, text="Completions Popup Wait (milliseconds)")
         self.auto_wait_int = Entry(
             frame_autocomplete,
             textvariable=self.autocomplete_wait,
@@ -1843,9 +1795,7 @@ class WinPage(Frame):
             validatecommand=self.digits_only,
             validate="key",
         )
-        self.bell_on = Checkbutton(
-            frame_paren2, text="Bell on Mismatch", variable=self.paren_bell
-        )
+        self.bell_on = Checkbutton(frame_paren2, text="Bell on Mismatch", variable=self.paren_bell)
         frame_format = Frame(frame_window, borderwidth=0)
         format_width_title = Label(frame_format, text="Format Paragraph Max Width")
         self.format_width_int = Entry(
@@ -1897,15 +1847,9 @@ class WinPage(Frame):
         self.startup_edit.set(
             idleConf.GetOption("main", "General", "editor-on-startup", type="bool")
         )
-        self.win_width.set(
-            idleConf.GetOption("main", "EditorWindow", "width", type="int")
-        )
-        self.win_height.set(
-            idleConf.GetOption("main", "EditorWindow", "height", type="int")
-        )
-        self.indent_spaces.set(
-            idleConf.GetOption("main", "Indent", "num-spaces", type="int")
-        )
+        self.win_width.set(idleConf.GetOption("main", "EditorWindow", "width", type="int"))
+        self.win_height.set(idleConf.GetOption("main", "EditorWindow", "height", type="int"))
+        self.indent_spaces.set(idleConf.GetOption("main", "Indent", "num-spaces", type="int"))
         self.cursor_blink.set(
             idleConf.GetOption("main", "EditorWindow", "cursor-blink", type="bool")
         )
@@ -1981,17 +1925,11 @@ class ShedPage(Frame):
         self.line_numbers_default = tracers.add(
             BooleanVar(self), ("main", "EditorWindow", "line-numbers-default")
         )
-        self.context_lines = tracers.add(
-            StringVar(self), ("extensions", "CodeContext", "maxlines")
-        )
+        self.context_lines = tracers.add(StringVar(self), ("extensions", "CodeContext", "maxlines"))
 
         # Create widgets:
-        frame_shell = LabelFrame(
-            self, borderwidth=2, relief=GROOVE, text=" Shell Preferences"
-        )
-        frame_editor = LabelFrame(
-            self, borderwidth=2, relief=GROOVE, text=" Editor Preferences"
-        )
+        frame_shell = LabelFrame(self, borderwidth=2, relief=GROOVE, text=" Shell Preferences")
+        frame_editor = LabelFrame(self, borderwidth=2, relief=GROOVE, text=" Editor Preferences")
         # Frame_shell.
         frame_auto_squeeze_min_lines = Frame(frame_shell, borderwidth=0)
         auto_squeeze_min_lines_title = Label(
@@ -2061,13 +1999,9 @@ class ShedPage(Frame):
             idleConf.GetOption("main", "PyShell", "auto-squeeze-min-lines", type="int")
         )
         # Set variables for editor windows.
-        self.autosave.set(
-            idleConf.GetOption("main", "General", "autosave", default=0, type="bool")
-        )
+        self.autosave.set(idleConf.GetOption("main", "General", "autosave", default=0, type="bool"))
         self.line_numbers_default.set(
-            idleConf.GetOption(
-                "main", "EditorWindow", "line-numbers-default", type="bool"
-            )
+            idleConf.GetOption("main", "EditorWindow", "line-numbers-default", type="bool")
         )
         self.context_lines.set(
             idleConf.GetOption("extensions", "CodeContext", "maxlines", type="int")
@@ -2109,9 +2043,7 @@ class ExtPage(Frame):
         """
         self.extension_names = StringVar(self)
 
-        frame_ext = LabelFrame(
-            self, borderwidth=2, relief=GROOVE, text=" Feature Extensions "
-        )
+        frame_ext = LabelFrame(self, borderwidth=2, relief=GROOVE, text=" Feature Extensions ")
         self.frame_help = HelpFrame(
             self, borderwidth=2, relief=GROOVE, text=" Help Menu Extensions "
         )
@@ -2159,9 +2091,7 @@ class ExtPage(Frame):
             opt_list = sorted(self.ext_defaultCfg.GetOptionList(ext_name))
 
             # Bring 'enable' options to the beginning of the list.
-            enables = [
-                opt_name for opt_name in opt_list if opt_name.startswith("enable")
-            ]
+            enables = [opt_name for opt_name in opt_list if opt_name.startswith("enable")]
             for opt_name in enables:
                 opt_list.remove(opt_name)
             opt_list = enables + opt_list
@@ -2306,9 +2236,7 @@ class HelpFrame(LabelFrame):
         """
         # self = frame_help in dialog (until ExtPage class).
         frame_helplist = Frame(self)
-        self.helplist = Listbox(
-            frame_helplist, height=5, takefocus=True, exportselection=FALSE
-        )
+        self.helplist = Listbox(frame_helplist, height=5, takefocus=True, exportselection=FALSE)
         scroll_helplist = Scrollbar(frame_helplist)
         scroll_helplist["command"] = self.helplist.yview
         self.helplist["yscrollcommand"] = scroll_helplist.set

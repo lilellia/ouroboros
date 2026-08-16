@@ -266,9 +266,7 @@ def _norm_version(version, build=""):
 # Windows versions.
 
 
-def _syscmd_ver(
-    system="", release="", version="", supported_platforms=("win32", "win16", "dos")
-):
+def _syscmd_ver(system="", release="", version="", supported_platforms=("win32", "win16", "dos")):
     """Tries to figure out the OS version used and returns
     a tuple (system, release, version).
 
@@ -667,9 +665,7 @@ def _follow_symlinks(filepath):
     """
     filepath = os.path.abspath(filepath)
     while os.path.islink(filepath):
-        filepath = os.path.normpath(
-            os.path.join(os.path.dirname(filepath), os.readlink(filepath))
-        )
+        filepath = os.path.normpath(os.path.join(os.path.dirname(filepath), os.readlink(filepath)))
     return filepath
 
 
@@ -695,9 +691,7 @@ def _syscmd_file(target, default=""):
     env = dict(os.environ, LC_ALL="C")
     try:
         # -b: do not prepend filenames to output lines (brief mode)
-        output = subprocess.check_output(
-            ["file", "-b", target], stderr=subprocess.DEVNULL, env=env
-        )
+        output = subprocess.check_output(["file", "-b", target], stderr=subprocess.DEVNULL, env=env)
     except (OSError, subprocess.CalledProcessError):
         return default
     if not output:
@@ -1299,18 +1293,14 @@ def platform(aliased=False, terse=False):
     elif system == "Linux":
         # check for libc vs. glibc
         libcname, libcversion = libc_ver()
-        platform = _platform(
-            system, release, machine, processor, "with", libcname + libcversion
-        )
+        platform = _platform(system, release, machine, processor, "with", libcname + libcversion)
     elif system == "Java":
         # Java platforms
         _r, _v, _vminfo, (os_name, os_version, os_arch) = java_ver()
         if terse or not os_name:
             platform = _platform(system, release, version)
         else:
-            platform = _platform(
-                system, release, version, "on", os_name, os_version, os_arch
-            )
+            platform = _platform(system, release, version, "on", os_name, os_version, os_arch)
 
     else:
         # Generic handler
@@ -1371,9 +1361,7 @@ def freedesktop_os_release():
             except OSError as e:
                 errno = e.errno
         else:
-            raise OSError(
-                errno, f"Unable to read files {', '.join(_os_release_candidates)}"
-            )
+            raise OSError(errno, f"Unable to read files {', '.join(_os_release_candidates)}")
 
     return _os_release_cache.copy()
 

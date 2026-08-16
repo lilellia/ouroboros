@@ -239,8 +239,7 @@ def _parse_overview(lines, fmt, data_process_func=None):
                 h = field_name + ": "
                 if token and token[: len(h)].lower() != h:
                     raise NNTPDataError(
-                        "OVER/XOVER response doesn't include "
-                        "names of additional headers"
+                        "OVER/XOVER response doesn't include names of additional headers"
                     )
                 token = token[len(h) :] if token else None
             fields[fmt[i]] = token
@@ -1114,9 +1113,7 @@ if __name__ == "__main__":
         type=int,
         help="number of articles to fetch (default: %(default)s)",
     )
-    parser.add_argument(
-        "-S", "--ssl", action="store_true", default=False, help="use NNTP over SSL"
-    )
+    parser.add_argument("-S", "--ssl", action="store_true", default=False, help="use NNTP over SSL")
     args = parser.parse_args()
 
     port = args.port

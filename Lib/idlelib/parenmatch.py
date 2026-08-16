@@ -55,15 +55,11 @@ class ParenMatch:
 
     @classmethod
     def reload(cls):
-        cls.STYLE = idleConf.GetOption(
-            "extensions", "ParenMatch", "style", default="opener"
-        )
+        cls.STYLE = idleConf.GetOption("extensions", "ParenMatch", "style", default="opener")
         cls.FLASH_DELAY = idleConf.GetOption(
             "extensions", "ParenMatch", "flash-delay", type="int", default=500
         )
-        cls.BELL = idleConf.GetOption(
-            "extensions", "ParenMatch", "bell", type="bool", default=1
-        )
+        cls.BELL = idleConf.GetOption("extensions", "ParenMatch", "bell", type="bool", default=1)
         cls.HILITE_CONFIG = idleConf.GetHighlight(idleConf.CurrentTheme(), "hilite")
 
     def activate_restore(self):
@@ -133,9 +129,7 @@ class ParenMatch:
             rightindex = indices[1] + "+1c"
         else:
             rightindex = indices[1]
-        self.text.tag_add(
-            "paren", indices[0], indices[0] + "+1c", rightindex + "-1c", rightindex
-        )
+        self.text.tag_add("paren", indices[0], indices[0] + "+1c", rightindex + "-1c", rightindex)
         self.text.tag_config("paren", self.HILITE_CONFIG)
 
     def create_tag_expression(self, indices):

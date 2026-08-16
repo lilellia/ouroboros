@@ -12,9 +12,7 @@ from email.mime.base import MIMEBase
 class MIMEMultipart(MIMEBase):
     """Base class for MIME multipart/* type messages."""
 
-    def __init__(
-        self, _subtype="mixed", boundary=None, _subparts=None, *, policy=None, **_params
-    ):
+    def __init__(self, _subtype="mixed", boundary=None, _subparts=None, *, policy=None, **_params):
         """Creates a multipart/* type message.
 
         By default, creates a multipart/mixed message, with proper

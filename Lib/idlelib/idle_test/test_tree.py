@@ -1,7 +1,7 @@
 "Test tree. coverage 56%."
 
-import unittest
 from idlelib import tree
+import unittest
 
 from test.support import requires
 
@@ -22,9 +22,7 @@ class TreeTest(unittest.TestCase):
 
     def test_init(self):
         # Start with code slightly adapted from htest.
-        sc = tree.ScrolledCanvas(
-            self.root, bg="white", highlightthickness=0, takefocus=1
-        )
+        sc = tree.ScrolledCanvas(self.root, bg="white", highlightthickness=0, takefocus=1)
         sc.frame.pack(expand=1, fill="both", side="left")
         item = tree.FileTreeItem(tree.ICONDIR)
         node = tree.TreeNode(sc.canvas, None, item)
