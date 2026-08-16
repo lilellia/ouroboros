@@ -6,22 +6,22 @@
 import textwrap
 
 
-def _ind(text, level=1, edges='both'):
-    indent = '    ' * level
+def _ind(text, level=1, edges="both"):
+    indent = "    " * level
     text = textwrap.indent(text, indent)
-    if edges == 'pre' or edges == 'both':
-        text = '\n' + indent + text.lstrip()
-    if edges == 'post' or edges == 'both':
-        text = text.rstrip() + '\n' + '    ' * (level - 1)
+    if edges == "pre" or edges == "both":
+        text = "\n" + indent + text.lstrip()
+    if edges == "post" or edges == "both":
+        text = text.rstrip() + "\n" + "    " * (level - 1)
     return text
 
 
 #######################################
 # general
 
-HEX = r'(?: [0-9a-zA-Z] )'
+HEX = r"(?: [0-9a-zA-Z] )"
 
-STRING_LITERAL = textwrap.dedent(rf'''
+STRING_LITERAL = textwrap.dedent(rf"""
     (?:
         # character literal
         (?:
@@ -48,9 +48,9 @@ STRING_LITERAL = textwrap.dedent(rf'''
          )
         # end string literal
      )
-    ''')
+    """)
 
-_KEYWORD = textwrap.dedent(r'''
+_KEYWORD = textwrap.dedent(r"""
     (?:
         \b
         (?:
@@ -95,24 +95,24 @@ _KEYWORD = textwrap.dedent(r'''
          )
         \b
      )
-    ''')
-KEYWORD = rf'''
+    """)
+KEYWORD = rf"""
     # keyword
     {_KEYWORD}
     # end keyword
-    '''
-_KEYWORD = ''.join(_KEYWORD.split())
+    """
+_KEYWORD = "".join(_KEYWORD.split())
 
-IDENTIFIER = r'(?: [a-zA-Z_][a-zA-Z0-9_]* )'
+IDENTIFIER = r"(?: [a-zA-Z_][a-zA-Z0-9_]* )"
 # We use a negative lookahead to filter out keywords.
-STRICT_IDENTIFIER = rf'(?: (?! {_KEYWORD} ) \b {IDENTIFIER} \b )'
-ANON_IDENTIFIER = rf'(?: (?! {_KEYWORD} ) \b {IDENTIFIER} (?: - \d+ )? \b )'
+STRICT_IDENTIFIER = rf"(?: (?! {_KEYWORD} ) \b {IDENTIFIER} \b )"
+ANON_IDENTIFIER = rf"(?: (?! {_KEYWORD} ) \b {IDENTIFIER} (?: - \d+ )? \b )"
 
 
 #######################################
 # types
 
-SIMPLE_TYPE = textwrap.dedent(rf'''
+SIMPLE_TYPE = textwrap.dedent(r"""
     # simple type
     (?:
         \b
@@ -130,20 +130,20 @@ SIMPLE_TYPE = textwrap.dedent(rf'''
         \b
      )
     # end simple type
-    ''')
+    """)
 
-COMPOUND_TYPE_KIND = r'(?: \b (?: struct | union | enum ) \b )'
+COMPOUND_TYPE_KIND = r"(?: \b (?: struct | union | enum ) \b )"
 
 
 #######################################
 # variable declarations
 
-_STORAGE = 'auto register static extern _Thread_local'.split()
-STORAGE_CLASS = rf'(?: \b (?: {" | ".join(_STORAGE)} ) \b )'
-TYPE_QUALIFIER = r'(?: \b (?: const | volatile ) \b )'
-PTR_QUALIFIER = rf'(?: [*] (?: \s* {TYPE_QUALIFIER} )? )'
+_STORAGE = ["auto", "register", "static", "extern", "_Thread_local"]
+STORAGE_CLASS = rf"(?: \b (?: {' | '.join(_STORAGE)} ) \b )"
+TYPE_QUALIFIER = r"(?: \b (?: const | volatile ) \b )"
+PTR_QUALIFIER = rf"(?: [*] (?: \s* {TYPE_QUALIFIER} )? )"
 
-TYPE_SPEC = textwrap.dedent(rf'''
+TYPE_SPEC = textwrap.dedent(rf"""
     # type spec
     (?:
         {_ind(SIMPLE_TYPE, 2)}
@@ -166,9 +166,9 @@ TYPE_SPEC = textwrap.dedent(rf'''
         {STRICT_IDENTIFIER}
      )
     # end type spec
-    ''')
+    """)
 
-DECLARATOR = textwrap.dedent(rf'''
+DECLARATOR = textwrap.dedent(rf"""
     # declarator  (possibly abstract)
     (?:
         (?: {PTR_QUALIFIER} \s* )*
@@ -206,9 +206,9 @@ DECLARATOR = textwrap.dedent(rf'''
          )
      )
     # end declarator
-    ''')
+    """)
 
-VAR_DECL = textwrap.dedent(rf'''
+VAR_DECL = textwrap.dedent(rf"""
     # var decl (and typedef and func return type)
     (?:
         (?:
@@ -236,9 +236,9 @@ VAR_DECL = textwrap.dedent(rf'''
          )
      )
     # end var decl
-    ''')
+    """)
 
-INITIALIZER = textwrap.dedent(rf'''
+INITIALIZER = textwrap.dedent(rf"""
     # initializer
     (?:
         (?:
@@ -282,13 +282,13 @@ INITIALIZER = textwrap.dedent(rf'''
          )
      )
     # end initializer
-    ''')
+    """)
 
 
 #######################################
 # compound type declarations
 
-STRUCT_MEMBER_DECL = textwrap.dedent(rf'''
+STRUCT_MEMBER_DECL = textwrap.dedent(rf"""
     (?:
         # inline compound type decl
         (?:
@@ -345,9 +345,9 @@ STRUCT_MEMBER_DECL = textwrap.dedent(rf'''
              )
          )
      )
-    ''')
+    """)
 
-ENUM_MEMBER_DECL = textwrap.dedent(rf'''
+ENUM_MEMBER_DECL = textwrap.dedent(rf"""
     (?:
         (?:
             \s*
@@ -376,13 +376,13 @@ ENUM_MEMBER_DECL = textwrap.dedent(rf'''
              )
          )
      )
-    ''')
+    """)
 
 
 #######################################
 # statements
 
-SIMPLE_STMT_BODY = textwrap.dedent(rf'''
+SIMPLE_STMT_BODY = textwrap.dedent(rf"""
     # simple statement body
     (?:
         (?:
@@ -393,8 +393,8 @@ SIMPLE_STMT_BODY = textwrap.dedent(rf'''
         #(?= [;{{] )  # Note this lookahead.
      )
     # end simple statement body
-    ''')
-SIMPLE_STMT = textwrap.dedent(rf'''
+    """)
+SIMPLE_STMT = textwrap.dedent(rf"""
     # simple statement
     (?:
         (?:  # <SIMPLE_STMT>
@@ -443,8 +443,8 @@ SIMPLE_STMT = textwrap.dedent(rf'''
          )
      )
     # end simple statement
-    ''')
-COMPOUND_STMT = textwrap.dedent(rf'''
+    """)
+COMPOUND_STMT = textwrap.dedent(rf"""
     # compound statement
     (?:
         \b
@@ -484,13 +484,13 @@ COMPOUND_STMT = textwrap.dedent(rf'''
         \s*
      )
     # end compound statement
-    ''')
+    """)
 
 
 #######################################
 # function bodies
 
-LOCAL = textwrap.dedent(rf'''
+LOCAL = textwrap.dedent(rf"""
     (?:
         # an empty statement
         (?:  # <EMPTY>
@@ -576,9 +576,9 @@ LOCAL = textwrap.dedent(rf'''
             }}
          )
      )
-    ''')
+    """)
 
-LOCAL_STATICS = textwrap.dedent(rf'''
+LOCAL_STATICS = textwrap.dedent(rf"""
     (?:
         # inline type decl
         (?:
@@ -652,13 +652,13 @@ LOCAL_STATICS = textwrap.dedent(rf'''
              )
          )
      )
-    ''')
+    """)
 
 
 #######################################
 # global declarations
 
-GLOBAL = textwrap.dedent(rf'''
+GLOBAL = textwrap.dedent(rf"""
     (?:
         # an empty statement
         (?:  # <EMPTY>
@@ -802,4 +802,4 @@ GLOBAL = textwrap.dedent(rf'''
              )
          )
      )
-    ''')
+    """)

@@ -1,10 +1,12 @@
 from builtins import open as _orig_open
 
-def open(file, mode='r', bufsize=-1):
-    if 'w' not in mode:
+
+def open(file, mode="r", bufsize=-1):
+    if "w" not in mode:
         return _orig_open(file, mode, bufsize)
     import os
-    backup = file + '~'
+
+    backup = file + "~"
     try:
         os.unlink(backup)
     except OSError:
@@ -13,14 +15,18 @@ def open(file, mode='r', bufsize=-1):
         os.rename(file, backup)
     except OSError:
         return _orig_open(file, mode, bufsize)
-    f = _orig_open(file, mode, bufsize)
+    f = _orig_open(file, mode, bufsize)  # noqa: SIM115
     _orig_close = f.close
+
     def close():
         _orig_close()
         import filecmp
+
         if filecmp.cmp(backup, file, shallow=False):
             import os
+
             os.unlink(file)
             os.rename(backup, file)
+
     f.close = close
     return f

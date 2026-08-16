@@ -73,9 +73,7 @@ proto_add_ref = create_proto_com_method("AddRef", 1, ctypes.c_long)
 # https://learn.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release
 proto_release = create_proto_com_method("Release", 2, ctypes.c_long)
 # https://learn.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-ipersist-getclassid
-proto_get_class_id = create_proto_com_method(
-    "GetClassID", 3, HRESULT, POINTER(GUID)
-)
+proto_get_class_id = create_proto_com_method("GetClassID", 3, HRESULT, POINTER(GUID))
 
 
 def create_shelllink_persist(typ):
@@ -282,5 +280,5 @@ class CopyComPointerTests(unittest.TestCase):
         self.assertEqual(0, dst_orig.Release())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

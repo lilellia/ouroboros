@@ -1,10 +1,9 @@
 #!/usr/bin/env python3.8
 
 import argparse
-import os
 import json
-
-from typing import Dict, Any
+import os
+from typing import Any
 from urllib.request import urlretrieve
 
 argparser = argparse.ArgumentParser(
@@ -15,11 +14,14 @@ argparser.add_argument(
     "-n", "--number", type=int, default=100, help="Number of packages to download"
 )
 argparser.add_argument(
-    "-a", "--all", action="store_true", help="Download all packages listed in the json file"
+    "-a",
+    "--all",
+    action="store_true",
+    help="Download all packages listed in the json file",
 )
 
 
-def load_json(filename: str) -> Dict[Any, Any]:
+def load_json(filename: str) -> dict[Any, Any]:
     with open(os.path.join("data", f"{filename}.json"), "r") as f:
         j = json.loads(f.read())
     return j
@@ -35,7 +37,7 @@ def download_package_json(package_name: str) -> None:
     urlretrieve(url, os.path.join("data", f"{package_name}.json"))
 
 
-def download_package_code(name: str, package_json: Dict[Any, Any]) -> None:
+def download_package_code(name: str, package_json: dict[Any, Any]) -> None:
     source_index = -1
     for idx, url_info in enumerate(package_json["urls"]):
         if url_info["python_version"] == "source":

@@ -6,14 +6,14 @@ from test import support
 from test.support import import_helper, os_helper, warnings_helper
 
 
-_testcapi = import_helper.import_module('_testcapi')
-_io = import_helper.import_module('_io')
+_testcapi = import_helper.import_module("_testcapi")
+_io = import_helper.import_module("_io")
 NULL = None
 STDOUT_FD = 1
 
-with open(__file__, 'rb') as fp:
+with open(__file__, "rb") as fp:
     FIRST_LINE = next(fp).decode()
-FIRST_LINE_NORM = FIRST_LINE.rstrip() + '\n'
+FIRST_LINE_NORM = FIRST_LINE.rstrip() + "\n"
 
 
 class CAPIFileTest(unittest.TestCase):
@@ -44,8 +44,7 @@ class CAPIFileTest(unittest.TestCase):
 
             # TextIOWrapper
             fp.seek(0)
-            obj = pyfile_fromfd(fd, filename, "r", 1,
-                                "utf-8", "replace", NULL, 0)
+            obj = pyfile_fromfd(fd, filename, "r", 1, "utf-8", "replace", NULL, 0)
             try:
                 self.assertIsInstance(obj, _io.TextIOWrapper)
                 self.assertEqual(obj.encoding, "utf-8")
@@ -62,40 +61,34 @@ class CAPIFileTest(unittest.TestCase):
         # Test Unicode
         with open(__file__, "r") as fp:
             fp.seek(0)
-            self.assertEqual(pyfile_getline(fp, -1),
-                             FIRST_LINE_NORM.rstrip('\n'))
+            self.assertEqual(pyfile_getline(fp, -1), FIRST_LINE_NORM.rstrip("\n"))
             fp.seek(0)
-            self.assertEqual(pyfile_getline(fp, 0),
-                             FIRST_LINE_NORM)
+            self.assertEqual(pyfile_getline(fp, 0), FIRST_LINE_NORM)
             fp.seek(0)
-            self.assertEqual(pyfile_getline(fp, 6),
-                             FIRST_LINE_NORM[:6])
+            self.assertEqual(pyfile_getline(fp, 6), FIRST_LINE_NORM[:6])
 
         # Test bytes
         with open(__file__, "rb") as fp:
             fp.seek(0)
-            self.assertEqual(pyfile_getline(fp, -1),
-                             FIRST_LINE.rstrip('\n').encode())
+            self.assertEqual(pyfile_getline(fp, -1), FIRST_LINE.rstrip("\n").encode())
             fp.seek(0)
-            self.assertEqual(pyfile_getline(fp, 0),
-                             FIRST_LINE.encode())
+            self.assertEqual(pyfile_getline(fp, 0), FIRST_LINE.encode())
             fp.seek(0)
-            self.assertEqual(pyfile_getline(fp, 6),
-                             FIRST_LINE.encode()[:6])
+            self.assertEqual(pyfile_getline(fp, 6), FIRST_LINE.encode()[:6])
 
     def test_pyfile_writestring(self):
         # Test PyFile_WriteString(str, file): call file.write(str)
         writestr = _testcapi.pyfile_writestring
 
         with io.StringIO() as fp:
-            self.assertEqual(writestr("a\xe9\u20ac\U0010FFFF".encode(), fp), 0)
+            self.assertEqual(writestr("a\xe9\u20ac\U0010ffff".encode(), fp), 0)
             with self.assertRaises(UnicodeDecodeError):
                 writestr(b"\xff", fp)
             with self.assertRaises(UnicodeDecodeError):
                 writestr("\udc80".encode("utf-8", "surrogatepass"), fp)
 
             text = fp.getvalue()
-            self.assertEqual(text, "a\xe9\u20ac\U0010FFFF")
+            self.assertEqual(text, "a\xe9\u20ac\U0010ffff")
 
         with self.assertRaises(SystemError):
             writestr(b"abc", NULL)
@@ -147,6 +140,7 @@ class CAPIFileTest(unittest.TestCase):
         class FakeFile:
             def __init__(self, fd):
                 self.fd = fd
+
             def fileno(self):
                 return self.fd
 

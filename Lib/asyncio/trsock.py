@@ -2,7 +2,6 @@ import socket
 
 
 class TransportSocket:
-
     """A socket-like wrapper for exposing real transport sockets.
 
     These objects can be safely returned by APIs like
@@ -10,7 +9,7 @@ class TransportSocket:
     operations (like "socket.close()") are banned.
     """
 
-    __slots__ = ('_sock',)
+    __slots__ = ("_sock",)
 
     def __init__(self, sock: socket.socket):
         self._sock = sock
@@ -39,13 +38,13 @@ class TransportSocket:
                 laddr = self.getsockname()
                 if laddr:
                     s = f"{s}, laddr={laddr}"
-            except socket.error:
+            except OSError:
                 pass
             try:
                 raddr = self.getpeername()
                 if raddr:
                     s = f"{s}, raddr={raddr}"
-            except socket.error:
+            except OSError:
                 pass
 
         return f"{s}>"
@@ -85,8 +84,7 @@ class TransportSocket:
     def settimeout(self, value):
         if value == 0:
             return
-        raise ValueError(
-            'settimeout(): only 0 timeout is allowed on transport sockets')
+        raise ValueError("settimeout(): only 0 timeout is allowed on transport sockets")
 
     def gettimeout(self):
         return 0
@@ -94,5 +92,4 @@ class TransportSocket:
     def setblocking(self, flag):
         if not flag:
             return
-        raise ValueError(
-            'setblocking(): transport sockets cannot be blocking')
+        raise ValueError("setblocking(): transport sockets cannot be blocking")

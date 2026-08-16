@@ -5,7 +5,7 @@ from test.support import import_helper
 from test.support.os_helper import unlink, TESTFN, TESTFN_ASCII, TESTFN_UNDECODABLE
 
 NULL = None
-_testcapi = import_helper.import_module('_testcapi')
+_testcapi = import_helper.import_module("_testcapi")
 Py_single_input = _testcapi.Py_single_input
 Py_file_input = _testcapi.Py_file_input
 Py_eval_input = _testcapi.Py_eval_input
@@ -37,20 +37,21 @@ class CAPITest(unittest.TestCase):
         # Test PyRun_StringFlags().
         def run(s, *args):
             return _testcapi.run_stringflags(s, Py_file_input, *args)
-        source = b'a\n'
 
-        self.assertIsNone(run(b'a\n', dict(a=1)))
-        self.assertIsNone(run(b'a\n', dict(a=1), {}))
-        self.assertIsNone(run(b'a\n', {}, dict(a=1)))
-        self.assertIsNone(run(b'a\n', {}, UserDict(a=1)))
+        source = b"a\n"
 
-        self.assertRaises(NameError, run, b'a\n', {})
-        self.assertRaises(NameError, run, b'a\n', {}, {})
-        self.assertRaises(TypeError, run, b'a\n', dict(a=1), [])
-        self.assertRaises(TypeError, run, b'a\n', dict(a=1), 1)
+        self.assertIsNone(run(b"a\n", dict(a=1)))
+        self.assertIsNone(run(b"a\n", dict(a=1), {}))
+        self.assertIsNone(run(b"a\n", {}, dict(a=1)))
+        self.assertIsNone(run(b"a\n", {}, UserDict(a=1)))
 
-        self.assertIsNone(run(b'\xc3\xa4\n', {'\xe4': 1}))
-        self.assertRaises(SyntaxError, run, b'\xe4\n', {})
+        self.assertRaises(NameError, run, b"a\n", {})
+        self.assertRaises(NameError, run, b"a\n", {}, {})
+        self.assertRaises(TypeError, run, b"a\n", dict(a=1), [])
+        self.assertRaises(TypeError, run, b"a\n", dict(a=1), 1)
+
+        self.assertIsNone(run(b"\xc3\xa4\n", {"\xe4": 1}))
+        self.assertRaises(SyntaxError, run, b"\xe4\n", {})
 
         # CRASHES run(b'a\n', NULL)
         # CRASHES run(b'a\n', NULL, {})
@@ -64,10 +65,11 @@ class CAPITest(unittest.TestCase):
     def test_run_fileexflags(self):
         # Test PyRun_FileExFlags().
         # XXX: fopen() uses different path encoding than Python on Windows.
-        filename = os.fsencode(TESTFN if os.name != 'nt' else TESTFN_ASCII)
-        with open(filename, 'wb') as fp:
-            fp.write(b'a\n')
+        filename = os.fsencode(TESTFN if os.name != "nt" else TESTFN_ASCII)
+        with open(filename, "wb") as fp:
+            fp.write(b"a\n")
         self.addCleanup(unlink, filename)
+
         def run(*args):
             return _testcapi.run_fileexflags(filename, Py_file_input, *args)
 
@@ -89,18 +91,20 @@ class CAPITest(unittest.TestCase):
         # CRASHES run(UserDict(), {})
         # CRASHES run(UserDict(), dict(a=1))
 
-    @unittest.skipUnless(TESTFN_UNDECODABLE, 'only works if there are undecodable paths')
-    @unittest.skipIf(os.name == 'nt', 'does not work on Windows')
+    @unittest.skipUnless(
+        TESTFN_UNDECODABLE, "only works if there are undecodable paths"
+    )
+    @unittest.skipIf(os.name == "nt", "does not work on Windows")
     def test_run_fileexflags_with_undecodable_filename(self):
         run = _testcapi.run_fileexflags
         try:
-            with open(TESTFN_UNDECODABLE, 'wb') as fp:
-                fp.write(b'a\n')
+            with open(TESTFN_UNDECODABLE, "wb") as fp:
+                fp.write(b"a\n")
             self.addCleanup(unlink, TESTFN_UNDECODABLE)
         except OSError:
-            self.skipTest('undecodable paths are not supported')
+            self.skipTest("undecodable paths are not supported")
         self.assertIsNone(run(TESTFN_UNDECODABLE, Py_file_input, dict(a=1)))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

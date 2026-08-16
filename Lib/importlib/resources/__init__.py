@@ -1,38 +1,35 @@
 """Read resources contained within a package."""
 
 from ._common import (
+    Anchor,
+    Package,
     as_file,
     files,
-    Package,
-    Anchor,
 )
-
 from ._legacy import (
-    contents,
-    open_binary,
-    read_binary,
-    open_text,
-    read_text,
-    is_resource,
-    path,
     Resource,
+    contents,
+    is_resource,
+    open_binary,
+    open_text,
+    path,
+    read_binary,
+    read_text,
 )
-
 from .abc import ResourceReader
 
-
 __all__ = [
-    'Package',
-    'Anchor',
-    'Resource',
-    'ResourceReader',
-    'as_file',
-    'contents',
-    'files',
-    'is_resource',
-    'open_binary',
-    'open_text',
-    'path',
-    'read_binary',
-    'read_text',
+    "Anchor",
+    "Package",
+    "Resource",
+    "ResourceReader",
+    "as_file",
+    "contents",
+    "files",
+    "is_resource",
+    "open_binary",
+    "open_text",
+    "path",
+    "read_binary",
+    "read_text",
 ]

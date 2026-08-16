@@ -10,8 +10,8 @@ from test.support import import_helper
 from test.support import os_helper
 
 
-support.requires('audio')
-winsound = import_helper.import_module('winsound')
+support.requires("audio")
+winsound = import_helper.import_module("winsound")
 
 
 # Unless we actually have an ear in the room, we have no idea whether a sound
@@ -25,11 +25,12 @@ def sound_func(func):
             ret = func(*args, **kwargs)
         except RuntimeError as e:
             if support.verbose:
-                print(func.__name__, 'failed:', e)
+                print(func.__name__, "failed:", e)
         else:
             if support.verbose:
-                print(func.__name__, 'returned')
+                print(func.__name__, "returned")
             return ret
+
     return wrapper
 
 
@@ -39,7 +40,6 @@ safe_PlaySound = sound_func(winsound.PlaySound)
 
 
 class BeepTest(unittest.TestCase):
-
     def test_errors(self):
         self.assertRaises(TypeError, winsound.Beep)
         self.assertRaises(ValueError, winsound.Beep, 36, 75)
@@ -58,7 +58,6 @@ class BeepTest(unittest.TestCase):
 
 
 class MessageBeepTest(unittest.TestCase):
-
     def tearDown(self):
         time.sleep(0.5)
 
@@ -87,49 +86,47 @@ class MessageBeepTest(unittest.TestCase):
 
 
 class PlaySoundTest(unittest.TestCase):
-
     def test_errors(self):
         self.assertRaises(TypeError, winsound.PlaySound)
         self.assertRaises(TypeError, winsound.PlaySound, "bad", "bad")
         self.assertRaises(
             RuntimeError,
             winsound.PlaySound,
-            "none", winsound.SND_ASYNC | winsound.SND_MEMORY
+            "none",
+            winsound.SND_ASYNC | winsound.SND_MEMORY,
         )
         self.assertRaises(TypeError, winsound.PlaySound, b"bad", 0)
-        self.assertRaises(TypeError, winsound.PlaySound, "bad",
-                          winsound.SND_MEMORY)
+        self.assertRaises(TypeError, winsound.PlaySound, "bad", winsound.SND_MEMORY)
         self.assertRaises(TypeError, winsound.PlaySound, 1, 0)
         # embedded null character
-        self.assertRaises(ValueError, winsound.PlaySound, 'bad\0', 0)
+        self.assertRaises(ValueError, winsound.PlaySound, "bad\0", 0)
 
     def test_keyword_args(self):
         safe_PlaySound(flags=winsound.SND_ALIAS, sound="SystemExit")
 
     def test_snd_memory(self):
-        with open(support.findfile('pluck-pcm8.wav',
-                                   subdir='audiodata'), 'rb') as f:
+        with open(support.findfile("pluck-pcm8.wav", subdir="audiodata"), "rb") as f:
             audio_data = f.read()
         safe_PlaySound(audio_data, winsound.SND_MEMORY)
         audio_data = bytearray(audio_data)
         safe_PlaySound(audio_data, winsound.SND_MEMORY)
 
     def test_snd_filename(self):
-        fn = support.findfile('pluck-pcm8.wav', subdir='audiodata')
+        fn = support.findfile("pluck-pcm8.wav", subdir="audiodata")
         safe_PlaySound(fn, winsound.SND_FILENAME | winsound.SND_NODEFAULT)
 
     def test_snd_filepath(self):
-        fn = support.findfile('pluck-pcm8.wav', subdir='audiodata')
+        fn = support.findfile("pluck-pcm8.wav", subdir="audiodata")
         path = os_helper.FakePath(fn)
         safe_PlaySound(path, winsound.SND_FILENAME | winsound.SND_NODEFAULT)
 
     def test_snd_filepath_as_bytes(self):
-        fn = support.findfile('pluck-pcm8.wav', subdir='audiodata')
+        fn = support.findfile("pluck-pcm8.wav", subdir="audiodata")
         self.assertRaises(
             TypeError,
             winsound.PlaySound,
             os_helper.FakePath(os.fsencode(fn)),
-            winsound.SND_FILENAME | winsound.SND_NODEFAULT
+            winsound.SND_FILENAME | winsound.SND_NODEFAULT,
         )
 
     def test_aliases(self):
@@ -152,11 +149,11 @@ class PlaySoundTest(unittest.TestCase):
 
     def test_stopasync(self):
         safe_PlaySound(
-            'SystemQuestion',
-            winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP
+            "SystemQuestion",
+            winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP,
         )
         time.sleep(0.5)
-        safe_PlaySound('SystemQuestion', winsound.SND_ALIAS | winsound.SND_NOSTOP)
+        safe_PlaySound("SystemQuestion", winsound.SND_ALIAS | winsound.SND_NOSTOP)
         # Issue 8367: PlaySound(None, winsound.SND_PURGE)
         # does not raise on systems without a sound card.
         winsound.PlaySound(None, winsound.SND_PURGE)

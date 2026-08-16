@@ -1,6 +1,7 @@
 import argparse
 import sys
-from typing import Any, Callable, Iterator
+from collections.abc import Callable, Iterator
+from typing import Any
 
 from pegen.build import build_parser
 from pegen.grammar import Grammar, Rule
@@ -24,11 +25,15 @@ class ASTGrammarPrinter:
             return repr(node)
         return node.__class__.__name__
 
-    def print_grammar_ast(self, grammar: Grammar, printer: Callable[..., None] = print) -> None:
+    def print_grammar_ast(
+        self, grammar: Grammar, printer: Callable[..., None] = print
+    ) -> None:
         for rule in grammar.rules.values():
             printer(self.print_nodes_recursively(rule))
 
-    def print_nodes_recursively(self, node: Rule, prefix: str = "", istail: bool = True) -> str:
+    def print_nodes_recursively(
+        self, node: Rule, prefix: str = "", istail: bool = True
+    ) -> str:
 
         children = list(self.children(node))
         value = self.name(node)
@@ -51,8 +56,8 @@ def main() -> None:
     args = argparser.parse_args()
 
     try:
-        grammar, parser, tokenizer = build_parser(args.filename)
-    except Exception as err:
+        grammar, _parser, _tokenizer = build_parser(args.filename)
+    except Exception:  # noqa: BLE001
         print("ERROR: Failed to parse grammar file", file=sys.stderr)
         sys.exit(1)
 

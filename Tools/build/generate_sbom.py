@@ -1,14 +1,15 @@
 """Tool for generating Software Bill of Materials (SBOM) for Python's dependencies"""
-import os
-import re
+
+import glob
 import hashlib
 import json
-import glob
-from pathlib import Path, PurePosixPath, PureWindowsPath
+import os
+import re
 import subprocess
 import sys
-import urllib.request
 import typing
+import urllib.request
+from pathlib import Path, PurePosixPath, PureWindowsPath
 
 CPYTHON_ROOT_DIR = Path(__file__).parent.parent.parent
 
@@ -29,20 +30,23 @@ ALLOWED_LICENSE_EXPRESSIONS = {
 }
 
 # Properties which are required for our purposes.
-REQUIRED_PROPERTIES_PACKAGE = frozenset([
-    "SPDXID",
-    "name",
-    "versionInfo",
-    "downloadLocation",
-    "checksums",
-    "licenseConcluded",
-    "externalRefs",
-    "primaryPackagePurpose",
-])
+REQUIRED_PROPERTIES_PACKAGE = frozenset(
+    [
+        "SPDXID",
+        "name",
+        "versionInfo",
+        "downloadLocation",
+        "checksums",
+        "licenseConcluded",
+        "externalRefs",
+        "primaryPackagePurpose",
+    ]
+)
 
 
 class PackageFiles(typing.NamedTuple):
     """Structure for describing the files of a package"""
+
     include: list[str] | None
     exclude: list[str] | None = None
 
@@ -52,16 +56,14 @@ class PackageFiles(typing.NamedTuple):
 # values to 'exclude' if we create new files within tracked
 # directories that aren't sourced from third-party packages.
 PACKAGE_TO_FILES = {
-    "mpdecimal": PackageFiles(
-        include=["Modules/_decimal/libmpdec/**"]
-    ),
+    "mpdecimal": PackageFiles(include=["Modules/_decimal/libmpdec/**"]),
     "expat": PackageFiles(
         include=["Modules/expat/**"],
         exclude=[
             "Modules/expat/expat_config.h",
             "Modules/expat/pyexpatns.h",
             "Modules/expat/refresh.sh",
-        ]
+        ],
     ),
     "macholib": PackageFiles(
         include=["Lib/ctypes/macholib/**"],
@@ -71,16 +73,14 @@ PACKAGE_TO_FILES = {
             "Lib/ctypes/macholib/fetch_macholib.bat",
         ],
     ),
-    "libb2": PackageFiles(
-        include=["Modules/_blake2/impl/**"]
-    ),
+    "libb2": PackageFiles(include=["Modules/_blake2/impl/**"]),
     "hacl-star": PackageFiles(
         include=["Modules/_hacl/**"],
         exclude=[
             "Modules/_hacl/refresh.sh",
             "Modules/_hacl/README.md",
             "Modules/_hacl/python_hacl_namespace.h",
-        ]
+        ],
     ),
 }
 
@@ -94,7 +94,9 @@ def error_if(value: bool, error_message: str) -> None:
     """Prints an error if a comparison fails along with a link to the devguide"""
     if value:
         print(error_message)
-        print("See 'https://devguide.python.org/developer-workflow/sbom' for more information.")
+        print(
+            "See 'https://devguide.python.org/developer-workflow/sbom' for more information."
+        )
         sys.exit(1)
 
 
@@ -158,7 +160,7 @@ def get_externals() -> list[str]:
     get_externals_bat_path = CPYTHON_ROOT_DIR / "PCbuild/get_externals.bat"
     externals = re.findall(
         r"set\s+libraries\s*=\s*%libraries%\s+([a-zA-Z0-9.-]+)\s",
-        get_externals_bat_path.read_text()
+        get_externals_bat_path.read_text(),
     )
     return externals
 
@@ -168,10 +170,7 @@ def check_sbom_packages(sbom_data: dict[str, typing.Any]) -> None:
 
     for package in sbom_data["packages"]:
         # Properties and ID must be properly formed.
-        error_if(
-            "name" not in package,
-            "Package is missing the 'name' field"
-        )
+        error_if("name" not in package, "Package is missing the 'name' field")
 
         # Verify that the checksum matches the expected value
         # and that the download URL is valid.
@@ -180,10 +179,12 @@ def check_sbom_packages(sbom_data: dict[str, typing.Any]) -> None:
             resp = urllib.request.urlopen(download_location)
             error_if(resp.status != 200, f"Couldn't access URL: {download_location}'")
 
-            package["checksums"] = [{
-                "algorithm": "SHA256",
-                "checksumValue": hashlib.sha256(resp.read()).hexdigest()
-            }]
+            package["checksums"] = [
+                {
+                    "algorithm": "SHA256",
+                    "checksumValue": hashlib.sha256(resp.read()).hexdigest(),
+                }
+            ]
 
         missing_required_keys = REQUIRED_PROPERTIES_PACKAGE - set(package.keys())
         error_if(
@@ -202,7 +203,10 @@ def check_sbom_packages(sbom_data: dict[str, typing.Any]) -> None:
             f"Version '{version}' for package '{package['name']} not in 'downloadLocation' field",
         )
         error_if(
-            any(version not in ref["referenceLocator"] for ref in package["externalRefs"]),
+            any(
+                version not in ref["referenceLocator"]
+                for ref in package["externalRefs"]
+            ),
             (
                 f"Version '{version}' for package '{package['name']} not in "
                 f"all 'externalRefs[].referenceLocator' fields"
@@ -211,49 +215,57 @@ def check_sbom_packages(sbom_data: dict[str, typing.Any]) -> None:
 
         # HACL* specifies its expected rev in a refresh script.
         if package["name"] == "hacl-star":
-            hacl_refresh_sh = (CPYTHON_ROOT_DIR / "Modules/_hacl/refresh.sh").read_text()
+            hacl_refresh_sh = (
+                CPYTHON_ROOT_DIR / "Modules/_hacl/refresh.sh"
+            ).read_text()
             hacl_expected_rev_match = re.search(
-                r"expected_hacl_star_rev=([0-9a-f]{40})",
-                hacl_refresh_sh
+                r"expected_hacl_star_rev=([0-9a-f]{40})", hacl_refresh_sh
             )
-            hacl_expected_rev = hacl_expected_rev_match and hacl_expected_rev_match.group(1)
+            hacl_expected_rev = (
+                hacl_expected_rev_match and hacl_expected_rev_match.group(1)
+            )
 
             error_if(
                 hacl_expected_rev != version,
-                "HACL* SBOM version doesn't match value in 'Modules/_hacl/refresh.sh'"
+                "HACL* SBOM version doesn't match value in 'Modules/_hacl/refresh.sh'",
             )
 
         # libexpat specifies its expected rev in a refresh script.
         if package["name"] == "expat":
-            libexpat_refresh_sh = (CPYTHON_ROOT_DIR / "Modules/expat/refresh.sh").read_text()
+            libexpat_refresh_sh = (
+                CPYTHON_ROOT_DIR / "Modules/expat/refresh.sh"
+            ).read_text()
             libexpat_expected_version_match = re.search(
                 r"expected_libexpat_version=\"([0-9]+\.[0-9]+\.[0-9]+)\"",
-                libexpat_refresh_sh
+                libexpat_refresh_sh,
             )
             libexpat_expected_sha256_match = re.search(
-                r"expected_libexpat_sha256=\"([a-f0-9]{64})\"",
-                libexpat_refresh_sh
+                r"expected_libexpat_sha256=\"([a-f0-9]{64})\"", libexpat_refresh_sh
             )
-            libexpat_expected_version = libexpat_expected_version_match and libexpat_expected_version_match.group(1)
-            libexpat_expected_sha256 = libexpat_expected_sha256_match and libexpat_expected_sha256_match.group(1)
+            libexpat_expected_version = (
+                libexpat_expected_version_match
+                and libexpat_expected_version_match.group(1)
+            )
+            libexpat_expected_sha256 = (
+                libexpat_expected_sha256_match
+                and libexpat_expected_sha256_match.group(1)
+            )
 
             error_if(
                 libexpat_expected_version != version,
-                "libexpat SBOM version doesn't match value in 'Modules/expat/refresh.sh'"
+                "libexpat SBOM version doesn't match value in 'Modules/expat/refresh.sh'",
             )
             error_if(
-                package["checksums"] != [{
-                    "algorithm": "SHA256",
-                    "checksumValue": libexpat_expected_sha256
-                }],
-                "libexpat SBOM checksum doesn't match value in 'Modules/expat/refresh.sh'"
+                package["checksums"]
+                != [{"algorithm": "SHA256", "checksumValue": libexpat_expected_sha256}],
+                "libexpat SBOM checksum doesn't match value in 'Modules/expat/refresh.sh'",
             )
 
         # License must be on the approved list for SPDX.
         license_concluded = package["licenseConcluded"]
         error_if(
             license_concluded != "NOASSERTION",
-            f"License identifier must be 'NOASSERTION'"
+            "License identifier must be 'NOASSERTION'",
         )
 
 
@@ -290,7 +302,6 @@ def create_source_sbom() -> None:
             )
 
             for path in paths:
-
                 # Normalize the filename from any combination of slashes.
                 path = str(PurePosixPath(PureWindowsPath(path)))
 
@@ -308,21 +319,25 @@ def create_source_sbom() -> None:
                 checksum_sha256 = hashlib.sha256(data).hexdigest()
 
                 file_spdx_id = spdx_id(f"SPDXRef-FILE-{path}")
-                sbom_data["files"].append({
-                    "SPDXID": file_spdx_id,
-                    "fileName": path,
-                    "checksums": [
-                        {"algorithm": "SHA1", "checksumValue": checksum_sha1},
-                        {"algorithm": "SHA256", "checksumValue": checksum_sha256},
-                    ],
-                })
+                sbom_data["files"].append(
+                    {
+                        "SPDXID": file_spdx_id,
+                        "fileName": path,
+                        "checksums": [
+                            {"algorithm": "SHA1", "checksumValue": checksum_sha1},
+                            {"algorithm": "SHA256", "checksumValue": checksum_sha256},
+                        ],
+                    }
+                )
 
                 # Tie each file back to its respective package.
-                sbom_data["relationships"].append({
-                    "spdxElementId": package_spdx_id,
-                    "relatedSpdxElement": file_spdx_id,
-                    "relationshipType": "CONTAINS",
-                })
+                sbom_data["relationships"].append(
+                    {
+                        "spdxElementId": package_spdx_id,
+                        "relatedSpdxElement": file_spdx_id,
+                        "relationshipType": "CONTAINS",
+                    }
+                )
 
     # Update the SBOM on disk
     sbom_path.write_text(json.dumps(sbom_data, indent=2, sort_keys=True))
@@ -360,14 +375,10 @@ def create_externals_sbom() -> None:
             # Version is the fifth field of a CPE.
             cpe23ref = external_ref["referenceLocator"]
             external_ref["referenceLocator"] = re.sub(
-                r"\A(cpe(?::[^:]+){4}):[^:]+:",
-                fr"\1:{package_version}:",
-                cpe23ref
+                r"\A(cpe(?::[^:]+){4}):[^:]+:", rf"\1:{package_version}:", cpe23ref
             )
 
-        download_location = (
-            f"https://github.com/python/cpython-source-deps/archive/refs/tags/{externals_name_to_git_tag[package['name']]}.tar.gz"
-        )
+        download_location = f"https://github.com/python/cpython-source-deps/archive/refs/tags/{externals_name_to_git_tag[package['name']]}.tar.gz"
         download_location_changed = download_location != package["downloadLocation"]
         package["downloadLocation"] = download_location
 

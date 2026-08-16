@@ -4,9 +4,9 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
 import string
 import sys
+from collections.abc import Iterable
 from types import MappingProxyType
 from typing import Any, BinaryIO, NamedTuple
 
@@ -49,11 +49,11 @@ BASIC_STR_ESCAPE_REPLACEMENTS = MappingProxyType(
     {
         "\\b": "\u0008",  # backspace
         "\\t": "\u0009",  # tab
-        "\\n": "\u000A",  # linefeed
-        "\\f": "\u000C",  # form feed
-        "\\r": "\u000D",  # carriage return
+        "\\n": "\u000a",  # linefeed
+        "\\f": "\u000c",  # form feed
+        "\\r": "\u000d",  # carriage return
         '\\"': "\u0022",  # quote
-        "\\\\": "\u005C",  # backslash
+        "\\\\": "\u005c",  # backslash
     }
 )
 
@@ -74,7 +74,7 @@ def load(fp: BinaryIO, /, *, parse_float: ParseFloat = float) -> dict[str, Any]:
     return loads(s, parse_float=parse_float)
 
 
-def loads(s: str, /, *, parse_float: ParseFloat = float) -> dict[str, Any]:  # noqa: C901
+def loads(s: str, /, *, parse_float: ParseFloat = float) -> dict[str, Any]:
     """Parse TOML from a string."""
 
     # The spec allows converting "\r\n" to "\n", even in string
@@ -169,7 +169,7 @@ class Flags:
             cont = cont[k]["nested"]
         cont.pop(key[-1], None)
 
-    def set(self, key: Key, flag: int, *, recursive: bool) -> None:  # noqa: A003
+    def set(self, key: Key, flag: int, *, recursive: bool) -> None:
         cont = self._flags
         key_parent, key_stem = key[:-1], key[-1]
         for k in key_parent:
@@ -593,9 +593,7 @@ def parse_basic_str(src: str, pos: Pos, *, multiline: bool) -> tuple[Pos, str]:
         pos += 1
 
 
-def parse_value(  # noqa: C901
-    src: str, pos: Pos, parse_float: ParseFloat
-) -> tuple[Pos, Any]:
+def parse_value(src: str, pos: Pos, parse_float: ParseFloat) -> tuple[Pos, Any]:
     try:
         char: str | None = src[pos]
     except IndexError:
@@ -616,12 +614,10 @@ def parse_value(  # noqa: C901
         return parse_literal_str(src, pos)
 
     # Booleans
-    if char == "t":
-        if src.startswith("true", pos):
-            return pos + 4, True
-    if char == "f":
-        if src.startswith("false", pos):
-            return pos + 5, False
+    if char == "t" and src.startswith("true", pos):
+        return pos + 4, True
+    if char == "f" and src.startswith("false", pos):
+        return pos + 5, False
 
     # Arrays
     if char == "[":
@@ -697,7 +693,7 @@ def make_safe_parse_float(parse_float: ParseFloat) -> ParseFloat:
     def safe_parse_float(float_str: str) -> Any:
         float_value = parse_float(float_str)
         if isinstance(float_value, (dict, list)):
-            raise ValueError("parse_float must not return dicts or lists")
+            raise ValueError("parse_float must not return dicts or lists")  # noqa: TRY004
         return float_value
 
     return safe_parse_float

@@ -6,11 +6,10 @@ _("")
 
 # Extra parentheses
 (_("parentheses"))
-((_("parentheses")))
+(_("parentheses"))
 
 # Multiline strings
-_("Hello, "
-  "world!")
+_("Hello, world!")
 
 _("""Hello,
     multiline!
@@ -32,8 +31,8 @@ _("Hello, {}!".format("world"))  # invalid
 # Nested structures
 _("1"), _("2")
 arr = [_("A"), _("B")]
-obj = {'a': _("A"), 'b': _("B")}
-{{{_('set')}}}
+obj = {"a": _("A"), "b": _("B")}
+{{{_("set")}}}
 
 
 # Nested functions and classes
@@ -47,11 +46,11 @@ class Foo:
         return _("baz")
 
 
-def bar(x=_('default value')):  # XXX This should be extracted but isn't.
+def bar(x=_("default value")):  # XXX This should be extracted but isn't.
     pass
 
 
-def baz(x=[_('default value')]):  # XXX This should be extracted but isn't.
+def baz(x=[_("default value")]):  # XXX This should be extracted but isn't.
     pass
 
 

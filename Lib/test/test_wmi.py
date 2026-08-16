@@ -8,7 +8,7 @@ from test.support import import_helper
 
 
 # Do this first so test will be skipped if module doesn't exist
-_wmi = import_helper.import_module('_wmi', required_on=['win'])
+_wmi = import_helper.import_module("_wmi", required_on=["win"])
 
 
 def wmi_exec_query(query):
@@ -60,7 +60,7 @@ class WmiTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             wmi_exec_query("not select, just in case someone tries something")
 
-    @support.requires_resource('cpu')
+    @support.requires_resource("cpu")
     def test_wmi_query_overflow(self):
         # Ensure very big queries fail
         # Test multiple times to ensure consistency
@@ -83,6 +83,7 @@ class WmiTests(unittest.TestCase):
 
     def test_wmi_query_threads(self):
         from concurrent.futures import ThreadPoolExecutor
+
         query = "SELECT ProcessId FROM Win32_Process WHERE ProcessId < 1000"
         with ThreadPoolExecutor(4) as pool:
             task = [pool.submit(wmi_exec_query, query) for _ in range(32)]

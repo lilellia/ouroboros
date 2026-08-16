@@ -1,11 +1,9 @@
+from idlelib import macosx
 from tkinter import *
 from tkinter.ttk import Frame, Scrollbar
 
-from idlelib import macosx
-
 
 class ScrolledList:
-
     default = "(None)"
 
     def __init__(self, master, **options):
@@ -15,8 +13,7 @@ class ScrolledList:
         self.frame.pack(fill="both", expand=1)
         self.vbar = vbar = Scrollbar(frame, name="vbar")
         self.vbar.pack(side="right", fill="y")
-        self.listbox = listbox = Listbox(frame, exportselection=0,
-            background="white")
+        self.listbox = listbox = Listbox(frame, exportselection=0, background="white")
         if options:
             listbox.configure(options)
         listbox.pack(expand=1, fill="both")
@@ -54,7 +51,7 @@ class ScrolledList:
         return self.listbox.get(index)
 
     def click_event(self, event):
-        self.listbox.activate("@%d,%d" % (event.x, event.y))
+        self.listbox.activate("@%d,%d" % (event.x, event.y))  # noqa: UP031
         index = self.listbox.index("active")
         self.select(index)
         self.on_select(index)
@@ -72,7 +69,7 @@ class ScrolledList:
         if not self.menu:
             self.make_menu()
         menu = self.menu
-        self.listbox.activate("@%d,%d" % (event.x, event.y))
+        self.listbox.activate("@%d,%d" % (event.x, event.y))  # noqa: UP031
         index = self.listbox.index("active")
         self.select(index)
         menu.tk_popup(event.x_root, event.y_root)
@@ -130,22 +127,29 @@ class ScrolledList:
 
 def _scrolled_list(parent):  # htest #
     top = Toplevel(parent)
-    x, y = map(int, parent.geometry().split('+')[1:])
-    top.geometry("+%d+%d" % (x+200, y + 175))
+    x, y = map(int, parent.geometry().split("+")[1:])
+    top.geometry("+%d+%d" % (x + 200, y + 175))  # noqa: UP031
 
     class MyScrolledList(ScrolledList):
-        def fill_menu(self): self.menu.add_command(label="right click")
-        def on_select(self, index): print("select", self.get(index))
-        def on_double(self, index): print("double", self.get(index))
+        def fill_menu(self):
+            self.menu.add_command(label="right click")
+
+        def on_select(self, index):
+            print("select", self.get(index))
+
+        def on_double(self, index):
+            print("double", self.get(index))
 
     scrolled_list = MyScrolledList(top)
     for i in range(30):
-        scrolled_list.append("Item %02d" % i)
+        scrolled_list.append("Item %02d" % i)  # noqa: UP031
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from unittest import main
-    main('idlelib.idle_test.test_scrolledlist', verbosity=2, exit=False)
+
+    main("idlelib.idle_test.test_scrolledlist", verbosity=2, exit=False)
 
     from idlelib.idle_test.htest import run
+
     run(_scrolled_list)

@@ -7,7 +7,6 @@ import symtable
 import unittest
 
 
-
 TEST_CODE = """
 import sys
 
@@ -175,7 +174,6 @@ def find_block(block, name):
 
 
 class SymtableTest(unittest.TestCase):
-
     top = symtable.symtable(TEST_CODE, "?", "exec")
     # These correspond to scopes in TEST_CODE
     Mine = find_block(top, "Mine")
@@ -245,9 +243,20 @@ class SymtableTest(unittest.TestCase):
     def test_function_info(self):
         func = self.spam
         self.assertEqual(sorted(func.get_parameters()), ["a", "b", "kw", "var"])
-        expected = ['a', 'b', 'internal', 'kw', 'other_internal', 'some_var', 'var', 'x']
+        expected = [
+            "a",
+            "b",
+            "internal",
+            "kw",
+            "other_internal",
+            "some_var",
+            "var",
+            "x",
+        ]
         self.assertEqual(sorted(func.get_locals()), expected)
-        self.assertEqual(sorted(func.get_globals()), ["bar", "glob", "some_assigned_global_var"])
+        self.assertEqual(
+            sorted(func.get_globals()), ["bar", "glob", "some_assigned_global_var"]
+        )
         self.assertEqual(self.internal.get_frees(), ("x",))
 
     def test_globals(self):
@@ -289,8 +298,7 @@ class SymtableTest(unittest.TestCase):
         self.assertFalse(self.spam.lookup("x").is_parameter())
 
     def test_symbol_lookup(self):
-        self.assertEqual(len(self.top.get_identifiers()),
-                         len(self.top.get_symbols()))
+        self.assertEqual(len(self.top.get_identifiers()), len(self.top.get_symbols()))
 
         self.assertRaises(KeyError, self.top.lookup, "not_here")
 
@@ -319,29 +327,28 @@ class SymtableTest(unittest.TestCase):
         self.assertFalse(self.internal.lookup("x").is_assigned())
 
     def test_annotated(self):
-        st1 = symtable.symtable('def f():\n    x: int\n', 'test', 'exec')
+        st1 = symtable.symtable("def f():\n    x: int\n", "test", "exec")
         st2 = st1.get_children()[0]
-        self.assertTrue(st2.lookup('x').is_local())
-        self.assertTrue(st2.lookup('x').is_annotated())
-        self.assertFalse(st2.lookup('x').is_global())
-        st3 = symtable.symtable('def f():\n    x = 1\n', 'test', 'exec')
+        self.assertTrue(st2.lookup("x").is_local())
+        self.assertTrue(st2.lookup("x").is_annotated())
+        self.assertFalse(st2.lookup("x").is_global())
+        st3 = symtable.symtable("def f():\n    x = 1\n", "test", "exec")
         st4 = st3.get_children()[0]
-        self.assertTrue(st4.lookup('x').is_local())
-        self.assertFalse(st4.lookup('x').is_annotated())
+        self.assertTrue(st4.lookup("x").is_local())
+        self.assertFalse(st4.lookup("x").is_annotated())
 
         # Test that annotations in the global scope are valid after the
         # variable is declared as nonlocal.
-        st5 = symtable.symtable('global x\nx: int', 'test', 'exec')
+        st5 = symtable.symtable("global x\nx: int", "test", "exec")
         self.assertTrue(st5.lookup("x").is_global())
 
         # Test that annotations for nonlocals are valid after the
         # variable is declared as nonlocal.
-        st6 = symtable.symtable('def g():\n'
-                                '    x = 2\n'
-                                '    def f():\n'
-                                '        nonlocal x\n'
-                                '    x: int',
-                                'test', 'exec')
+        st6 = symtable.symtable(
+            "def g():\n    x = 2\n    def f():\n        nonlocal x\n    x: int",
+            "test",
+            "exec",
+        )
 
     def test_imported(self):
         self.assertTrue(self.top.lookup("sys").is_imported())
@@ -353,25 +360,40 @@ class SymtableTest(unittest.TestCase):
         self.assertEqual(self.Mine.get_name(), "Mine")
 
     def test_class_get_methods(self):
-        self.assertEqual(self.Mine.get_methods(), ('a_method',))
+        self.assertEqual(self.Mine.get_methods(), ("a_method",))
 
         top = symtable.symtable(TEST_COMPLEX_CLASS_CODE, "?", "exec")
         this = find_block(top, "ComplexClass")
 
-        self.assertEqual(this.get_methods(), (
-            'a_method', 'a_method_pep_695',
-            'an_async_method', 'an_async_method_pep_695',
-            'a_classmethod', 'a_classmethod_pep_695',
-            'an_async_classmethod', 'an_async_classmethod_pep_695',
-            'a_staticmethod', 'a_staticmethod_pep_695',
-            'an_async_staticmethod', 'an_async_staticmethod_pep_695',
-            'a_fakemethod', 'a_fakemethod_pep_695',
-            'an_async_fakemethod', 'an_async_fakemethod_pep_695',
-            'glob_unassigned_meth', 'glob_unassigned_meth_pep_695',
-            'glob_unassigned_async_meth', 'glob_unassigned_async_meth_pep_695',
-            'glob_assigned_meth', 'glob_assigned_meth_pep_695',
-            'glob_assigned_async_meth', 'glob_assigned_async_meth_pep_695',
-        ))
+        self.assertEqual(
+            this.get_methods(),
+            (
+                "a_method",
+                "a_method_pep_695",
+                "an_async_method",
+                "an_async_method_pep_695",
+                "a_classmethod",
+                "a_classmethod_pep_695",
+                "an_async_classmethod",
+                "an_async_classmethod_pep_695",
+                "a_staticmethod",
+                "a_staticmethod_pep_695",
+                "an_async_staticmethod",
+                "an_async_staticmethod_pep_695",
+                "a_fakemethod",
+                "a_fakemethod_pep_695",
+                "an_async_fakemethod",
+                "an_async_fakemethod_pep_695",
+                "glob_unassigned_meth",
+                "glob_unassigned_meth_pep_695",
+                "glob_unassigned_async_meth",
+                "glob_unassigned_async_meth_pep_695",
+                "glob_assigned_meth",
+                "glob_assigned_meth_pep_695",
+                "glob_assigned_async_meth",
+                "glob_assigned_async_meth_pep_695",
+            ),
+        )
 
         # Test generator expressions that are of type TYPE_FUNCTION
         # but will not be reported by get_methods() since they are
@@ -381,17 +403,17 @@ class SymtableTest(unittest.TestCase):
         # expressions do not have the TYPE_FUNCTION type.
 
         def check_body(body, expected_methods):
-            indented = textwrap.indent(body, ' ' * 4)
+            indented = textwrap.indent(body, " " * 4)
             top = symtable.symtable(f"class A:\n{indented}", "?", "exec")
             this = find_block(top, "A")
             self.assertEqual(this.get_methods(), expected_methods)
 
         # statements with 'genexpr' inside it
         GENEXPRS = (
-            'x = (x for x in [])',
-            'x = (x async for x in [])',
-            'genexpr = (x for x in [])',
-            'genexpr = (x async for x in [])',
+            "x = (x for x in [])",
+            "x = (x async for x in [])",
+            "genexpr = (x for x in [])",
+            "genexpr = (x async for x in [])",
         )
 
         for gen in GENEXPRS:
@@ -401,25 +423,25 @@ class SymtableTest(unittest.TestCase):
 
             # test generator expression + variable named 'genexpr'
             with self.subTest(gen=gen, isvar=True):
-                check_body('\n'.join((gen, 'genexpr = 1')), ())
-                check_body('\n'.join(('genexpr = 1', gen)), ())
+                check_body("\n".join((gen, "genexpr = 1")), ())
+                check_body("\n".join(("genexpr = 1", gen)), ())
 
-        for paramlist in ('()', '(x)', '(x, y)', '(z: T)'):
+        for paramlist in ("()", "(x)", "(x, y)", "(z: T)"):
             for func in (
-                f'def genexpr{paramlist}:pass',
-                f'async def genexpr{paramlist}:pass',
-                f'def genexpr[T]{paramlist}:pass',
-                f'async def genexpr[T]{paramlist}:pass',
+                f"def genexpr{paramlist}:pass",
+                f"async def genexpr{paramlist}:pass",
+                f"def genexpr[T]{paramlist}:pass",
+                f"async def genexpr[T]{paramlist}:pass",
             ):
                 with self.subTest(func=func):
                     # test function named 'genexpr'
-                    check_body(func, ('genexpr',))
+                    check_body(func, ("genexpr",))
 
                 for gen in GENEXPRS:
                     with self.subTest(gen=gen, func=func):
                         # test generator expression + function named 'genexpr'
-                        check_body('\n'.join((gen, func)), ('genexpr',))
-                        check_body('\n'.join((func, gen)), ('genexpr',))
+                        check_body("\n".join((gen, func)), ("genexpr",))
+                        check_body("\n".join((func, gen)), ("genexpr",))
 
     def test_filename_correct(self):
         ### Bug tickler: SyntaxError file name correct whether error raised
@@ -433,6 +455,7 @@ class SymtableTest(unittest.TestCase):
                 self.assertEqual(e.offset, offset)
             else:
                 self.fail("no SyntaxError for %r" % (brokencode,))
+
         checkfilename("def f(x): foo)(", 14)  # parse-time
         checkfilename("def f(x): global x", 11)  # symtable-build-time
         symtable.symtable("pass", b"spam", "exec")
@@ -453,10 +476,10 @@ class SymtableTest(unittest.TestCase):
         symbols = symtable.symtable("def f(x): return x", "?", "exec")
 
     def test_bytes(self):
-        top = symtable.symtable(TEST_CODE.encode('utf8'), "?", "exec")
+        top = symtable.symtable(TEST_CODE.encode("utf8"), "?", "exec")
         self.assertIsNotNone(find_block(top, "Mine"))
 
-        code = b'# -*- coding: iso8859-15 -*-\nclass \xb4: pass\n'
+        code = b"# -*- coding: iso8859-15 -*-\nclass \xb4: pass\n"
 
         top = symtable.symtable(code, "?", "exec")
         self.assertIsNotNone(find_block(top, "\u017d"))
@@ -466,9 +489,11 @@ class SymtableTest(unittest.TestCase):
         self.assertEqual(str(self.spam), "<Function SymbolTable for spam in ?>")
 
     def test_symtable_entry_repr(self):
-        expected = f"<symtable entry top({self.top.get_id()}), line {self.top.get_lineno()}>"
+        expected = (
+            f"<symtable entry top({self.top.get_id()}), line {self.top.get_lineno()}>"
+        )
         self.assertEqual(repr(self.top._table), expected)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

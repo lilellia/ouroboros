@@ -1,30 +1,32 @@
 import io
 import os
 
+from . import popen_fork, spawn, util
 from .context import reduction, set_spawning_popen
-from . import popen_fork
-from . import spawn
-from . import util
 
-__all__ = ['Popen']
+__all__ = ["Popen"]
 
 
 #
 # Wrapper for an fd used while launching a process
 #
 
-class _DupFd(object):
+
+class _DupFd:
     def __init__(self, fd):
         self.fd = fd
+
     def detach(self):
         return self.fd
+
 
 #
 # Start child process using a fresh interpreter
 #
 
+
 class Popen(popen_fork.Popen):
-    method = 'spawn'
+    method = "spawn"
     DupFd = _DupFd
 
     def __init__(self, process_obj):
@@ -37,6 +39,7 @@ class Popen(popen_fork.Popen):
 
     def _launch(self, process_obj):
         from . import resource_tracker
+
         tracker_fd = resource_tracker.getfd()
         self._fds.append(tracker_fd)
         prep_data = spawn.get_preparation_data(process_obj._name)
@@ -52,13 +55,11 @@ class Popen(popen_fork.Popen):
         try:
             parent_r, child_w = os.pipe()
             child_r, parent_w = os.pipe()
-            cmd = spawn.get_command_line(tracker_fd=tracker_fd,
-                                         pipe_handle=child_r)
+            cmd = spawn.get_command_line(tracker_fd=tracker_fd, pipe_handle=child_r)
             self._fds.extend([child_r, child_w])
-            self.pid = util.spawnv_passfds(spawn.get_executable(),
-                                           cmd, self._fds)
+            self.pid = util.spawnv_passfds(spawn.get_executable(), cmd, self._fds)
             self.sentinel = parent_r
-            with open(parent_w, 'wb', closefd=False) as f:
+            with open(parent_w, "wb", closefd=False) as f:
                 f.write(fp.getbuffer())
         finally:
             fds_to_close = []

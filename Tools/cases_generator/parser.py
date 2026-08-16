@@ -1,11 +1,11 @@
 """Parser for bytecodes.inst."""
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import NamedTuple, Callable, TypeVar, Literal
+from typing import Literal, NamedTuple, TypeVar
 
 import lexer as lx
 from plexer import PLexer
-
 
 P = TypeVar("P", bound="Parser")
 N = TypeVar("N", bound="Node")
@@ -154,7 +154,13 @@ class Parser(PLexer):
         if hdr := self.inst_header():
             if block := self.block():
                 return InstDef(
-                    hdr.override, hdr.register, hdr.kind, hdr.name, hdr.inputs, hdr.outputs, block
+                    hdr.override,
+                    hdr.register,
+                    hdr.kind,
+                    hdr.name,
+                    hdr.inputs,
+                    hdr.outputs,
+                    block,
                 )
             raise self.make_syntax_error("Expected block")
         return None
@@ -167,12 +173,12 @@ class Parser(PLexer):
         # TODO: Make INST a keyword in the lexer.
         override = bool(self.expect(lx.OVERRIDE))
         register = bool(self.expect(lx.REGISTER))
-        if (tkn := self.expect(lx.IDENTIFIER)) and (kind := tkn.text) in ("inst", "op"):
+        if (tkn := self.expect(lx.IDENTIFIER)) and (kind := tkn.text) in ("inst", "op"):  # noqa: SIM102
             if self.expect(lx.LPAREN) and (tkn := self.expect(lx.IDENTIFIER)):
                 name = tkn.text
                 if self.expect(lx.COMMA):
                     inp, outp = self.io_effect()
-                    if self.expect(lx.RPAREN):
+                    if self.expect(lx.RPAREN):  # noqa: SIM102
                         if (tkn := self.peek()) and tkn.kind == lx.LBRACE:
                             return InstHeader(override, register, kind, name, inp, outp)
                 elif self.expect(lx.RPAREN) and kind == "inst":
@@ -195,9 +201,8 @@ class Parser(PLexer):
         here = self.getpos()
         if inp := self.input():
             near = self.getpos()
-            if self.expect(lx.COMMA):
-                if rest := self.inputs():
-                    return [inp] + rest
+            if self.expect(lx.COMMA) and (rest := self.inputs()):
+                return [inp] + rest
             self.setpos(near)
             return [inp]
         self.setpos(here)
@@ -212,9 +217,8 @@ class Parser(PLexer):
         here = self.getpos()
         if outp := self.output():
             near = self.getpos()
-            if self.expect(lx.COMMA):
-                if rest := self.outputs():
-                    return [outp] + rest
+            if self.expect(lx.COMMA) and (rest := self.outputs()):
+                return [outp] + rest
             self.setpos(near)
             return [outp]
         self.setpos(here)
@@ -227,15 +231,14 @@ class Parser(PLexer):
     @contextual
     def cache_effect(self) -> CacheEffect | None:
         # IDENTIFIER '/' NUMBER
-        if tkn := self.expect(lx.IDENTIFIER):
-            if self.expect(lx.DIVIDE):
-                num = self.require(lx.NUMBER).text
-                try:
-                    size = int(num)
-                except ValueError:
-                    raise self.make_syntax_error(f"Expected integer, got {num!r}")
-                else:
-                    return CacheEffect(tkn.text, size)
+        if (tkn := self.expect(lx.IDENTIFIER)) and self.expect(lx.DIVIDE):
+            num = self.require(lx.NUMBER).text
+            try:
+                size = int(num)
+            except ValueError:
+                raise self.make_syntax_error(f"Expected integer, got {num!r}")
+            else:
+                return CacheEffect(tkn.text, size)
 
     @contextual
     def stack_effect(self) -> StackEffect | None:
@@ -282,11 +285,11 @@ class Parser(PLexer):
 
     @contextual
     def super_def(self) -> Super | None:
-        if (tkn := self.expect(lx.IDENTIFIER)) and tkn.text == "super":
-            if self.expect(lx.LPAREN):
-                if tkn := self.expect(lx.IDENTIFIER):
-                    if self.expect(lx.RPAREN):
-                        if self.expect(lx.EQUALS):
+        if (tkn := self.expect(lx.IDENTIFIER)) and tkn.text == "super":  # noqa: SIM102
+            if self.expect(lx.LPAREN):  # noqa: SIM102
+                if tkn := self.expect(lx.IDENTIFIER):  # noqa: SIM102
+                    if self.expect(lx.RPAREN):  # noqa: SIM102
+                        if self.expect(lx.EQUALS):  # noqa: SIM102
                             if ops := self.ops():
                                 self.require(lx.SEMI)
                                 res = Super(tkn.text, ops)
@@ -307,11 +310,11 @@ class Parser(PLexer):
 
     @contextual
     def macro_def(self) -> Macro | None:
-        if (tkn := self.expect(lx.IDENTIFIER)) and tkn.text == "macro":
-            if self.expect(lx.LPAREN):
-                if tkn := self.expect(lx.IDENTIFIER):
-                    if self.expect(lx.RPAREN):
-                        if self.expect(lx.EQUALS):
+        if (tkn := self.expect(lx.IDENTIFIER)) and tkn.text == "macro":  # noqa: SIM102
+            if self.expect(lx.LPAREN):  # noqa: SIM102
+                if tkn := self.expect(lx.IDENTIFIER):  # noqa: SIM102
+                    if self.expect(lx.RPAREN):  # noqa: SIM102
+                        if self.expect(lx.EQUALS):  # noqa: SIM102
                             if uops := self.uops():
                                 self.require(lx.SEMI)
                                 res = Macro(tkn.text, uops)
@@ -348,16 +351,16 @@ class Parser(PLexer):
     def family_def(self) -> Family | None:
         if (tkn := self.expect(lx.IDENTIFIER)) and tkn.text == "family":
             size = None
-            if self.expect(lx.LPAREN):
+            if self.expect(lx.LPAREN):  # noqa: SIM102
                 if tkn := self.expect(lx.IDENTIFIER):
-                    if self.expect(lx.COMMA):
+                    if self.expect(lx.COMMA):  # noqa: SIM102
                         if not (size := self.expect(lx.IDENTIFIER)):
                             raise self.make_syntax_error("Expected identifier")
-                    if self.expect(lx.RPAREN):
+                    if self.expect(lx.RPAREN):  # noqa: SIM102
                         if self.expect(lx.EQUALS):
                             if not self.expect(lx.LBRACE):
                                 raise self.make_syntax_error("Expected {")
-                            if members := self.members():
+                            if members := self.members():  # noqa: SIM102
                                 if self.expect(lx.RBRACE) and self.expect(lx.SEMI):
                                     return Family(
                                         tkn.text, size.text if size else "", members

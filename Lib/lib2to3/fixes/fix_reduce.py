@@ -11,9 +11,7 @@ from lib2to3 import fixer_base
 from lib2to3.fixer_util import touch_import
 
 
-
 class FixReduce(fixer_base.BaseFix):
-
     BM_compatible = True
     order = "pre"
 
@@ -32,4 +30,4 @@ class FixReduce(fixer_base.BaseFix):
     """
 
     def transform(self, node, results):
-        touch_import('functools', 'reduce', node)
+        touch_import("functools", "reduce", node)

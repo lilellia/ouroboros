@@ -1,15 +1,18 @@
 import re
 from unicodedata import ucd_3_2_0 as unicodedata
 
+
 def gen_category(cats):
-    for i in range(0, 0x110000):
+    for i in range(0x110000):
         if unicodedata.category(chr(i)) in cats:
-            yield(i)
+            yield (i)
+
 
 def gen_bidirectional(cats):
-    for i in range(0, 0x110000):
+    for i in range(0x110000):
         if unicodedata.bidirectional(chr(i)) in cats:
-            yield(i)
+            yield (i)
+
 
 def compact_set(l):
     single = []
@@ -21,29 +24,30 @@ def compact_set(l):
             prev = e
             span = 0
             continue
-        if prev+span+1 != e:
+        if prev + span + 1 != e:
             if span > 2:
-                tuple.append((prev,prev+span+1))
+                tuple.append((prev, prev + span + 1))
             else:
-                for i in range(prev, prev+span+1):
-                    single.append(i)
+                for i in range(prev, prev + span + 1):
+                    single.append(i)  # noqa: PERF402
             prev = e
             span = 0
         else:
             span += 1
     if span:
-        tuple.append((prev,prev+span+1))
+        tuple.append((prev, prev + span + 1))
     else:
         single.append(prev)
     if not single and len(tuple) == 1:
-        tuple = "range(%d,%d)" % tuple[0]
+        tuple = "range(%d,%d)" % tuple[0]  # noqa: UP031
     else:
-        tuple = " + ".join("list(range(%d,%d))" % t for t in tuple)
+        tuple = " + ".join("list(range(%d,%d))" % t for t in tuple)  # noqa: UP031
     if not single:
-        return "set(%s)" % tuple
+        return f"set({tuple})"
     if not tuple:
-        return "set(%r)" % (single,)
-    return "set(%r + %s)" % (single, tuple)
+        return f"set({single!r})"
+    return f"set({single!r} + {tuple})"
+
 
 ############## Read the tables in the RFC #######################
 
@@ -95,7 +99,7 @@ for l in data:
             start = end = fields[0]
         start = int(start, 16)
         end = int(end, 16)
-        for i in range(start, end+1):
+        for i in range(start, end + 1):
             table[i] = i
     else:
         code, value = fields
@@ -119,7 +123,7 @@ and mappings, for which a mapping function is provided.
 from unicodedata import ucd_3_2_0 as unicodedata
 """)
 
-print("assert unicodedata.unidata_version == %r" % (unicodedata.unidata_version,))
+print(f"assert unicodedata.unidata_version == {unicodedata.unidata_version!r}")
 
 # A.1 is the table of unassigned characters
 # XXX Plane 15 PUA is listed as unassigned in Python.
@@ -150,11 +154,15 @@ name, table = tables[0]
 del tables[0]
 assert name == "B.1"
 table = sorted(table.keys())
-print("""
-b1_set = """ + compact_set(table) + """
+print(
+    """
+b1_set = """
+    + compact_set(table)
+    + """
 def in_table_b1(code):
     return ord(code) in b1_set
-""")
+"""
+)
 
 # B.2 and B.3 is case folding.
 # It takes CaseFolding.txt into account, which is
@@ -175,16 +183,16 @@ assert name == "B.3"
 
 b3_exceptions = {}
 
-for k,v in table_b2.items():
+for k, v in table_b2.items():
     if list(map(ord, chr(k).lower())) != v:
-        b3_exceptions[k] = "".join(map(chr,v))
+        b3_exceptions[k] = "".join(map(chr, v))
 
 b3 = sorted(b3_exceptions.items())
 
 print("""
 b3_exceptions = {""")
 for i, kv in enumerate(b3):
-    print("0x%x:%a," % kv, end=' ')
+    print("0x{:x}:{!a},".format(*kv), end=" ")
     if i % 4 == 3:
         print()
 print("}")
@@ -196,14 +204,18 @@ def map_table_b3(code):
     return code.lower()
 """)
 
+
 def map_table_b3(code):
     r = b3_exceptions.get(ord(code))
-    if r is not None: return r
+    if r is not None:
+        return r
     return code.lower()
+
 
 # B.2 is case folding for NFKC. This is the same as B.3,
 # except where NormalizeWithKC(Fold(a)) !=
 # NormalizeWithKC(Fold(NormalizeWithKC(Fold(a))))
+
 
 def map_table_b2(a):
     al = map_table_b3(a)
@@ -215,8 +227,9 @@ def map_table_b2(a):
     else:
         return al
 
+
 specials = {}
-for k,v in table_b2.items():
+for k, v in table_b2.items():
     if list(map(ord, map_table_b2(chr(k)))) != v:
         specials[k] = v
 
@@ -239,7 +252,7 @@ def map_table_b2(a):
 name, table = tables[0]
 del tables[0]
 assert name == "C.1.1"
-assert table == {0x20:0x20}
+assert table == {0x20: 0x20}
 
 print("""
 def in_table_c11(code):
@@ -291,7 +304,10 @@ assert len(Cc_nonascii - table_c22) == 0
 specials = list(table_c22 - Cc_nonascii)
 specials.sort()
 
-print("""c22_specials = """ + compact_set(specials) + """
+print(
+    """c22_specials = """
+    + compact_set(specials)
+    + """
 def in_table_c22(code):
     c = ord(code)
     if c < 128: return False
@@ -301,7 +317,8 @@ def in_table_c22(code):
 def in_table_c21_c22(code):
     return unicodedata.category(code) == "Cc" or \\
            ord(code) in c22_specials
-""")
+"""
+)
 
 # C.3 Private use
 name, table = tables[0]
@@ -322,9 +339,9 @@ name, table = tables[0]
 del tables[0]
 assert name == "C.4"
 
-nonchar = set(range(0xFDD0,0xFDF0))
-nonchar.update(range(0xFFFE,0x110000,0x10000))
-nonchar.update(range(0xFFFF,0x110000,0x10000))
+nonchar = set(range(0xFDD0, 0xFDF0))
+nonchar.update(range(0xFFFE, 0x110000, 0x10000))
+nonchar.update(range(0xFFFF, 0x110000, 0x10000))
 table = set(table.keys())
 assert table == nonchar
 
@@ -356,11 +373,15 @@ assert name == "C.6"
 
 table = sorted(table.keys())
 
-print("""
-c6_set = """ + compact_set(table) + """
+print(
+    """
+c6_set = """
+    + compact_set(table)
+    + """
 def in_table_c6(code):
     return ord(code) in c6_set
-""")
+"""
+)
 
 # C.7 Inappropriate for canonical representation
 name, table = tables[0]
@@ -369,11 +390,15 @@ assert name == "C.7"
 
 table = sorted(table.keys())
 
-print("""
-c7_set = """ + compact_set(table) + """
+print(
+    """
+c7_set = """
+    + compact_set(table)
+    + """
 def in_table_c7(code):
     return ord(code) in c7_set
-""")
+"""
+)
 
 # C.8 Change display properties or are deprecated
 name, table = tables[0]
@@ -382,11 +407,15 @@ assert name == "C.8"
 
 table = sorted(table.keys())
 
-print("""
-c8_set = """ + compact_set(table) + """
+print(
+    """
+c8_set = """
+    + compact_set(table)
+    + """
 def in_table_c8(code):
     return ord(code) in c8_set
-""")
+"""
+)
 
 # C.9 Tagging characters
 name, table = tables[0]
@@ -395,18 +424,22 @@ assert name == "C.9"
 
 table = sorted(table.keys())
 
-print("""
-c9_set = """ + compact_set(table) + """
+print(
+    """
+c9_set = """
+    + compact_set(table)
+    + """
 def in_table_c9(code):
     return ord(code) in c9_set
-""")
+"""
+)
 
 # D.1 Characters with bidirectional property "R" or "AL"
 name, table = tables[0]
 del tables[0]
 assert name == "D.1"
 
-RandAL = set(gen_bidirectional(["R","AL"]))
+RandAL = set(gen_bidirectional(["R", "AL"]))
 assert set(table.keys()) == RandAL
 
 print("""

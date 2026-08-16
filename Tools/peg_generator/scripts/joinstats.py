@@ -1,5 +1,5 @@
 #!/usr/bin/env python3.8
-
+# noqa: EXE001
 """Produce a report about the most-memoable types.
 
 Reads a list of statistics from stdin.  Each line must be two numbers,
@@ -13,8 +13,6 @@ import os
 import re
 import sys
 
-from typing import Dict
-
 reporoot = os.path.dirname(os.path.dirname(__file__))
 parse_c = os.path.join(reporoot, "peg_extension", "parse.c")
 
@@ -23,7 +21,7 @@ class TypeMapper:
     """State used to map types to names."""
 
     def __init__(self, filename: str) -> None:
-        self.table: Dict[int, str] = {}
+        self.table: dict[int, str] = {}
         with open(filename) as f:
             for line in f:
                 match = re.match(r"#define (\w+)_type (\d+)", line)
@@ -53,7 +51,7 @@ def main() -> None:
                 continue
             try:
                 type, count = map(int, parts[:2])
-            except ValueError as err:
+            except ValueError:
                 print(f"{lineno}: non-integer input ({line!r})")
                 continue
             table.append((type, count))

@@ -10,26 +10,26 @@ def _read_cmd_output(commandstring, capture_stderr=False):
     # Similar to os.popen(commandstring, "r").read(),
     # but without actually using os.popen because that
     # function is not usable during python bootstrap.
-    import os
     import contextlib
-    fp = open("/tmp/_aix_support.%s"%(
-        os.getpid(),), "w+b")
+    import os
+
+    fp = open(f"/tmp/_aix_support.{os.getpid()}", "w+b")  # noqa: SIM115
 
     with contextlib.closing(fp) as fp:
         if capture_stderr:
-            cmd = "%s >'%s' 2>&1" % (commandstring, fp.name)
+            cmd = f"{commandstring} >'{fp.name}' 2>&1"
         else:
-            cmd = "%s 2>/dev/null >'%s'" % (commandstring, fp.name)
+            cmd = f"{commandstring} 2>/dev/null >'{fp.name}'"
         return fp.read() if not os.system(cmd) else None
 
 
 def _aix_tag(vrtl, bd):
     # type: (List[int], int) -> str
     # Infer the ABI bitwidth from maxsize (assuming 64 bit as the default)
-    _sz = 32 if sys.maxsize == (2**31-1) else 64
+    _sz = 32 if sys.maxsize == (2**31 - 1) else 64
     _bd = bd if bd != 0 else 9988
     # vrtl[version, release, technology_level]
-    return "aix-{:1x}{:1d}{:02d}-{:04d}-{}".format(vrtl[0], vrtl[1], vrtl[2], _bd, _sz)
+    return f"aix-{vrtl[0]:1x}{vrtl[1]:1d}{vrtl[2]:02d}-{_bd:04d}-{_sz}"
 
 
 # extract version, release and technology level from a VRMF string
@@ -51,12 +51,13 @@ def _aix_bos_rte():
     # subprocess may not be available during python bootstrap
     try:
         import subprocess
+
         out = subprocess.check_output(["/usr/bin/lslpp", "-Lqc", "bos.rte"])
     except ImportError:
         out = _read_cmd_output("/usr/bin/lslpp -Lqc bos.rte")
     out = out.decode("utf-8")
     out = out.strip().split(":")  # type: ignore
-    _bd = int(out[-1]) if out[-1] != '' else 9988
+    _bd = int(out[-1]) if out[-1] != "" else 9988
     return (str(out[2]), _bd)
 
 
@@ -103,6 +104,5 @@ def aix_buildtag():
     try:
         build_date = int(build_date)
     except (ValueError, TypeError):
-        raise ValueError(f"AIX_BUILDDATE is not defined or invalid: "
-                         f"{build_date!r}")
+        raise ValueError(f"AIX_BUILDDATE is not defined or invalid: {build_date!r}")
     return _aix_tag(_aix_bgt(), build_date)

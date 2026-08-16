@@ -151,6 +151,7 @@ We also repeat each of the above scoping tests inside a function
 
 """
 
+
 class SetComprehensionTest(unittest.TestCase):
     def test_exception_locations(self):
         # The location of an exception raised from __init__ or
@@ -174,10 +175,11 @@ class SetComprehensionTest(unittest.TestCase):
             except Exception as e:
                 return e
 
-        for func, expected in [(init_raises, "BrokenIter(init_raises=True)"),
-                               (next_raises, "BrokenIter(next_raises=True)"),
-                               (iter_raises, "BrokenIter(iter_raises=True)"),
-                              ]:
+        for func, expected in [
+            (init_raises, "BrokenIter(init_raises=True)"),
+            (next_raises, "BrokenIter(next_raises=True)"),
+            (iter_raises, "BrokenIter(iter_raises=True)"),
+        ]:
             with self.subTest(func):
                 exc = func()
                 f = traceback.extract_tb(exc.__traceback__)[0]
@@ -185,10 +187,13 @@ class SetComprehensionTest(unittest.TestCase):
                 co = func.__code__
                 self.assertEqual(f.lineno, co.co_firstlineno + 2)
                 self.assertEqual(f.end_lineno, co.co_firstlineno + 2)
-                self.assertEqual(f.line[f.colno - indent : f.end_colno - indent],
-                                 expected)
+                self.assertEqual(
+                    f.line[f.colno - indent : f.end_colno - indent], expected
+                )
 
-__test__ = {'doctests' : doctests}
+
+__test__ = {"doctests": doctests}
+
 
 def load_tests(loader, tests, pattern):
     tests.addTest(doctest.DocTestSuite())

@@ -9,7 +9,7 @@ from test import support
 from setuptools import setup, Extension
 
 
-SOURCE = 'extension.cpp'
+SOURCE = "extension.cpp"
 
 if not support.MS_WINDOWS:
     # C++ compiler flags for GCC and clang
@@ -17,15 +17,15 @@ if not support.MS_WINDOWS:
         # gh-91321: The purpose of _testcppext extension is to check that building
         # a C++ extension using the Python C API does not emit C++ compiler
         # warnings
-        '-Werror',
+        "-Werror",
     ]
 else:
     # MSVC compiler flags
     CPPFLAGS = [
         # Display warnings level 1 to 4
-        '/W4',
+        "/W4",
         # Treat all compiler warnings as compiler errors
-        '/WX',
+        "/WX",
     ]
 
 
@@ -36,42 +36,42 @@ def main():
     limited = bool(os.environ.get("CPYTHON_TEST_LIMITED", ""))
 
     cppflags = list(CPPFLAGS)
-    cppflags.append(f'-DMODULE_NAME={module_name}')
+    cppflags.append(f"-DMODULE_NAME={module_name}")
 
     # Add -std=STD or /std:STD (MSVC) compiler flag
     if std:
         if support.MS_WINDOWS:
-            cppflags.append(f'/std:{std}')
+            cppflags.append(f"/std:{std}")
         else:
-            cppflags.append(f'-std={std}')
+            cppflags.append(f"-std={std}")
 
     # gh-105776: When "gcc -std=11" is used as the C++ compiler, -std=c11
     # option emits a C++ compiler warning. Remove "-std11" option from the
     # CC command.
-    cmd = (sysconfig.get_config_var('CC') or '')
+    cmd = sysconfig.get_config_var("CC") or ""
     if cmd is not None:
         if support.MS_WINDOWS:
-            std_prefix = '/std'
+            std_prefix = "/std"
         else:
-            std_prefix = '-std'
+            std_prefix = "-std"
         cmd = shlex.split(cmd)
         cmd = [arg for arg in cmd if not arg.startswith(std_prefix)]
         cmd = shlex.join(cmd)
         # CC env var overrides sysconfig CC variable in setuptools
-        os.environ['CC'] = cmd
+        os.environ["CC"] = cmd
 
     # Define Py_LIMITED_API macro
     if limited:
         version = sys.hexversion
-        cppflags.append(f'-DPy_LIMITED_API={version:#x}')
+        cppflags.append(f"-DPy_LIMITED_API={version:#x}")
 
     # On Windows, add PCbuild\amd64\ to include and library directories
     include_dirs = []
     library_dirs = []
     if support.MS_WINDOWS:
-        srcdir = sysconfig.get_config_var('srcdir')
+        srcdir = sysconfig.get_config_var("srcdir")
         machine = platform.uname().machine
-        pcbuild = os.path.join(srcdir, 'PCbuild', machine)
+        pcbuild = os.path.join(srcdir, "PCbuild", machine)
         if os.path.exists(pcbuild):
             # pyconfig.h is generated in PCbuild\amd64\
             include_dirs.append(pcbuild)
@@ -80,7 +80,7 @@ def main():
             print(f"Add PCbuild directory: {pcbuild}")
 
     # Display information to help debugging
-    for env_name in ('CC', 'CFLAGS', 'CPPFLAGS'):
+    for env_name in ("CC", "CFLAGS", "CPPFLAGS"):
         if env_name in os.environ:
             print(f"{env_name} env var: {os.environ[env_name]!r}")
         else:
@@ -90,13 +90,12 @@ def main():
     ext = Extension(
         module_name,
         sources=[SOURCE],
-        language='c++',
+        language="c++",
         extra_compile_args=cppflags,
         include_dirs=include_dirs,
-        library_dirs=library_dirs)
-    setup(name=f'internal_{module_name}',
-          version='0.0',
-          ext_modules=[ext])
+        library_dirs=library_dirs,
+    )
+    setup(name=f"internal_{module_name}", version="0.0", ext_modules=[ext])
 
 
 if __name__ == "__main__":

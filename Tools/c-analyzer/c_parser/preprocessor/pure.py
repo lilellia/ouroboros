@@ -6,13 +6,13 @@ from . import common as _common
 
 def preprocess(lines, filename=None, cwd=None):
     if isinstance(lines, str):
-        with _open_source(lines, filename) as (lines, filename):
+        with _open_source(lines, filename) as (lines, filename):  # noqa: PLR1704
             yield from preprocess(lines, filename)
         return
 
     # XXX actually preprocess...
     for lno, line in enumerate(lines, 1):
-        kind = 'source'
+        kind = "source"
         data = line
         conditions = None
         yield _common.SourceLine(

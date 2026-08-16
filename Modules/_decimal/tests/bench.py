@@ -7,10 +7,12 @@
 
 
 import time
+
 from test.support.import_helper import import_fresh_module
 
-C = import_fresh_module('decimal', fresh=['_decimal'])
-P = import_fresh_module('decimal', blocked=['_decimal'])
+C = import_fresh_module("decimal", fresh=["_decimal"])
+P = import_fresh_module("decimal", blocked=["_decimal"])
+
 
 #
 # NOTE: This is the pi function from the decimal documentation, modified
@@ -24,11 +26,12 @@ def pi_float():
     lasts, t, s, n, na, d, da = 0, 3.0, 3, 1, 0, 0, 24
     while s != lasts:
         lasts = s
-        n, na = n+na, na+8
-        d, da = d+da, da+32
+        n, na = n + na, na + 8
+        d, da = d + da, da + 32
         t = (t * n) / d
         s += t
     return s
+
 
 def pi_cdecimal():
     """cdecimal"""
@@ -36,11 +39,12 @@ def pi_cdecimal():
     lasts, t, s, n, na, d, da = D(0), D(3), D(3), D(1), D(0), D(0), D(24)
     while s != lasts:
         lasts = s
-        n, na = n+na, na+8
-        d, da = d+da, da+32
+        n, na = n + na, na + 8
+        d, da = d + da, da + 32
         t = (t * n) / d
         s += t
     return s
+
 
 def pi_decimal():
     """decimal"""
@@ -48,21 +52,22 @@ def pi_decimal():
     lasts, t, s, n, na, d, da = D(0), D(3), D(3), D(1), D(0), D(0), D(24)
     while s != lasts:
         lasts = s
-        n, na = n+na, na+8
-        d, da = d+da, da+32
+        n, na = n + na, na + 8
+        d, da = d + da, da + 32
         t = (t * n) / d
         s += t
     return s
 
+
 def factorial(n, m):
-    if (n > m):
+    if n > m:
         return factorial(m, n)
     elif m == 0:
         return 1
     elif n == m:
         return n
     else:
-        return factorial(n, (n+m)//2) * factorial((n+m)//2 + 1, m)
+        return factorial(n, (n + m) // 2) * factorial((n + m) // 2 + 1, m)
 
 
 print("\n# ======================================================================")
@@ -74,7 +79,7 @@ if C is not None:
     to_benchmark.insert(1, pi_cdecimal)
 
 for prec in [9, 19]:
-    print("\nPrecision: %d decimal digits\n" % prec)
+    print("\nPrecision: %d decimal digits\n" % prec)  # noqa: UP031
     for func in to_benchmark:
         start = time.time()
         if C is not None:
@@ -82,9 +87,9 @@ for prec in [9, 19]:
         P.getcontext().prec = prec
         for i in range(10000):
             x = func()
-        print("%s:" % func.__name__.replace("pi_", ""))
-        print("result: %s" % str(x))
-        print("time: %fs\n" % (time.time()-start))
+        print("{}:".format(func.__name__.replace("pi_", "")))
+        print(f"result: {x!s}")
+        print("time: %fs\n" % (time.time() - start))
 
 
 print("\n# ======================================================================")
@@ -98,8 +103,7 @@ if C is not None:
     c.Emin = C.MIN_EMIN
 
 for n in [100000, 1000000]:
-
-    print("n = %d\n" % n)
+    print("n = %d\n" % n)  # noqa: UP031
 
     if C is not None:
         # C version of decimal
@@ -110,8 +114,8 @@ for n in [100000, 1000000]:
         sx = str(x)
         end_conv = time.time()
         print("cdecimal:")
-        print("calculation time: %fs" % (end_calc-start_calc))
-        print("conversion time: %fs\n" % (end_conv-start_conv))
+        print("calculation time: %fs" % (end_calc - start_calc))
+        print("conversion time: %fs\n" % (end_conv - start_conv))
 
     # Python integers
     start_calc = time.time()
@@ -119,11 +123,11 @@ for n in [100000, 1000000]:
     end_calc = time.time()
     start_conv = time.time()
     sy = str(y)
-    end_conv =  time.time()
+    end_conv = time.time()
 
     print("int:")
-    print("calculation time: %fs" % (end_calc-start_calc))
-    print("conversion time: %fs\n\n" % (end_conv-start_conv))
+    print("calculation time: %fs" % (end_calc - start_calc))
+    print("conversion time: %fs\n\n" % (end_conv - start_conv))
 
     if C is not None:
-        assert(sx == sy)
+        assert sx == sy

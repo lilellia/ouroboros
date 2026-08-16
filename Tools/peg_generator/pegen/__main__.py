@@ -10,7 +10,6 @@ import sys
 import time
 import token
 import traceback
-from typing import Tuple
 
 from pegen.build import Grammar, Parser, ParserGenerator, Tokenizer
 from pegen.validator import validate_grammar
@@ -18,7 +17,7 @@ from pegen.validator import validate_grammar
 
 def generate_c_code(
     args: argparse.Namespace,
-) -> Tuple[Grammar, Parser, Tokenizer, ParserGenerator]:
+) -> tuple[Grammar, Parser, Tokenizer, ParserGenerator]:
     from pegen.build import build_c_parser_and_generator
 
     verbose = args.verbose
@@ -33,7 +32,7 @@ def generate_c_code(
             verbose_tokenizer,
             verbose_parser,
             args.verbose,
-            keep_asserts_in_extension=False if args.optimized else True,
+            keep_asserts_in_extension=not args.optimized,
             skip_actions=args.skip_actions,
         )
         return grammar, parser, tokenizer, gen
@@ -47,7 +46,7 @@ def generate_c_code(
 
 def generate_python_code(
     args: argparse.Namespace,
-) -> Tuple[Grammar, Parser, Tokenizer, ParserGenerator]:
+) -> tuple[Grammar, Parser, Tokenizer, ParserGenerator]:
     from pegen.build import build_python_parser_and_generator
 
     verbose = args.verbose
@@ -73,7 +72,9 @@ def generate_python_code(
 argparser = argparse.ArgumentParser(
     prog="pegen", description="Experimental PEG-like parser generator"
 )
-argparser.add_argument("-q", "--quiet", action="store_true", help="Don't print the parsed grammar")
+argparser.add_argument(
+    "-q", "--quiet", action="store_true", help="Don't print the parsed grammar"
+)
 argparser.add_argument(
     "-v",
     "--verbose",
@@ -88,7 +89,11 @@ c_parser.set_defaults(func=generate_c_code)
 c_parser.add_argument("grammar_filename", help="Grammar description")
 c_parser.add_argument("tokens_filename", help="Tokens description")
 c_parser.add_argument(
-    "-o", "--output", metavar="OUT", default="parse.c", help="Where to write the generated parser"
+    "-o",
+    "--output",
+    metavar="OUT",
+    default="parse.c",
+    help="Where to write the generated parser",
 )
 c_parser.add_argument(
     "--compile-extension",
@@ -182,7 +187,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    if sys.version_info < (3, 8):
-        print("ERROR: using pegen requires at least Python 3.8!", file=sys.stderr)
-        sys.exit(1)
     main()

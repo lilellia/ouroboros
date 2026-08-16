@@ -1,27 +1,26 @@
 #!/usr/bin/env python3.8
 
-""" Convert a grammar into a dot-file suitable for use with GraphViz
+"""Convert a grammar into a dot-file suitable for use with GraphViz
 
-    For example:
-        Generate the GraphViz file:
-        # scripts/grammar_grapher.py data/python.gram > python.gv
+For example:
+    Generate the GraphViz file:
+    # scripts/grammar_grapher.py data/python.gram > python.gv
 
-        Then generate the graph...
+    Then generate the graph...
 
-        # twopi python.gv -Tpng > python_twopi.png
+    # twopi python.gv -Tpng > python_twopi.png
 
-        or
+    or
 
-        # dot python.gv -Tpng > python_dot.png
+    # dot python.gv -Tpng > python_dot.png
 
-        NOTE: The _dot_ and _twopi_ tools seem to produce the most useful results.
-              The _circo_ tool is the worst of the bunch. Don't even bother.
+    NOTE: The _dot_ and _twopi_ tools seem to produce the most useful results.
+          The _circo_ tool is the worst of the bunch. Don't even bother.
 """
 
 import argparse
 import sys
-
-from typing import Any, List
+from typing import Any
 
 sys.path.insert(0, ".")
 
@@ -33,12 +32,12 @@ from pegen.grammar import (
     Group,
     Leaf,
     Lookahead,
-    Rule,
-    NameLeaf,
     NamedItem,
+    NameLeaf,
     Opt,
     Repeat,
     Rhs,
+    Rule,
 )
 
 argparser = argparse.ArgumentParser(
@@ -55,7 +54,7 @@ argparser.add_argument(
 argparser.add_argument("grammar_file", help="The grammar file to graph")
 
 
-def references_for_item(item: Any) -> List[Any]:
+def references_for_item(item: Any) -> list[Any]:
     if isinstance(item, Alt):
         return [_ref for _item in item.items for _ref in references_for_item(_item)]
     elif isinstance(item, Cut):
@@ -77,24 +76,22 @@ def references_for_item(item: Any) -> List[Any]:
     elif isinstance(item, Leaf):
         return []
 
-    elif isinstance(item, Opt):
-        return references_for_item(item.node)
-    elif isinstance(item, Repeat):
+    elif isinstance(item, (Opt, Repeat)):
         return references_for_item(item.node)
     elif isinstance(item, Rhs):
         return [_ref for alt in item.alts for _ref in references_for_item(alt)]
     elif isinstance(item, Rule):
         return references_for_item(item.rhs)
     else:
-        raise RuntimeError(f"Unknown item: {type(item)}")
+        raise RuntimeError(f"Unknown item: {type(item)}")  # noqa: TRY004
 
 
 def main() -> None:
     args = argparser.parse_args()
 
     try:
-        grammar, parser, tokenizer = build_parser(args.grammar_file)
-    except Exception as err:
+        grammar, _parser, _tokenizer = build_parser(args.grammar_file)
+    except Exception:  # noqa: BLE001
         print("ERROR: Failed to parse grammar file", file=sys.stderr)
         sys.exit(1)
 

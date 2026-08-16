@@ -3,7 +3,6 @@ from idlelib.redirector import WidgetRedirector
 
 
 class Percolator:
-
     def __init__(self, text):
         # XXX would be nice to inherit from Delegator
         self.text = text
@@ -88,8 +87,8 @@ def _percolator(parent):  # htest #
 
     top = tk.Toplevel(parent)
     top.title("Test Percolator")
-    x, y = map(int, parent.geometry().split('+')[1:])
-    top.geometry("+%d+%d" % (x, y + 175))
+    x, y = map(int, parent.geometry().split("+")[1:])
+    top.geometry("+%d+%d" % (x, y + 175))  # noqa: UP031
     text = tk.Text(top)
     p = Percolator(text)
     pin = p.insertfilter
@@ -99,6 +98,7 @@ def _percolator(parent):  # htest #
 
     def toggle1():
         (pin if var1.get() else pout)(t1)
+
     def toggle2():
         (pin if var2.get() else pout)(t2)
 
@@ -114,7 +114,9 @@ def _percolator(parent):  # htest #
 
 if __name__ == "__main__":
     from unittest import main
-    main('idlelib.idle_test.test_percolator', verbosity=2, exit=False)
+
+    main("idlelib.idle_test.test_percolator", verbosity=2, exit=False)
 
     from idlelib.idle_test.htest import run
+
     run(_percolator)

@@ -1,9 +1,8 @@
-from tkinter import Toplevel, TclError
 import sys
+from tkinter import TclError, Toplevel
 
 
 class WindowList:
-
     def __init__(self):
         self.dict = {}
         self.callbacks = []
@@ -20,7 +19,7 @@ class WindowList:
             pass
         self.call_callbacks()
 
-    def add_windows_to_menu(self,  menu):
+    def add_windows_to_menu(self, menu):
         list = []
         for key in self.dict:
             window = self.dict[key]
@@ -46,8 +45,8 @@ class WindowList:
         for callback in self.callbacks:
             try:
                 callback()
-            except:
-                t, v, tb = sys.exc_info()
+            except:  # noqa: E722
+                t, v, _tb = sys.exc_info()
                 print("warning: callback failed in WindowList", t, ":", v)
 
 
@@ -59,7 +58,6 @@ unregister_callback = registry.unregister_callback
 
 
 class ListedToplevel(Toplevel):
-
     def __init__(self, master, **kw):
         Toplevel.__init__(self, master, kw)
         registry.add(self)
@@ -95,4 +93,5 @@ class ListedToplevel(Toplevel):
 
 if __name__ == "__main__":
     from unittest import main
-    main('idlelib.idle_test.test_window', verbosity=2)
+
+    main("idlelib.idle_test.test_window", verbosity=2)

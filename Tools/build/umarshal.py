@@ -1,41 +1,40 @@
 # Implementat marshal.loads() in pure Python
 
 import ast
-
-from typing import Any, Tuple
+from typing import Any
 
 
 class Type:
     # Adapted from marshal.c
-    NULL                = ord('0')
-    NONE                = ord('N')
-    FALSE               = ord('F')
-    TRUE                = ord('T')
-    STOPITER            = ord('S')
-    ELLIPSIS            = ord('.')
-    INT                 = ord('i')
-    INT64               = ord('I')
-    FLOAT               = ord('f')
-    BINARY_FLOAT        = ord('g')
-    COMPLEX             = ord('x')
-    BINARY_COMPLEX      = ord('y')
-    LONG                = ord('l')
-    STRING              = ord('s')
-    INTERNED            = ord('t')
-    REF                 = ord('r')
-    TUPLE               = ord('(')
-    LIST                = ord('[')
-    DICT                = ord('{')
-    CODE                = ord('c')
-    UNICODE             = ord('u')
-    UNKNOWN             = ord('?')
-    SET                 = ord('<')
-    FROZENSET           = ord('>')
-    ASCII               = ord('a')
-    ASCII_INTERNED      = ord('A')
-    SMALL_TUPLE         = ord(')')
-    SHORT_ASCII         = ord('z')
-    SHORT_ASCII_INTERNED = ord('Z')
+    NULL = ord("0")
+    NONE = ord("N")
+    FALSE = ord("F")
+    TRUE = ord("T")
+    STOPITER = ord("S")
+    ELLIPSIS = ord(".")
+    INT = ord("i")
+    INT64 = ord("I")
+    FLOAT = ord("f")
+    BINARY_FLOAT = ord("g")
+    COMPLEX = ord("x")
+    BINARY_COMPLEX = ord("y")
+    LONG = ord("l")
+    STRING = ord("s")
+    INTERNED = ord("t")
+    REF = ord("r")
+    TUPLE = ord("(")
+    LIST = ord("[")
+    DICT = ord("{")
+    CODE = ord("c")
+    UNICODE = ord("u")
+    UNKNOWN = ord("?")
+    SET = ord("<")
+    FROZENSET = ord(">")
+    ASCII = ord("a")
+    ASCII_INTERNED = ord("A")
+    SMALL_TUPLE = ord(")")
+    SHORT_ASCII = ord("z")
+    SHORT_ASCII_INTERNED = ord("Z")
 
 
 FLAG_REF = 0x80  # with a type, add obj to index
@@ -55,27 +54,26 @@ class Code:
     def __repr__(self) -> str:
         return f"Code(**{self.__dict__})"
 
-    co_localsplusnames: Tuple[str]
-    co_localspluskinds: Tuple[int]
+    co_localsplusnames: tuple[str]
+    co_localspluskinds: tuple[int]
 
-    def get_localsplus_names(self, select_kind: int) -> Tuple[str, ...]:
+    def get_localsplus_names(self, select_kind: int) -> tuple[str, ...]:
         varnames: list[str] = []
-        for name, kind in zip(self.co_localsplusnames,
-                              self.co_localspluskinds):
+        for name, kind in zip(self.co_localsplusnames, self.co_localspluskinds):
             if kind & select_kind:
                 varnames.append(name)
         return tuple(varnames)
 
     @property
-    def co_varnames(self) -> Tuple[str, ...]:
+    def co_varnames(self) -> tuple[str, ...]:
         return self.get_localsplus_names(CO_FAST_LOCAL)
 
     @property
-    def co_cellvars(self) -> Tuple[str, ...]:
+    def co_cellvars(self) -> tuple[str, ...]:
         return self.get_localsplus_names(CO_FAST_CELL)
 
     @property
-    def co_freevars(self) -> Tuple[str, ...]:
+    def co_freevars(self) -> tuple[str, ...]:
         return self.get_localsplus_names(CO_FAST_FREE)
 
     @property
@@ -107,7 +105,7 @@ class Reader:
         buf = self.r_string(2)
         x = buf[0]
         x |= buf[1] << 8
-        x |= -(x & (1<<15))  # Sign-extend
+        x |= -(x & (1 << 15))  # Sign-extend
         return x
 
     def r_long(self) -> int:
@@ -116,7 +114,7 @@ class Reader:
         x |= buf[1] << 8
         x |= buf[2] << 16
         x |= buf[3] << 24
-        x |= -(x & (1<<31))  # Sign-extend
+        x |= -(x & (1 << 31))  # Sign-extend
         return x
 
     def r_long64(self) -> int:
@@ -129,7 +127,7 @@ class Reader:
         x |= buf[5] << 40
         x |= buf[6] << 48
         x |= buf[7] << 56
-        x |= -(x & (1<<63))  # Sign-extend
+        x |= -(x & (1 << 63))  # Sign-extend
         return x
 
     def r_PyLong(self) -> int:
@@ -138,7 +136,7 @@ class Reader:
         x = 0
         # Pray this is right
         for i in range(size):
-            x |= self.r_short() << i*15
+            x |= self.r_short() << i * 15
         if n < 0:
             x = -x
         return x
@@ -146,6 +144,7 @@ class Reader:
     def r_float_bin(self) -> float:
         buf = self.r_string(8)
         import struct  # Lazy import to avoid breaking UNIX build
+
         return struct.unpack("d", buf)[0]
 
     def r_float_str(self) -> float:
@@ -211,11 +210,9 @@ class Reader:
         elif type == Type.BINARY_FLOAT:
             return R_REF(self.r_float_bin())
         elif type == Type.COMPLEX:
-            return R_REF(complex(self.r_float_str(),
-                                    self.r_float_str()))
+            return R_REF(complex(self.r_float_str(), self.r_float_str()))
         elif type == Type.BINARY_COMPLEX:
-            return R_REF(complex(self.r_float_bin(),
-                                    self.r_float_bin()))
+            return R_REF(complex(self.r_float_bin(), self.r_float_bin()))
         elif type == Type.STRING:
             n = self.r_long()
             return R_REF(self.r_string(n))
@@ -297,7 +294,7 @@ class Reader:
             assert retval is not None
             return retval
         else:
-            breakpoint()
+            breakpoint()  # noqa: T100
             raise AssertionError(f"Unknown type {type} {chr(type)!r}")
 
 
@@ -309,8 +306,10 @@ def loads(data: bytes) -> Any:
 
 def main():
     # Test
-    import marshal, pprint
-    sample = {'foo': {(42, "bar", 3.14)}}
+    import marshal
+    import pprint
+
+    sample = {"foo": {(42, "bar", 3.14)}}
     data = marshal.dumps(sample)
     retval = loads(data)
     assert retval == sample, retval

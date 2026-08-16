@@ -1,5 +1,4 @@
-"""Tests for sys.audit and sys.addaudithook
-"""
+"""Tests for sys.audit and sys.addaudithook"""
 
 import subprocess
 import sys
@@ -112,7 +111,9 @@ class AuditTest(unittest.TestCase):
         expected = events[1][2]
         self.assertTrue(expected)
         self.assertSequenceEqual(["winreg.EnumKey", " ", f"{expected} 0"], events[2])
-        self.assertSequenceEqual(["winreg.EnumKey", " ", f"{expected} 10000"], events[3])
+        self.assertSequenceEqual(
+            ["winreg.EnumKey", " ", f"{expected} 10000"], events[3]
+        )
         self.assertSequenceEqual(["winreg.PyHKEY.Detach", " ", expected], events[4])
 
     def test_socket(self):
@@ -122,7 +123,7 @@ class AuditTest(unittest.TestCase):
             self.fail(stderr)
 
         if support.verbose:
-            print(*events, sep='\n')
+            print(*events, sep="\n")
         self.assertEqual(events[0][0], "socket.gethostname")
         self.assertEqual(events[1][0], "socket.__new__")
         self.assertEqual(events[2][0], "socket.bind")
@@ -134,14 +135,13 @@ class AuditTest(unittest.TestCase):
             self.fail(stderr)
 
         if support.verbose:
-            print(*events, sep='\n')
+            print(*events, sep="\n")
         self.assertEqual(
             [event[0] for event in events],
-            ["gc.get_objects", "gc.get_referrers", "gc.get_referents"]
+            ["gc.get_objects", "gc.get_referrers", "gc.get_referents"],
         )
 
-
-    @support.requires_resource('network')
+    @support.requires_resource("network")
     def test_http(self):
         import_helper.import_module("http.client")
         returncode, events, stderr = self.run_python("test_http_client")
@@ -149,13 +149,12 @@ class AuditTest(unittest.TestCase):
             self.fail(stderr)
 
         if support.verbose:
-            print(*events, sep='\n')
+            print(*events, sep="\n")
         self.assertEqual(events[0][0], "http.client.connect")
         self.assertEqual(events[0][2], "www.python.org 80")
         self.assertEqual(events[1][0], "http.client.send")
-        if events[1][2] != '[cannot send]':
-            self.assertIn('HTTP', events[1][2])
-
+        if events[1][2] != "[cannot send]":
+            self.assertIn("HTTP", events[1][2])
 
     def test_sqlite3(self):
         sqlite3 = import_helper.import_module("sqlite3")
@@ -164,7 +163,7 @@ class AuditTest(unittest.TestCase):
             self.fail(stderr)
 
         if support.verbose:
-            print(*events, sep='\n')
+            print(*events, sep="\n")
         actual = [ev[0] for ev in events]
         expected = ["sqlite3.connect", "sqlite3.connect/handle"] * 2
 
@@ -175,14 +174,13 @@ class AuditTest(unittest.TestCase):
             ]
         self.assertEqual(actual, expected)
 
-
     def test_sys_getframe(self):
         returncode, events, stderr = self.run_python("test_sys_getframe")
         if returncode:
             self.fail(stderr)
 
         if support.verbose:
-            print(*events, sep='\n')
+            print(*events, sep="\n")
         actual = [(ev[0], ev[2]) for ev in events]
         expected = [("sys._getframe", "test_sys_getframe")]
 
@@ -194,12 +192,11 @@ class AuditTest(unittest.TestCase):
             self.fail(stderr)
 
         if support.verbose:
-            print(*events, sep='\n')
+            print(*events, sep="\n")
         actual = [(ev[0], ev[2]) for ev in events]
         expected = [("sys._getframemodulename", "0")]
 
         self.assertEqual(actual, expected)
-
 
     def test_threading(self):
         returncode, events, stderr = self.run_python("test_threading")
@@ -207,7 +204,7 @@ class AuditTest(unittest.TestCase):
             self.fail(stderr)
 
         if support.verbose:
-            print(*events, sep='\n')
+            print(*events, sep="\n")
         actual = [(ev[0], ev[2]) for ev in events]
         expected = [
             ("_thread.start_new_thread", "(<test_func>, (), None)"),
@@ -216,7 +213,6 @@ class AuditTest(unittest.TestCase):
 
         self.assertEqual(actual, expected)
 
-
     def test_wmi_exec_query(self):
         import_helper.import_module("_wmi")
         returncode, events, stderr = self.run_python("test_wmi_exec_query")
@@ -224,7 +220,7 @@ class AuditTest(unittest.TestCase):
             self.fail(stderr)
 
         if support.verbose:
-            print(*events, sep='\n')
+            print(*events, sep="\n")
         actual = [(ev[0], ev[2]) for ev in events]
         expected = [("_wmi.exec_query", "SELECT * FROM Win32_OperatingSystem")]
 
@@ -238,19 +234,25 @@ class AuditTest(unittest.TestCase):
             self.fail(stderr)
 
         if support.verbose:
-            print('Events:', *events, sep='\n  ')
+            print("Events:", *events, sep="\n  ")
 
         self.assertSequenceEqual(
             events,
-            [('syslog.openlog', ' ', f'python 0 {syslog.LOG_USER}'),
-            ('syslog.syslog', ' ', f'{syslog.LOG_INFO} test'),
-            ('syslog.setlogmask', ' ', f'{syslog.LOG_DEBUG}'),
-            ('syslog.closelog', '', ''),
-            ('syslog.syslog', ' ', f'{syslog.LOG_INFO} test2'),
-            ('syslog.openlog', ' ', f'audit-tests.py 0 {syslog.LOG_USER}'),
-            ('syslog.openlog', ' ', f'audit-tests.py {syslog.LOG_NDELAY} {syslog.LOG_LOCAL0}'),
-            ('syslog.openlog', ' ', f'None 0 {syslog.LOG_USER}'),
-            ('syslog.closelog', '', '')]
+            [
+                ("syslog.openlog", " ", f"python 0 {syslog.LOG_USER}"),
+                ("syslog.syslog", " ", f"{syslog.LOG_INFO} test"),
+                ("syslog.setlogmask", " ", f"{syslog.LOG_DEBUG}"),
+                ("syslog.closelog", "", ""),
+                ("syslog.syslog", " ", f"{syslog.LOG_INFO} test2"),
+                ("syslog.openlog", " ", f"audit-tests.py 0 {syslog.LOG_USER}"),
+                (
+                    "syslog.openlog",
+                    " ",
+                    f"audit-tests.py {syslog.LOG_NDELAY} {syslog.LOG_LOCAL0}",
+                ),
+                ("syslog.openlog", " ", f"None 0 {syslog.LOG_USER}"),
+                ("syslog.closelog", "", ""),
+            ],
         )
 
     def test_not_in_gc(self):
@@ -258,14 +260,15 @@ class AuditTest(unittest.TestCase):
         if returncode:
             self.fail(stderr)
 
-
     def test_sys_monitoring_register_callback(self):
-        returncode, events, stderr = self.run_python("test_sys_monitoring_register_callback")
+        returncode, events, stderr = self.run_python(
+            "test_sys_monitoring_register_callback"
+        )
         if returncode:
             self.fail(stderr)
 
         if support.verbose:
-            print(*events, sep='\n')
+            print(*events, sep="\n")
         actual = [(ev[0], ev[2]) for ev in events]
         expected = [("sys.monitoring.register_callback", "(None,)")]
 
@@ -275,16 +278,19 @@ class AuditTest(unittest.TestCase):
         winapi = import_helper.import_module("_winapi")
 
         pipe_name = r"\\.\pipe\LOCAL\test_winapi_createnamed_pipe"
-        returncode, events, stderr = self.run_python("test_winapi_createnamedpipe", pipe_name)
+        returncode, events, stderr = self.run_python(
+            "test_winapi_createnamedpipe", pipe_name
+        )
         if returncode:
             self.fail(stderr)
 
         if support.verbose:
-            print(*events, sep='\n')
+            print(*events, sep="\n")
         actual = [(ev[0], ev[2]) for ev in events]
         expected = [("_winapi.CreateNamedPipe", f"({pipe_name!r}, 3, 8)")]
 
         self.assertEqual(actual, expected)
+
 
 if __name__ == "__main__":
     unittest.main()

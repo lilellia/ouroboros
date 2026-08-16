@@ -9,31 +9,42 @@ https://peps.python.org/pep-0205/
 # they are called this instead of "ref" to avoid name collisions with
 # the module-global ref() function imported from _weakref.
 
-from _weakref import (
-     getweakrefcount,
-     getweakrefs,
-     ref,
-     proxy,
-     CallableProxyType,
-     ProxyType,
-     ReferenceType,
-     _remove_dead_weakref)
-
-from _weakrefset import WeakSet, _IterationGuard
-
 import _collections_abc  # Import after _weakref to avoid circular import.
-import sys
 import itertools
+import sys
+from _weakref import (
+    CallableProxyType,
+    ProxyType,
+    ReferenceType,
+    _remove_dead_weakref,
+    getweakrefcount,
+    getweakrefs,
+    proxy,
+    ref,
+)
+from _weakrefset import WeakSet, _IterationGuard
 
 ProxyTypes = (ProxyType, CallableProxyType)
 
-__all__ = ["ref", "proxy", "getweakrefcount", "getweakrefs",
-           "WeakKeyDictionary", "ReferenceType", "ProxyType",
-           "CallableProxyType", "ProxyTypes", "WeakValueDictionary",
-           "WeakSet", "WeakMethod", "finalize"]
+__all__ = [
+    "CallableProxyType",
+    "ProxyType",
+    "ProxyTypes",
+    "ReferenceType",
+    "WeakKeyDictionary",
+    "WeakMethod",
+    "WeakSet",
+    "WeakValueDictionary",
+    "finalize",
+    "getweakrefcount",
+    "getweakrefs",
+    "proxy",
+    "ref",
+]
 
 
 _collections_abc.MutableSet.register(WeakSet)
+
 
 class WeakMethod(ref):
     """
@@ -41,15 +52,17 @@ class WeakMethod(ref):
     a bound method, working around the lifetime problem of bound methods.
     """
 
-    __slots__ = "_func_ref", "_meth_type", "_alive", "__weakref__"
+    __slots__ = "__weakref__", "_alive", "_func_ref", "_meth_type"
 
     def __new__(cls, meth, callback=None):
         try:
             obj = meth.__self__
             func = meth.__func__
         except AttributeError:
-            raise TypeError("argument should be a bound method, not {}"
-                            .format(type(meth))) from None
+            raise TypeError(
+                f"argument should be a bound method, not {type(meth)}"
+            ) from None
+
         def _cb(arg):
             # The self-weakref trick is needed to avoid creating a reference
             # cycle.
@@ -58,6 +71,7 @@ class WeakMethod(ref):
                 self._alive = False
                 if callback is not None:
                     callback(self)
+
         self = ref.__new__(cls, obj, _cb)
         self._func_ref = ref(func, _cb)
         self._meth_type = type(meth)
@@ -95,6 +109,7 @@ class WeakValueDictionary(_collections_abc.MutableMapping):
     Entries in the dictionary will be discarded when no strong
     reference to the value exists anymore
     """
+
     # We inherit the constructor without worrying about the input
     # dictionary; since it uses our .update() method, we get the right
     # checks (if the other dictionary is a WeakValueDictionary,
@@ -102,7 +117,7 @@ class WeakValueDictionary(_collections_abc.MutableMapping):
     # way in).
 
     def __init__(self, other=(), /, **kw):
-        def remove(wr, selfref=ref(self), _atomic_removal=_remove_dead_weakref):
+        def remove(wr, selfref=ref(self), _atomic_removal=_remove_dead_weakref):  # noqa: B008
             self = selfref()
             if self is not None:
                 if self._iterating:
@@ -111,6 +126,7 @@ class WeakValueDictionary(_collections_abc.MutableMapping):
                     # Atomic removal is necessary since this function
                     # can be called asynchronously by the GC
                     _atomic_removal(self.data, wr.key)
+
         self._remove = remove
         # A list of keys to be removed
         self._pending_removals = []
@@ -159,7 +175,7 @@ class WeakValueDictionary(_collections_abc.MutableMapping):
         return o is not None
 
     def __repr__(self):
-        return "<%s at %#x>" % (self.__class__.__name__, id(self))
+        return f"<{self.__class__.__name__} at {id(self):#x}>"
 
     def __setitem__(self, key, value):
         if self._pending_removals:
@@ -181,6 +197,7 @@ class WeakValueDictionary(_collections_abc.MutableMapping):
 
     def __deepcopy__(self, memo):
         from copy import deepcopy
+
         if self._pending_removals:
             self._commit_removals()
         new = self.__class__()
@@ -342,7 +359,7 @@ class KeyedRef(ref):
 
     """
 
-    __slots__ = "key",
+    __slots__ = ("key",)
 
     def __new__(type, ob, callback, key):
         self = ref.__new__(type, ob, callback)
@@ -354,7 +371,7 @@ class KeyedRef(ref):
 
 
 class WeakKeyDictionary(_collections_abc.MutableMapping):
-    """ Mapping class that references keys weakly.
+    """Mapping class that references keys weakly.
 
     Entries in the dictionary will be discarded when there is no
     longer a strong reference to the key. This can be used to
@@ -366,7 +383,8 @@ class WeakKeyDictionary(_collections_abc.MutableMapping):
 
     def __init__(self, dict=None):
         self.data = {}
-        def remove(k, selfref=ref(self)):
+
+        def remove(k, selfref=ref(self)):  # noqa: B008
             self = selfref()
             if self is not None:
                 if self._iterating:
@@ -376,6 +394,7 @@ class WeakKeyDictionary(_collections_abc.MutableMapping):
                         del self.data[k]
                     except KeyError:
                         pass
+
         self._remove = remove
         # A list of dead weakrefs (keys to be removed)
         self._pending_removals = []
@@ -422,7 +441,7 @@ class WeakKeyDictionary(_collections_abc.MutableMapping):
         return len(self.data) - len(self._pending_removals)
 
     def __repr__(self):
-        return "<%s at %#x>" % (self.__class__.__name__, id(self))
+        return f"<{self.__class__.__name__} at {id(self):#x}>"
 
     def __setitem__(self, key, value):
         self.data[ref(key, self._remove)] = value
@@ -440,6 +459,7 @@ class WeakKeyDictionary(_collections_abc.MutableMapping):
 
     def __deepcopy__(self, memo):
         from copy import deepcopy
+
         new = self.__class__()
         with _IterationGuard(self):
             for key, value in self.data.items():
@@ -449,7 +469,7 @@ class WeakKeyDictionary(_collections_abc.MutableMapping):
         return new
 
     def get(self, key, default=None):
-        return self.data.get(ref(key),default)
+        return self.data.get(ref(key), default)
 
     def __contains__(self, key):
         try:
@@ -505,7 +525,7 @@ class WeakKeyDictionary(_collections_abc.MutableMapping):
         return self.data.pop(ref(key), *args)
 
     def setdefault(self, key, default=None):
-        return self.data.setdefault(ref(key, self._remove),default)
+        return self.data.setdefault(ref(key, self._remove), default)
 
     def update(self, dict=None, /, **kwargs):
         d = self.data
@@ -556,20 +576,21 @@ class finalize:
     # ensures that they cannot be part of a ref-cycle.
 
     __slots__ = ()
-    _registry = {}
+    _registry = {}  # noqa: RUF012
     _shutdown = False
     _index_iter = itertools.count()
     _dirty = False
     _registered_with_atexit = False
 
     class _Info:
-        __slots__ = ("weakref", "func", "args", "kwargs", "atexit", "index")
+        __slots__ = ("args", "atexit", "func", "index", "kwargs", "weakref")
 
     def __init__(self, obj, func, /, *args, **kwargs):
         if not self._registered_with_atexit:
             # We may register the exit function more than once because
             # of a thread race, but that is harmless
             import atexit
+
             atexit.register(self._exitfunc)
             finalize._registered_with_atexit = True
         info = self._Info()
@@ -626,17 +647,16 @@ class finalize:
         info = self._registry.get(self)
         obj = info and info.weakref()
         if obj is None:
-            return '<%s object at %#x; dead>' % (type(self).__name__, id(self))
+            return f"<{type(self).__name__} object at {id(self):#x}; dead>"
         else:
-            return '<%s object at %#x; for %r at %#x>' % \
-                (type(self).__name__, id(self), type(obj).__name__, id(obj))
+            return f"<{type(self).__name__} object at {id(self):#x}; for {type(obj).__name__!r} at {id(obj):#x}>"
 
     @classmethod
     def _select_for_exit(cls):
         # Return live finalizers marked for exit, oldest first
-        L = [(f,i) for (f,i) in cls._registry.items() if i.atexit]
-        L.sort(key=lambda item:item[1].index)
-        return [f for (f,i) in L]
+        L = [(f, i) for (f, i) in cls._registry.items() if i.atexit]
+        L.sort(key=lambda item: item[1].index)
+        return [f for (f, i) in L]
 
     @classmethod
     def _exitfunc(cls):
@@ -647,6 +667,7 @@ class finalize:
         try:
             if cls._registry:
                 import gc
+
                 if gc.isenabled():
                     reenable_gc = True
                     gc.disable()
@@ -664,7 +685,7 @@ class finalize:
                         # this function which might trigger creation
                         # of a new finalizer
                         f()
-                    except Exception:
+                    except Exception:  # noqa: BLE001
                         sys.excepthook(*sys.exc_info())
                     assert f not in cls._registry
         finally:

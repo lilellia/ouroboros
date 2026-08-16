@@ -7,27 +7,26 @@ import stat
 
 from .iterutil import iter_many
 
-
 USE_CWD = object()
 
 
-C_SOURCE_SUFFIXES = ('.c', '.h')
+C_SOURCE_SUFFIXES = (".c", ".h")
 
 
 def create_backup(old, backup=None):
     if isinstance(old, str):
         filename = old
     else:
-        filename = getattr(old, 'name', None)
+        filename = getattr(old, "name", None)
     if not filename:
         return None
     if not backup or backup is True:
-        backup = f'{filename}.bak'
+        backup = f"{filename}.bak"
     try:
         shutil.copyfile(filename, backup)
     except FileNotFoundError as exc:
         if exc.filename != filename:
-            raise   # re-raise
+            raise  # re-raise
         backup = None
     return backup
 
@@ -35,10 +34,14 @@ def create_backup(old, backup=None):
 ##################################
 # filenames
 
-def fix_filename(filename, relroot=USE_CWD, *,
-                 fixroot=True,
-                 _badprefix=f'..{os.path.sep}',
-                 ):
+
+def fix_filename(
+    filename,
+    relroot=USE_CWD,
+    *,
+    fixroot=True,
+    _badprefix=f"..{os.path.sep}",
+):
     """Return a normalized, absolute-path copy of the given filename."""
     if not relroot or relroot is USE_CWD:
         return os.path.abspath(filename)
@@ -47,15 +50,18 @@ def fix_filename(filename, relroot=USE_CWD, *,
     return _fix_filename(filename, relroot)
 
 
-def _fix_filename(filename, relroot, *,
-                  _badprefix=f'..{os.path.sep}',
-                  ):
+def _fix_filename(
+    filename,
+    relroot,
+    *,
+    _badprefix=f"..{os.path.sep}",
+):
     orig = filename
 
     # First we normalize.
     filename = os.path.normpath(filename)
     if filename.startswith(_badprefix):
-        raise ValueError(f'bad filename {orig!r} (resolves beyond relative root')
+        raise ValueError(f"bad filename {orig!r} (resolves beyond relative root")
 
     # Now make sure it is absolute (relative to relroot).
     if not os.path.isabs(filename):
@@ -63,7 +69,7 @@ def _fix_filename(filename, relroot, *,
     else:
         relpath = os.path.relpath(filename, relroot)
         if os.path.join(relroot, relpath) != filename:
-            raise ValueError(f'expected {relroot!r} as lroot, got {orig!r}')
+            raise ValueError(f"expected {relroot!r} as lroot, got {orig!r}")
 
     return filename
 
@@ -77,11 +83,14 @@ def fix_filenames(filenames, relroot=USE_CWD):
     return filenames, relroot
 
 
-def format_filename(filename, relroot=USE_CWD, *,
-                    fixroot=True,
-                    normalize=True,
-                    _badprefix=f'..{os.path.sep}',
-                    ):
+def format_filename(
+    filename,
+    relroot=USE_CWD,
+    *,
+    fixroot=True,
+    normalize=True,
+    _badprefix=f"..{os.path.sep}",
+):
     """Return a consistent relative-path representation of the filename."""
     orig = filename
     if normalize:
@@ -97,10 +106,10 @@ def format_filename(filename, relroot=USE_CWD, *,
         if fixroot:
             relroot = os.path.abspath(relroot)
         elif not relroot:
-            raise ValueError('missing relroot')
+            raise ValueError("missing relroot")
         filename = os.path.relpath(filename, relroot)
     if filename.startswith(_badprefix):
-        raise ValueError(f'bad filename {orig!r} (resolves beyond relative root')
+        raise ValueError(f"bad filename {orig!r} (resolves beyond relative root")
     return filename
 
 
@@ -126,6 +135,7 @@ def _match_tail(path, tail):
 ##################################
 # find files
 
+
 def match_glob(filename, pattern):
     if fnmatch.fnmatch(filename, pattern):
         return True
@@ -141,31 +151,31 @@ def match_glob(filename, pattern):
     #  ('x/y/spam.py', 'x/**/*.py')
     #  ('x/spam.py', '**/*.py')
 
-    if '**/' not in pattern:
+    if "**/" not in pattern:
         return False
 
     # We only accommodate the single-"**" case.
-    return fnmatch.fnmatch(filename, pattern.replace('**/', '', 1))
+    return fnmatch.fnmatch(filename, pattern.replace("**/", "", 1))
 
 
-def process_filenames(filenames, *,
-                      start=None,
-                      include=None,
-                      exclude=None,
-                      relroot=USE_CWD,
-                      ):
+def process_filenames(
+    filenames,
+    *,
+    start=None,
+    include=None,
+    exclude=None,
+    relroot=USE_CWD,
+):
     if relroot and relroot is not USE_CWD:
         relroot = os.path.abspath(relroot)
     if start:
         start = fix_filename(start, relroot, fixroot=False)
     if include:
-        include = set(fix_filename(v, relroot, fixroot=False)
-                      for v in include)
+        include = {fix_filename(v, relroot, fixroot=False) for v in include}
     if exclude:
-        exclude = set(fix_filename(v, relroot, fixroot=False)
-                      for v in exclude)
+        exclude = {fix_filename(v, relroot, fixroot=False) for v in exclude}
 
-    onempty = Exception('no filenames provided')
+    onempty = Exception("no filenames provided")
     for filename, solo in iter_many(filenames, onempty):
         filename = fix_filename(filename, relroot, fixroot=False)
         relfile = format_filename(filename, relroot, fixroot=False, normalize=False)
@@ -176,19 +186,21 @@ def process_filenames(filenames, *,
 def expand_filenames(filenames):
     for filename in filenames:
         # XXX Do we need to use glob.escape (a la commit 9355868458, GH-20994)?
-        if '**/' in filename:
-            yield from glob.glob(filename.replace('**/', ''))
+        if "**/" in filename:
+            yield from glob.glob(filename.replace("**/", ""))
         yield from glob.glob(filename)
 
 
 def _get_check(filename, start, include, exclude):
     if start and filename != start:
-        return (lambda: '<skipped>'), start
+        return (lambda: "<skipped>"), start
     else:
+
         def check():
             if _is_excluded(filename, exclude, include):
-                return '<excluded>'
+                return "<excluded>"
             return None
+
         return check, None
 
 
@@ -207,26 +219,30 @@ def _is_excluded(filename, exclude, include):
         return False
 
 
-def _walk_tree(root, *,
-               _walk=os.walk,
-               ):
+def _walk_tree(
+    root,
+    *,
+    _walk=os.walk,
+):
     # A wrapper around os.walk that resolves the filenames.
     for parent, _, names in _walk(root):
         for name in names:
             yield os.path.join(parent, name)
 
 
-def walk_tree(root, *,
-              suffix=None,
-              walk=_walk_tree,
-              ):
+def walk_tree(
+    root,
+    *,
+    suffix=None,
+    walk=_walk_tree,
+):
     """Yield each file in the tree under the given directory name.
 
     If "suffix" is provided then only files with that suffix will
     be included.
     """
     if suffix and not isinstance(suffix, str):
-        raise ValueError('suffix must be a string')
+        raise ValueError("suffix must be a string")
 
     for filename in walk(root):
         if suffix and not filename.endswith(suffix):
@@ -234,30 +250,36 @@ def walk_tree(root, *,
         yield filename
 
 
-def glob_tree(root, *,
-              suffix=None,
-              _glob=glob.iglob,
-              ):
+def glob_tree(
+    root,
+    *,
+    suffix=None,
+    _glob=glob.iglob,
+):
     """Yield each file in the tree under the given directory name.
 
     If "suffix" is provided then only files with that suffix will
     be included.
     """
-    suffix = suffix or ''
+    suffix = suffix or ""
     if not isinstance(suffix, str):
-        raise ValueError('suffix must be a string')
+        raise ValueError("suffix must be a string")  # noqa: TRY004
 
-    for filename in _glob(f'{root}/*{suffix}'):
+    for filename in _glob(f"{root}/*{suffix}"):
         yield filename
-    for filename in _glob(f'{root}/**/*{suffix}'):
+    for filename in _glob(f"{root}/**/*{suffix}"):
         yield filename
 
 
-def iter_files(root, suffix=None, relparent=None, *,
-               get_files=os.walk,
-               _glob=glob_tree,
-               _walk=walk_tree,
-               ):
+def iter_files(
+    root,
+    suffix=None,
+    relparent=None,
+    *,
+    get_files=os.walk,
+    _glob=glob_tree,
+    _walk=walk_tree,
+):
     """Yield each file in the tree under the given directory name.
 
     If "root" is a non-string iterable then do the same for each of
@@ -271,10 +293,10 @@ def iter_files(root, suffix=None, relparent=None, *,
     """
     if not isinstance(root, str):
         roots = root
-        for root in roots:
-            yield from iter_files(root, suffix, relparent,
-                                  get_files=get_files,
-                                  _glob=_glob, _walk=_walk)
+        for root in roots:  # noqa: PLR1704
+            yield from iter_files(
+                root, suffix, relparent, get_files=get_files, _glob=_glob, _walk=_walk
+            )
         return
 
     # Use the right "walk" function.
@@ -282,7 +304,7 @@ def iter_files(root, suffix=None, relparent=None, *,
         get_files = _glob
     else:
         _files = _walk_tree if get_files in (os.walk, walk_tree) else get_files
-        get_files = (lambda *a, **k: _walk(*a, walk=_files, **k))
+        get_files = lambda *a, **k: _walk(*a, walk=_files, **k)
 
     # Handle a single suffix.
     if suffix and not isinstance(suffix, str):
@@ -293,7 +315,7 @@ def iter_files(root, suffix=None, relparent=None, *,
         suffix = None
 
     for filename in filenames:
-        if suffix and not isinstance(suffix, str):  # multiple suffixes
+        if suffix and not isinstance(suffix, str):  # multiple suffixes  # noqa: SIM102
             if not filename.endswith(suffix):
                 continue
         if relparent:
@@ -301,10 +323,14 @@ def iter_files(root, suffix=None, relparent=None, *,
         yield filename
 
 
-def iter_files_by_suffix(root, suffixes, relparent=None, *,
-                         walk=walk_tree,
-                         _iter_files=iter_files,
-                         ):
+def iter_files_by_suffix(
+    root,
+    suffixes,
+    relparent=None,
+    *,
+    walk=walk_tree,
+    _iter_files=iter_files,
+):
     """Yield each file in the tree that has the given suffixes.
 
     Unlike iter_files(), the results are in the original suffix order.
@@ -374,7 +400,7 @@ def _get_file_info(file):
     else:
         if isinstance(file, str):
             filename = file
-        elif hasattr(file, 'name') and os.path.exists(file.name):
+        elif hasattr(file, "name") and os.path.exists(file.name):
             filename = file.name
         else:
             raise NotImplementedError(file)
@@ -384,7 +410,7 @@ def _get_file_info(file):
 
 def _check_file(filename, check):
     if not isinstance(filename, str):
-        raise Exception(f'filename required to check file, got {filename}')
+        raise Exception(f"filename required to check file, got {filename}")  # noqa: TRY002, TRY004
     if check & S_IRANY:
         flags = os.O_RDONLY
     elif check & S_IWANY:
@@ -407,10 +433,11 @@ def _check_file(filename, check):
 
 def _get_user_info(user):
     import pwd
+
     username = uid = gid = groups = None
     if user is None:
         uid = os.geteuid()
-        #username = os.getlogin()
+        # username = os.getlogin()
         username = pwd.getpwuid(uid)[0]
         gid = os.getgid()
         groups = os.getgroups()
@@ -436,12 +463,10 @@ def _check_mode(st, mode, check, user):
     if check & S_IRANY:
         check -= S_IRANY
         matched = False
-        if mode & stat.S_IRUSR:
-            if st.st_uid == uid:
-                matched = True
-        if mode & stat.S_IRGRP:
-            if st.st_uid == gid or st.st_uid in groups:
-                matched = True
+        if mode & stat.S_IRUSR and st.st_uid == uid:
+            matched = True
+        if mode & stat.S_IRGRP and (st.st_uid == gid or st.st_uid in groups):
+            matched = True
         if mode & stat.S_IROTH:
             matched = True
         if not matched:
@@ -449,12 +474,10 @@ def _check_mode(st, mode, check, user):
     if check & S_IWANY:
         check -= S_IWANY
         matched = False
-        if mode & stat.S_IWUSR:
-            if st.st_uid == uid:
-                matched = True
-        if mode & stat.S_IWGRP:
-            if st.st_uid == gid or st.st_uid in groups:
-                matched = True
+        if mode & stat.S_IWUSR and st.st_uid == uid:
+            matched = True
+        if mode & stat.S_IWGRP and (st.st_uid == gid or st.st_uid in groups):
+            matched = True
         if mode & stat.S_IWOTH:
             matched = True
         if not matched:
@@ -462,12 +485,10 @@ def _check_mode(st, mode, check, user):
     if check & S_IXANY:
         check -= S_IXANY
         matched = False
-        if mode & stat.S_IXUSR:
-            if st.st_uid == uid:
-                matched = True
-        if mode & stat.S_IXGRP:
-            if st.st_uid == gid or st.st_uid in groups:
-                matched = True
+        if mode & stat.S_IXUSR and st.st_uid == uid:
+            matched = True
+        if mode & stat.S_IXGRP and (st.st_uid == gid or st.st_uid in groups):
+            matched = True
         if mode & stat.S_IXOTH:
             matched = True
         if not matched:

@@ -126,13 +126,13 @@ def load_data(fobj):
 
 class _TZifHeader:
     __slots__ = [
-        "version",
-        "isutcnt",
+        "charcnt",
         "isstdcnt",
+        "isutcnt",
         "leapcnt",
         "timecnt",
         "typecnt",
-        "charcnt",
+        "version",
     ]
 
     def __init__(self, *args):

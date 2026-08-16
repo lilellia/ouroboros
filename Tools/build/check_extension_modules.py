@@ -17,6 +17,7 @@ Module information is parsed from several sources:
 
 See --help for more information
 """
+
 import argparse
 import collections
 import enum
@@ -27,11 +28,10 @@ import re
 import sys
 import sysconfig
 import warnings
-
+from collections.abc import Iterable
 from importlib._bootstrap import _load as bootstrap_load
 from importlib.machinery import BuiltinImporter, ExtensionFileLoader, ModuleSpec
 from importlib.util import spec_from_file_location, spec_from_loader
-from typing import Iterable
 
 SRC_DIR = pathlib.Path(__file__).parent.parent.parent
 
@@ -191,7 +191,7 @@ class ModuleChecker:
             while len(names) % 3:
                 names.append("")
             for l, m, r in zip(names[::3], names[1::3], names[2::3]):
-                print("%-*s   %-*s   %-*s" % (longest, l, longest, m, longest, r))
+                print("%-*s   %-*s   %-*s" % (longest, l, longest, m, longest, r))  # noqa: UP031
 
         if verbose and self.builtin_ok:
             print("The following *built-in* modules have been successfully built:")
@@ -415,7 +415,7 @@ class ModuleChecker:
         except ImportError as e:
             logger.error("%s failed to import: %s", modinfo.name, e)
             raise
-        except Exception as e:
+        except Exception:
             logger.exception("Importing extension '%s' failed!", modinfo.name)
             raise
 

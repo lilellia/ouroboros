@@ -1,19 +1,20 @@
 #! /usr/bin/env python3
 # This script generates Modules/_sre/sre_constants.h from Lib/re/_constants.py.
 
-SCRIPT_NAME = 'Tools/build/generate_sre_constants.py'
+SCRIPT_NAME = "Tools/build/generate_sre_constants.py"
 
 
 def update_file(file, content):
     try:
-        with open(file, 'r') as fobj:
+        with open(file, "r") as fobj:
             if fobj.read() == content:
                 return False
     except (OSError, ValueError):
         pass
-    with open(file, 'w') as fobj:
+    with open(file, "w") as fobj:
         fobj.write(content)
     return True
+
 
 sre_constants_header = f"""\
 /*
@@ -31,6 +32,7 @@ sre_constants_header = f"""\
 
 """
 
+
 def main(
     infile="Lib/re/_constants.py",
     outfile_constants="Modules/_sre/sre_constants.h",
@@ -39,18 +41,17 @@ def main(
     ns = {}
     with open(infile) as fp:
         code = fp.read()
-    exec(code, ns)
+    exec(code, ns)  # noqa: S102
 
     def dump(d, prefix):
         items = sorted(d)
         for item in items:
-            yield "#define %s_%s %d\n" % (prefix, item, item)
+            yield "#define %s_%s %d\n" % (prefix, item, item)  # noqa: UP031
 
     def dump2(d, prefix):
-        items = [(value, name) for name, value in d.items()
-                 if name.startswith(prefix)]
+        items = [(value, name) for name, value in d.items() if name.startswith(prefix)]
         for value, name in sorted(items):
-            yield "#define %s %d\n" % (name, value)
+            yield "#define %s %d\n" % (name, value)  # noqa: UP031
 
     def dump_gotos(d, prefix):
         for i, item in enumerate(sorted(d)):
@@ -58,23 +59,24 @@ def main(
             yield f"    &&{prefix}_{item},\n"
 
     content = [sre_constants_header]
-    content.append("#define SRE_MAGIC %d\n" % ns["MAGIC"])
+    content.append("#define SRE_MAGIC %d\n" % ns["MAGIC"])  # noqa: UP031
     content.extend(dump(ns["OPCODES"], "SRE_OP"))
     content.extend(dump(ns["ATCODES"], "SRE"))
     content.extend(dump(ns["CHCODES"], "SRE"))
     content.extend(dump2(ns, "SRE_FLAG_"))
     content.extend(dump2(ns, "SRE_INFO_"))
 
-    update_file(outfile_constants, ''.join(content))
+    update_file(outfile_constants, "".join(content))
 
     content = [sre_constants_header]
     content.append(f"static void *sre_targets[{len(ns['OPCODES'])}] = {{\n")
     content.extend(dump_gotos(ns["OPCODES"], "TARGET_SRE_OP"))
     content.append("};\n")
 
-    update_file(outfile_targets, ''.join(content))
+    update_file(outfile_targets, "".join(content))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
+
     main(*sys.argv[1:])

@@ -1,20 +1,16 @@
-"""Editor window that can serve as an output file.
-"""
+"""Editor window that can serve as an output file."""
 
 import re
-
-from tkinter import messagebox
-
 from idlelib.editor import EditorWindow
-
+from tkinter import messagebox
 
 file_line_pats = [
     # order of patterns matters
     r'file "([^"]*)", line (\d+)',
-    r'([^\s]+)\((\d+)\)',
-    r'^(\s*\S.*?):\s*(\d+):',  # Win filename, maybe starting with spaces
-    r'([^\s]+):\s*(\d+):',     # filename or path, ltrim
-    r'^\s*(\S.*?):\s*(\d+):',  # Win abs path with embedded spaces, ltrim
+    r"([^\s]+)\((\d+)\)",
+    r"^(\s*\S.*?):\s*(\d+):",  # Win filename, maybe starting with spaces
+    r"([^\s]+):\s*(\d+):",  # filename or path, ltrim
+    r"^\s*(\S.*?):\s*(\d+):",  # Win abs path with embedded spaces, ltrim
 ]
 
 file_line_progs = None
@@ -23,8 +19,7 @@ file_line_progs = None
 def compile_progs():
     "Compile the patterns for matching to file name and line number."
     global file_line_progs
-    file_line_progs = [re.compile(pat, re.IGNORECASE)
-                       for pat in file_line_pats]
+    file_line_progs = [re.compile(pat, re.IGNORECASE) for pat in file_line_pats]
 
 
 def file_line_helper(line):
@@ -42,7 +37,7 @@ def file_line_helper(line):
         if match:
             filename, lineno = match.group(1, 2)
             try:
-                f = open(filename)
+                f = open(filename)  # noqa: SIM115
                 f.close()
                 break
             except OSError:
@@ -65,7 +60,7 @@ class OutputWindow(EditorWindow):
     """
 
     # Our own right-button menu
-    rmenu_specs = [
+    rmenu_specs = [  # noqa: RUF012
         ("Cut", "<<cut>>", "rmenu_check_cut"),
         ("Copy", "<<copy>>", "rmenu_check_copy"),
         ("Paste", "<<paste>>", "rmenu_check_paste"),
@@ -90,7 +85,7 @@ class OutputWindow(EditorWindow):
 
     def maybesave(self):
         "Customize EditorWindow to not display save file messagebox."
-        return 'yes' if self.get_saved() else 'no'
+        return "yes" if self.get_saved() else "no"
 
     # Act as output file
     def write(self, s, tags=(), mark="insert"):
@@ -122,7 +117,6 @@ class OutputWindow(EditorWindow):
 
     def flush(self):
         "No flushing needed as write() directly writes to widget."
-        pass
 
     def showerror(self, *args, **kwargs):
         messagebox.showerror(*args, **kwargs)
@@ -141,15 +135,15 @@ class OutputWindow(EditorWindow):
         if not result:
             # Try the previous line.  This is handy e.g. in tracebacks,
             # where you tend to right-click on the displayed source line
-            line = self.text.get("insert -1line linestart",
-                                 "insert -1line lineend")
+            line = self.text.get("insert -1line linestart", "insert -1line lineend")
             result = file_line_helper(line)
             if not result:
                 self.showerror(
                     "No special line",
                     "The line you point at doesn't look like "
                     "a valid file name followed by a line number.",
-                    parent=self.text)
+                    parent=self.text,
+                )
                 return
         filename, lineno = result
         self.flist.gotofileline(filename, lineno)
@@ -157,11 +151,10 @@ class OutputWindow(EditorWindow):
 
 # These classes are currently not used but might come in handy
 class OnDemandOutputWindow:
-
-    tagdefs = {
+    tagdefs = {  # noqa: RUF012
         # XXX Should use IdlePrefs.ColorPrefs
-        "stdout":  {"foreground": "blue"},
-        "stderr":  {"foreground": "#007700"},
+        "stdout": {"foreground": "blue"},
+        "stderr": {"foreground": "#007700"},
     }
 
     def __init__(self, flist):
@@ -179,10 +172,11 @@ class OnDemandOutputWindow:
         for tag, cnf in self.tagdefs.items():
             if cnf:
                 text.tag_configure(tag, **cnf)
-        text.tag_raise('sel')
+        text.tag_raise("sel")
         self.write = self.owin.write
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from unittest import main
-    main('idlelib.idle_test.test_outwin', verbosity=2, exit=False)
+
+    main("idlelib.idle_test.test_outwin", verbosity=2, exit=False)

@@ -8,32 +8,50 @@
 #
 
 __all__ = [
-    'Process', 'current_process', 'active_children', 'freeze_support',
-    'Lock', 'RLock', 'Semaphore', 'BoundedSemaphore', 'Condition',
-    'Event', 'Barrier', 'Queue', 'Manager', 'Pipe', 'Pool', 'JoinableQueue'
-    ]
+    "Barrier",
+    "BoundedSemaphore",
+    "Condition",
+    "Event",
+    "JoinableQueue",
+    "Lock",
+    "Manager",
+    "Pipe",
+    "Pool",
+    "Process",
+    "Queue",
+    "RLock",
+    "Semaphore",
+    "active_children",
+    "current_process",
+    "freeze_support",
+]
 
 #
 # Imports
 #
 
-import threading
-import sys
-import weakref
 import array
+import sys
+import threading
+import weakref
+from queue import Queue
+from threading import (
+    Barrier,
+    BoundedSemaphore,
+    Condition,
+    Event,
+    Lock,
+    RLock,
+    Semaphore,
+)
 
 from .connection import Pipe
-from threading import Lock, RLock, Semaphore, BoundedSemaphore
-from threading import Event, Condition, Barrier
-from queue import Queue
 
-#
-#
-#
 
 class DummyProcess(threading.Thread):
-
-    def __init__(self, group=None, target=None, name=None, args=(), kwargs={}):
+    def __init__(self, group=None, target=None, name=None, args=(), kwargs=None):
+        if kwargs is None:
+            kwargs = {}
         threading.Thread.__init__(self, group, target, name, args, kwargs)
         self._pid = None
         self._children = weakref.WeakKeyDictionary()
@@ -43,10 +61,10 @@ class DummyProcess(threading.Thread):
     def start(self):
         if self._parent is not current_process():
             raise RuntimeError(
-                "Parent is {0!r} but current_process is {1!r}".format(
-                    self._parent, current_process()))
+                f"Parent is {self._parent!r} but current_process is {current_process()!r}"
+            )
         self._start_called = True
-        if hasattr(self._parent, '_children'):
+        if hasattr(self._parent, "_children"):
             self._parent._children[self] = None
         threading.Thread.start(self)
 
@@ -57,13 +75,11 @@ class DummyProcess(threading.Thread):
         else:
             return None
 
-#
-#
-#
 
 Process = DummyProcess
 current_process = threading.current_thread
 current_process()._children = weakref.WeakKeyDictionary()
+
 
 def active_children():
     children = current_process()._children
@@ -72,32 +88,34 @@ def active_children():
             children.pop(p, None)
     return list(children)
 
+
 def freeze_support():
     pass
 
-#
-#
-#
 
-class Namespace(object):
+class Namespace:
     def __init__(self, /, **kwds):
         self.__dict__.update(kwds)
+
     def __repr__(self):
         items = list(self.__dict__.items())
         temp = []
         for name, value in items:
-            if not name.startswith('_'):
-                temp.append('%s=%r' % (name, value))
+            if not name.startswith("_"):
+                temp.append(f"{name}={value!r}")
         temp.sort()
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(temp))
+        return "{}({})".format(self.__class__.__name__, ", ".join(temp))
 
-dict = dict
-list = list
+
+dict = dict  # noqa: PLW0127
+list = list  # noqa: PLW0127
+
 
 def Array(typecode, sequence, lock=True):
     return array.array(typecode, sequence)
 
-class Value(object):
+
+class Value:
     def __init__(self, typecode, value, lock=True):
         self._typecode = typecode
         self._value = value
@@ -111,16 +129,21 @@ class Value(object):
         self._value = value
 
     def __repr__(self):
-        return '<%s(%r, %r)>'%(type(self).__name__,self._typecode,self._value)
+        return f"<{type(self).__name__}({self._typecode!r}, {self._value!r})>"
+
 
 def Manager():
     return sys.modules[__name__]
 
+
 def shutdown():
     pass
 
+
 def Pool(processes=None, initializer=None, initargs=()):
     from ..pool import ThreadPool
+
     return ThreadPool(processes, initializer, initargs)
+
 
 JoinableQueue = Queue

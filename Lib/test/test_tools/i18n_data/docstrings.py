@@ -9,7 +9,6 @@ def test(x):
 
 # Leading empty line
 def test2(x):
-
     """docstring"""  # XXX This should be extracted but isn't.
 
 

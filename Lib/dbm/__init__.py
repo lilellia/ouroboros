@@ -27,9 +27,10 @@ tested for existence, and add interfaces to other dbm-like
 implementations.
 """
 
-__all__ = ['open', 'whichdb', 'error']
+__all__ = ["error", "open", "whichdb"]
 
-import io
+import builtins
+import io  # noqa: F401
 import os
 import struct
 import sys
@@ -38,7 +39,8 @@ import sys
 class error(Exception):
     pass
 
-_names = ['dbm.gnu', 'dbm.ndbm', 'dbm.dumb']
+
+_names = ["dbm.gnu", "dbm.ndbm", "dbm.dumb"]
 _defaultmod = None
 _modules = {}
 
@@ -50,7 +52,7 @@ except ImportError:
     ndbm = None
 
 
-def open(file, flag='r', mode=0o666):
+def open(file, flag="r", mode=0o666):
     """Open or create database at path given by *file*.
 
     Optional argument *flag* can be 'r' (default) for read-only access, 'w'
@@ -65,31 +67,31 @@ def open(file, flag='r', mode=0o666):
     if _defaultmod is None:
         for name in _names:
             try:
-                mod = __import__(name, fromlist=['open'])
+                mod = __import__(name, fromlist=["open"])
             except ImportError:
                 continue
             if not _defaultmod:
                 _defaultmod = mod
             _modules[name] = mod
         if not _defaultmod:
-            raise ImportError("no dbm clone found; tried %s" % _names)
+            raise ImportError(f"no dbm clone found; tried {_names}")
 
     # guess the type of an existing database, if not creating a new one
-    result = whichdb(file) if 'n' not in flag else None
+    result = whichdb(file) if "n" not in flag else None
     if result is None:
         # db doesn't exist or 'n' flag was specified to create a new db
-        if 'c' in flag or 'n' in flag:
+        if "c" in flag or "n" in flag:
             # file doesn't exist and the new flag was used so use default type
             mod = _defaultmod
         else:
-            raise error[0]("db file doesn't exist; "
-                           "use 'c' or 'n' flag to create a new db")
+            raise error[0](
+                "db file doesn't exist; use 'c' or 'n' flag to create a new db"
+            )
     elif result == "":
         # db type cannot be determined
         raise error[0]("db type could not be determined")
     elif result not in _modules:
-        raise error[0]("db type is {0}, but the module is not "
-                       "available".format(result))
+        raise error[0](f"db type is {result}, but the module is not available")
     else:
         mod = _modules[result]
     return mod.open(file, flag, mode)
@@ -111,16 +113,16 @@ def whichdb(filename):
     # Check for ndbm first -- this has a .pag and a .dir file
     filename = os.fsencode(filename)
     try:
-        f = io.open(filename + b".pag", "rb")
+        f = builtins.open(filename + b".pag", "rb")  # noqa: SIM115
         f.close()
-        f = io.open(filename + b".dir", "rb")
+        f = builtins.open(filename + b".dir", "rb")  # noqa: SIM115
         f.close()
         return "dbm.ndbm"
     except OSError:
         # some dbm emulations based on Berkeley DB generate a .db file
         # some do not, but they should be caught by the bsd checks
         try:
-            f = io.open(filename + b".db", "rb")
+            f = builtins.open(filename + b".db", "rb")  # noqa: SIM115
             f.close()
             # guarantee we can actually open the file using dbm
             # kind of overkill, but since we are dealing with emulations
@@ -140,7 +142,7 @@ def whichdb(filename):
         # dumbdbm files with no keys are empty
         if size == 0:
             return "dbm.dumb"
-        f = io.open(filename + b".dir", "rb")
+        f = builtins.open(filename + b".dir", "rb")  # noqa: SIM115
         try:
             if f.read(1) in (b"'", b'"'):
                 return "dbm.dumb"
@@ -151,7 +153,7 @@ def whichdb(filename):
 
     # See if the file exists, return None if not
     try:
-        f = io.open(filename, "rb")
+        f = builtins.open(filename, "rb")  # noqa: SIM115
     except OSError:
         return None
 
@@ -171,7 +173,7 @@ def whichdb(filename):
         return ""
 
     # Check for GNU dbm
-    if magic in (0x13579ace, 0x13579acd, 0x13579acf):
+    if magic in (0x13579ACE, 0x13579ACD, 0x13579ACF):
         return "dbm.gnu"
 
     # Later versions of Berkeley db hash file have a 12-byte pad in

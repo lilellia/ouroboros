@@ -88,13 +88,13 @@ def get_argparse_options():
     for opt, info in OPTIONS.items():
         help = "When specified, includes {}".format(info["help"])
         if info.get("not-in-all"):
-            help = "{}. Not affected by --include-all".format(help)
+            help = f"{help}. Not affected by --include-all"
 
-        yield "--include-{}".format(opt), help
+        yield f"--include-{opt}", help
 
     for opt, info in PRESETS.items():
         help = "When specified, includes default options for {}".format(info["help"])
-        yield "--preset-{}".format(opt), help
+        yield f"--preset-{opt}", help
 
 
 def ns_get(ns, key, default=False):
@@ -103,24 +103,24 @@ def ns_get(ns, key, default=False):
 
 def ns_set(ns, key, value=True):
     k1 = key.replace("-", "_")
-    k2 = "include_{}".format(k1)
+    k2 = f"include_{k1}"
     if hasattr(ns, k2):
         setattr(ns, k2, value)
     elif hasattr(ns, k1):
         setattr(ns, k1, value)
     else:
-        raise AttributeError("no argument named '{}'".format(k1))
+        raise AttributeError(f"no argument named '{k1}'")
 
 
 @public
 def update_presets(ns):
     for preset, info in PRESETS.items():
-        if ns_get(ns, "preset-{}".format(preset)):
+        if ns_get(ns, f"preset-{preset}"):
             for opt in info["options"]:
                 ns_set(ns, opt)
 
     if ns.include_all:
-        for opt in OPTIONS:
+        for opt in OPTIONS:  # noqa: PLC0206
             if OPTIONS[opt].get("not-in-all"):
                 continue
             ns_set(ns, opt)

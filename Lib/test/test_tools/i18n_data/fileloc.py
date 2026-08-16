@@ -2,11 +2,11 @@
 from gettext import gettext as _
 
 # Duplicate strings
-_('foo')
-_('foo')
+_("foo")
+_("foo")
 
 # Duplicate strings on the same line should only add one location to the output
-_('bar'), _('bar')
+_("bar"), _("bar")
 
 
 # Duplicate docstrings
@@ -19,7 +19,7 @@ def f():
 
 
 # Duplicate message and docstring
-_('baz')
+_("baz")
 
 
 def g():

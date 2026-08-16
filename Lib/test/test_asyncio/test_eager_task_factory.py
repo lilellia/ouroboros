@@ -22,7 +22,6 @@ def tearDownModule():
 
 
 class EagerTaskFactoryLoopTests:
-
     Task = None
 
     def run_coro(self, coro):
@@ -51,7 +50,8 @@ class EagerTaskFactoryLoopTests:
         self.assertIsNotNone(self.eager_task_factory)
         self.assertIs(self.loop.get_task_factory(), self.eager_task_factory)
 
-        async def noop(): pass
+        async def noop():
+            pass
 
         async def run():
             t = self.loop.create_task(noop())
@@ -67,17 +67,17 @@ class EagerTaskFactoryLoopTests:
 
         async def run():
             fut = self.loop.create_future()
-            t = self.loop.create_task(set_result(fut, 'my message'))
+            t = self.loop.create_task(set_result(fut, "my message"))
             # assert the eager step completed the task
             self.assertTrue(t.done())
             return await fut
 
-        self.assertEqual(self.run_coro(run()), 'my message')
+        self.assertEqual(self.run_coro(run()), "my message")
 
     def test_eager_completion(self):
 
         async def coro():
-            return 'hello'
+            return "hello"
 
         async def run():
             t = self.loop.create_task(coro())
@@ -85,13 +85,13 @@ class EagerTaskFactoryLoopTests:
             self.assertTrue(t.done())
             return await t
 
-        self.assertEqual(self.run_coro(run()), 'hello')
+        self.assertEqual(self.run_coro(run()), "hello")
 
     def test_block_after_eager_step(self):
 
         async def coro():
             await asyncio.sleep(0.1)
-            return 'finished after blocking'
+            return "finished after blocking"
 
         async def run():
             t = self.loop.create_task(coro())
@@ -100,12 +100,12 @@ class EagerTaskFactoryLoopTests:
             self.assertTrue(t.done())
             return result
 
-        self.assertEqual(self.run_coro(run()), 'finished after blocking')
+        self.assertEqual(self.run_coro(run()), "finished after blocking")
 
     def test_cancellation_after_eager_completion(self):
 
         async def coro():
-            return 'finished without blocking'
+            return "finished without blocking"
 
         async def run():
             t = self.loop.create_task(coro())
@@ -115,24 +115,24 @@ class EagerTaskFactoryLoopTests:
             self.assertFalse(t.cancelled())
             return result
 
-        self.assertEqual(self.run_coro(run()), 'finished without blocking')
+        self.assertEqual(self.run_coro(run()), "finished without blocking")
 
     def test_cancellation_after_eager_step_blocks(self):
 
         async def coro():
             await asyncio.sleep(0.1)
-            return 'finished after blocking'
+            return "finished after blocking"
 
         async def run():
             t = self.loop.create_task(coro())
-            t.cancel('cancellation message')
+            t.cancel("cancellation message")
             self.assertGreater(t.cancelling(), 0)
             result = await t
 
         with self.assertRaises(asyncio.CancelledError) as cm:
             self.run_coro(run())
 
-        self.assertEqual('cancellation message', cm.exception.args[0])
+        self.assertEqual("cancellation message", cm.exception.args[0])
 
     def test_current_task(self):
         captured_current_task = None
@@ -188,7 +188,7 @@ class EagerTaskFactoryLoopTests:
         self.run_coro(run())
 
     def test_context_vars(self):
-        cv = contextvars.ContextVar('cv', default=0)
+        cv = contextvars.ContextVar("cv", default=0)
 
         coro_first_step_ran = False
         coro_second_step_ran = False
@@ -234,11 +234,11 @@ class EagerTaskFactoryLoopTests:
                 [
                     lambda: blocked(),
                     lambda: asyncio.sleep(1, result="sleep1"),
-                    lambda: fail()
+                    lambda: fail(),
                 ],
-                delay=0.25
+                delay=0.25,
             )
-            self.assertEqual(winner, 'sleep1')
+            self.assertEqual(winner, "sleep1")
             self.assertEqual(index, 1)
             self.assertIsNone(excs[index])
             self.assertIsInstance(excs[0], asyncio.CancelledError)
@@ -258,9 +258,9 @@ class EagerTaskFactoryLoopTests:
                     lambda: asyncio.sleep(1, result="sleep1"),
                     lambda: asyncio.sleep(0, result="sleep0"),
                 ],
-                delay=None
+                delay=None,
             )
-            self.assertEqual(winner, 'sleep1')
+            self.assertEqual(winner, "sleep1")
             self.assertEqual(index, 1)
             self.assertIsNone(excs[index])
             self.assertIsInstance(excs[0], ValueError)
@@ -273,10 +273,9 @@ class PyEagerTaskFactoryLoopTests(EagerTaskFactoryLoopTests, test_utils.TestCase
     Task = tasks._PyTask
 
 
-@unittest.skipUnless(hasattr(tasks, '_CTask'),
-                     'requires the C _asyncio module')
+@unittest.skipUnless(hasattr(tasks, "_CTask"), "requires the C _asyncio module")
 class CEagerTaskFactoryLoopTests(EagerTaskFactoryLoopTests, test_utils.TestCase):
-    Task = getattr(tasks, '_CTask', None)
+    Task = getattr(tasks, "_CTask", None)
 
     def test_issue105987(self):
         code = """if 1:
@@ -297,15 +296,15 @@ class CEagerTaskFactoryLoopTests(EagerTaskFactoryLoopTests, test_utils.TestCase)
         self.assertFalse(err)
 
     def test_issue122332(self):
-       async def coro():
-           pass
+        async def coro():
+            pass
 
-       async def run():
-           task = self.loop.create_task(coro())
-           await task
-           self.assertIsNone(task.get_coro())
+        async def run():
+            task = self.loop.create_task(coro())
+            await task
+            self.assertIsNone(task.get_coro())
 
-       self.run_coro(run())
+        self.run_coro(run())
 
 
 class AsyncTaskCounter:
@@ -322,8 +321,10 @@ class AsyncTaskCounter:
         if eager:
             factory = asyncio.create_eager_task_factory(CountingTask)
         else:
+
             def factory(loop, coro, **kwargs):
                 return CountingTask(coro, loop=loop, **kwargs)
+
         loop.set_task_factory(factory)
 
     def get(self):
@@ -342,8 +343,7 @@ async def recursive_taskgroups(width, depth):
 
     async with asyncio.TaskGroup() as tg:
         futures = [
-            tg.create_task(recursive_taskgroups(width, depth - 1))
-            for _ in range(width)
+            tg.create_task(recursive_taskgroups(width, depth - 1)) for _ in range(width)
         ]
 
 
@@ -351,13 +351,10 @@ async def recursive_gather(width, depth):
     if depth == 0:
         return
 
-    await asyncio.gather(
-        *[recursive_gather(width, depth - 1) for _ in range(width)]
-    )
+    await asyncio.gather(*[recursive_gather(width, depth - 1) for _ in range(width)])
 
 
 class BaseTaskCountingTests:
-
     Task = None
     eager = None
     expected_task_count = None
@@ -365,7 +362,9 @@ class BaseTaskCountingTests:
     def setUp(self):
         super().setUp()
         self.loop = asyncio.new_event_loop()
-        self.counter = AsyncTaskCounter(self.loop, task_class=self.Task, eager=self.eager)
+        self.counter = AsyncTaskCounter(
+            self.loop, task_class=self.Task, eager=self.eager
+        )
         self.set_event_loop(self.loop)
 
     def test_awaitables_chain(self):
@@ -408,16 +407,15 @@ class EagerPyTaskTests(BaseEagerTaskFactoryTests, test_utils.TestCase):
     Task = tasks._PyTask
 
 
-@unittest.skipUnless(hasattr(tasks, '_CTask'),
-                     'requires the C _asyncio module')
+@unittest.skipUnless(hasattr(tasks, "_CTask"), "requires the C _asyncio module")
 class NonEagerCTaskTests(BaseNonEagerTaskFactoryTests, test_utils.TestCase):
-    Task = getattr(tasks, '_CTask', None)
+    Task = getattr(tasks, "_CTask", None)
 
 
-@unittest.skipUnless(hasattr(tasks, '_CTask'),
-                     'requires the C _asyncio module')
+@unittest.skipUnless(hasattr(tasks, "_CTask"), "requires the C _asyncio module")
 class EagerCTaskTests(BaseEagerTaskFactoryTests, test_utils.TestCase):
-    Task = getattr(tasks, '_CTask', None)
+    Task = getattr(tasks, "_CTask", None)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

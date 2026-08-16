@@ -13,8 +13,9 @@ INITIAL_NESTING_DEPTH, or NESTED_INCR_AMT variables.
 
 Usage: python -m scripts.find_max_nesting
 """
-import sys
+
 import ast
+import sys
 
 GRAMMAR_FILE = "data/python.gram"
 INITIAL_NESTING_DEPTH = 10
@@ -31,19 +32,21 @@ def check_nested_expr(nesting_depth: int) -> bool:
         ast.parse(expr)
         print(f"Nesting depth of {nesting_depth} is successful")
         return True
-    except Exception as err:
+    except Exception as err:  # noqa: BLE001
         print(f"{FAIL}(Failed with nesting depth of {nesting_depth}{ENDC}")
         print(f"{FAIL}\t{err}{ENDC}")
         return False
 
 
 def main() -> None:
-    print(f"Testing {GRAMMAR_FILE} starting at nesting depth of {INITIAL_NESTING_DEPTH}...")
+    print(
+        f"Testing {GRAMMAR_FILE} starting at nesting depth of {INITIAL_NESTING_DEPTH}..."
+    )
 
     nesting_depth = INITIAL_NESTING_DEPTH
     succeeded = True
     while succeeded:
-        expr = f"{'(' * nesting_depth}0{')' * nesting_depth}"
+        f"{'(' * nesting_depth}0{')' * nesting_depth}"
         if succeeded:
             succeeded = check_nested_expr(nesting_depth)
         nesting_depth += NESTED_INCR_AMT

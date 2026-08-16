@@ -7,13 +7,12 @@ from test.support import swap_attr
 
 
 # Skip this test if the _testcapi module isn't available.
-_testcapi = import_helper.import_module('_testcapi')
+_testcapi = import_helper.import_module("_testcapi")
 
 NULL = None
 
 
 class PyEval_EvalCodeExTests(unittest.TestCase):
-
     def test_simple(self):
         def f():
             return a
@@ -33,11 +32,13 @@ class PyEval_EvalCodeExTests(unittest.TestCase):
     def test_custom_locals(self):
         # Monkey-patch __build_class__ to get a class code object.
         code = None
+
         def build_class(func, name, /, *bases, **kwds):
             nonlocal code
             code = func.__code__
 
-        with swap_attr(builtins, '__build_class__', build_class):
+        with swap_attr(builtins, "__build_class__", build_class):
+
             class A:
                 # Uses LOAD_NAME for a
                 r[:] = [a]
@@ -82,7 +83,9 @@ class PyEval_EvalCodeExTests(unittest.TestCase):
         self.assertEqual(eval_code_ex(code, {}, {}, (), dict(a=1, b=2, c=3)), 1)
         self.assertRaises(TypeError, eval_code_ex, code, {}, {}, (), dict(a=1, b=2))
         self.assertRaises(TypeError, eval_code_ex, code, {}, {}, (), dict(a=1, b=2))
-        self.assertRaises(TypeError, eval_code_ex, code, {}, {}, (), dict(a=1, b=2, c=3, d=4))
+        self.assertRaises(
+            TypeError, eval_code_ex, code, {}, {}, (), dict(a=1, b=2, c=3, d=4)
+        )
 
     def test_with_default(self):
         def f(a):
@@ -102,13 +105,16 @@ class PyEval_EvalCodeExTests(unittest.TestCase):
         self.assertEqual(eval_code_ex(code, {}, {}, (), {}, (), dict(a=1)), 1)
         self.assertRaises(TypeError, eval_code_ex, code, {}, {}, (), {}, (), {})
         self.assertRaises(TypeError, eval_code_ex, code, {}, {}, (), {}, (), NULL)
-        self.assertRaises(SystemError, eval_code_ex, code, {}, {}, (), {}, (), UserDict(a=1))
+        self.assertRaises(
+            SystemError, eval_code_ex, code, {}, {}, (), {}, (), UserDict(a=1)
+        )
         self.assertRaises(SystemError, eval_code_ex, code, {}, {}, (), {}, (), [])
         self.assertRaises(SystemError, eval_code_ex, code, {}, {}, (), {}, (), 1)
 
     def test_with_closure(self):
         a = 1
         b = 2
+
         def f():
             b
             return a
@@ -116,7 +122,9 @@ class PyEval_EvalCodeExTests(unittest.TestCase):
         eval_code_ex = _testcapi.eval_code_ex
         code = f.__code__
         self.assertEqual(eval_code_ex(code, {}, {}, (), {}, (), {}, f.__closure__), 1)
-        self.assertEqual(eval_code_ex(code, {}, {}, (), {}, (), {}, f.__closure__[::-1]), 2)
+        self.assertEqual(
+            eval_code_ex(code, {}, {}, (), {}, (), {}, f.__closure__[::-1]), 2
+        )
 
         # CRASHES eval_code_ex(code, {}, {}, (), {}, (), {}, ()), 1)
         # CRASHES eval_code_ex(code, {}, {}, (), {}, (), {}, NULL), 1)

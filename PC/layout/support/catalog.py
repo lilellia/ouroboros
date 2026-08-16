@@ -39,4 +39,4 @@ def can_sign(file):
 def write_catalog(target, files):
     with target.open("w", encoding="utf-8") as cat:
         cat.write(CATALOG_TEMPLATE.format(target=target))
-        cat.writelines("<HASH>{}={}\n".format(n, f) for n, f in files if can_sign(f))
+        cat.writelines(f"<HASH>{n}={f}\n" for n, f in files if can_sign(f))

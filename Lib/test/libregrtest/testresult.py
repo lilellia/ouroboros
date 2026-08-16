@@ -1,6 +1,4 @@
-'''Test runner and result class for the regression test suite.
-
-'''
+"""Test runner and result class for the regression test suite."""
 
 import functools
 import io
@@ -11,22 +9,24 @@ import unittest
 from test import support
 from test.libregrtest.utils import sanitize_xml
 
+
 class RegressionTestResult(unittest.TextTestResult):
     USE_XML = False
 
     def __init__(self, stream, descriptions, verbosity):
-        super().__init__(stream=stream, descriptions=descriptions,
-                         verbosity=2 if verbosity else 0)
+        super().__init__(
+            stream=stream, descriptions=descriptions, verbosity=2 if verbosity else 0
+        )
         self.buffer = True
         if self.USE_XML:
             from xml.etree import ElementTree as ET
             from datetime import datetime, UTC
+
             self.__ET = ET
-            self.__suite = ET.Element('testsuite')
-            self.__suite.set('start',
-                             datetime.now(UTC)
-                                     .replace(tzinfo=None)
-                                     .isoformat(' '))
+            self.__suite = ET.Element("testsuite")
+            self.__suite.set(
+                "start", datetime.now(UTC).replace(tzinfo=None).isoformat(" ")
+            )
             self.__e = None
         self.__start_time = None
 
@@ -45,7 +45,7 @@ class RegressionTestResult(unittest.TextTestResult):
     def startTest(self, test):
         super().startTest(test)
         if self.USE_XML:
-            self.__e = e = self.__ET.SubElement(self.__suite, 'testcase')
+            self.__e = e = self.__ET.SubElement(self.__suite, "testcase")
         self.__start_time = time.perf_counter()
 
     def _add_result(self, test, capture=False, **args):
@@ -57,26 +57,26 @@ class RegressionTestResult(unittest.TextTestResult):
             return
         ET = self.__ET
 
-        e.set('name', args.pop('name', self.__getId(test)))
-        e.set('status', args.pop('status', 'run'))
-        e.set('result', args.pop('result', 'completed'))
+        e.set("name", args.pop("name", self.__getId(test)))
+        e.set("status", args.pop("status", "run"))
+        e.set("result", args.pop("result", "completed"))
         if self.__start_time:
-            e.set('time', f'{time.perf_counter() - self.__start_time:0.6f}')
+            e.set("time", f"{time.perf_counter() - self.__start_time:0.6f}")
 
         if capture:
             if self._stdout_buffer is not None:
                 stdout = self._stdout_buffer.getvalue().rstrip()
-                ET.SubElement(e, 'system-out').text = sanitize_xml(stdout)
+                ET.SubElement(e, "system-out").text = sanitize_xml(stdout)
             if self._stderr_buffer is not None:
                 stderr = self._stderr_buffer.getvalue().rstrip()
-                ET.SubElement(e, 'system-err').text = sanitize_xml(stderr)
+                ET.SubElement(e, "system-err").text = sanitize_xml(stderr)
 
         for k, v in args.items():
             if not k or not v:
                 continue
 
             e2 = ET.SubElement(e, k)
-            if hasattr(v, 'items'):
+            if hasattr(v, "items"):
                 for k2, v2 in v.items():
                     if k2:
                         e2.set(k2, sanitize_xml(str(v2)))
@@ -88,10 +88,10 @@ class RegressionTestResult(unittest.TextTestResult):
     @classmethod
     def __makeErrorDict(cls, err_type, err_value, err_tb):
         if isinstance(err_type, type):
-            if err_type.__module__ == 'builtins':
+            if err_type.__module__ == "builtins":
                 typename = err_type.__name__
             else:
-                typename = f'{err_type.__module__}.{err_type.__name__}'
+                typename = f"{err_type.__module__}.{err_type.__name__}"
         else:
             typename = repr(err_type)
 
@@ -99,9 +99,9 @@ class RegressionTestResult(unittest.TextTestResult):
         tb = traceback.format_exception(err_type, err_value, err_tb)
 
         return {
-            'type': typename,
-            'message': ''.join(msg),
-            '': ''.join(tb),
+            "type": typename,
+            "message": "".join(msg),
+            "": "".join(tb),
         }
 
     def addError(self, test, err):
@@ -127,17 +127,18 @@ class RegressionTestResult(unittest.TextTestResult):
         super().addSuccess(test)
 
     def addUnexpectedSuccess(self, test):
-        self._add_result(test, outcome='UNEXPECTED_SUCCESS')
+        self._add_result(test, outcome="UNEXPECTED_SUCCESS")
         super().addUnexpectedSuccess(test)
 
     def get_xml_element(self):
         if not self.USE_XML:
             raise ValueError("USE_XML is false")
         e = self.__suite
-        e.set('tests', str(self.testsRun))
-        e.set('errors', str(len(self.errors)))
-        e.set('failures', str(len(self.failures)))
+        e.set("tests", str(self.testsRun))
+        e.set("errors", str(len(self.errors)))
+        e.set("failures", str(len(self.failures)))
         return e
+
 
 class QuietRegressionTestRunner:
     def __init__(self, stream, buffer=False):
@@ -148,19 +149,25 @@ class QuietRegressionTestRunner:
         test(self.result)
         return self.result
 
+
 def get_test_runner_class(verbosity, buffer=False):
     if verbosity:
-        return functools.partial(unittest.TextTestRunner,
-                                 resultclass=RegressionTestResult,
-                                 buffer=buffer,
-                                 verbosity=verbosity)
+        return functools.partial(
+            unittest.TextTestRunner,
+            resultclass=RegressionTestResult,
+            buffer=buffer,
+            verbosity=verbosity,
+        )
     return functools.partial(QuietRegressionTestRunner, buffer=buffer)
+
 
 def get_test_runner(stream, verbosity, capture_output=False):
     return get_test_runner_class(verbosity, capture_output)(stream)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     import xml.etree.ElementTree as ET
+
     RegressionTestResult.USE_XML = True
 
     class TestTests(unittest.TestCase):
@@ -171,23 +178,23 @@ if __name__ == '__main__':
             time.sleep(1.0)
 
         def test_fail(self):
-            print('stdout', file=sys.stdout)
-            print('stderr', file=sys.stderr)
-            self.fail('failure message')
+            print("stdout", file=sys.stdout)
+            print("stderr", file=sys.stderr)
+            self.fail("failure message")
 
         def test_error(self):
-            print('stdout', file=sys.stdout)
-            print('stderr', file=sys.stderr)
-            raise RuntimeError('error message')
+            print("stdout", file=sys.stdout)
+            print("stderr", file=sys.stderr)
+            raise RuntimeError("error message")
 
     suite = unittest.TestSuite()
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTests))
     stream = io.StringIO()
-    runner_cls = get_test_runner_class(sum(a == '-v' for a in sys.argv))
+    runner_cls = get_test_runner_class(sum(a == "-v" for a in sys.argv))
     runner = runner_cls(sys.stdout)
     result = runner.run(suite)
-    print('Output:', stream.getvalue())
-    print('XML: ', end='')
+    print("Output:", stream.getvalue())
+    print("XML: ", end="")
     for s in ET.tostringlist(result.get_xml_element()):
-        print(s.decode(), end='')
+        print(s.decode(), end="")
     print()

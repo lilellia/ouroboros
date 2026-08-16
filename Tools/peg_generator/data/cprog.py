@@ -3,9 +3,7 @@ if 1:
     if 0:
         print("then")
         print("clause")
-    elif 1:
-        pass
-    elif 1:
+    elif True:
         pass
     else:
         print("else-clause")

@@ -3,13 +3,14 @@ Uses idlelib.searchengine.SearchEngine for search capability.
 Defines various replace related functions like replace, replace all,
 and replace+find.
 """
+
 import re
+
 re.PatternError = re.error  # New in 3.13.
 
-from tkinter import StringVar, TclError
-
-from idlelib.searchbase import SearchDialogBase
 from idlelib import searchengine
+from idlelib.searchbase import SearchDialogBase
+from tkinter import StringVar, TclError
 
 
 def replace(text, insert_tags=None):
@@ -102,9 +103,9 @@ class ReplaceDialog(SearchDialogBase):
         First performs a replace and then, if the replace was
         successful, a find next.
         """
-        if self.do_find(self.ok):
+        if self.do_find(self.ok):  # noqa: SIM102
             if self.do_replace():  # Only find next match if replace succeeded.
-                                   # A bad re can cause it to fail.
+                # A bad re can cause it to fail.
                 self.do_find(False)
 
     def _replace_expand(self, m, repl):
@@ -113,7 +114,7 @@ class ReplaceDialog(SearchDialogBase):
             try:
                 new = m.expand(repl)
             except re.PatternError:
-                self.engine.report_error(repl, 'Invalid Replace Expression')
+                self.engine.report_error(repl, "Invalid Replace Expression")
                 new = None
         else:
             new = repl
@@ -151,16 +152,17 @@ class ReplaceDialog(SearchDialogBase):
         # XXX ought to replace circular instead of top-to-bottom when wrapping
         text.undo_block_start()
         while res := self.engine.search_forward(
-                text, prog, line, col, wrap=False, ok=ok):
+            text, prog, line, col, wrap=False, ok=ok
+        ):
             line, m = res
-            chars = text.get("%d.0" % line, "%d.0" % (line+1))
+            text.get("%d.0" % line, "%d.0" % (line + 1))  # noqa: UP031
             orig = m.group()
             new = self._replace_expand(m, repl)
             if new is None:
                 break
             i, j = m.span()
-            first = "%d.%d" % (line, i)
-            last = "%d.%d" % (line, j)
+            first = "%d.%d" % (line, i)  # noqa: UP031
+            last = "%d.%d" % (line, j)  # noqa: UP031
             if new == orig:
                 text.mark_set("insert", last)
             else:
@@ -190,8 +192,8 @@ class ReplaceDialog(SearchDialogBase):
             return False
         line, m = res
         i, j = m.span()
-        first = "%d.%d" % (line, i)
-        last = "%d.%d" % (line, j)
+        first = "%d.%d" % (line, i)  # noqa: UP031
+        last = "%d.%d" % (line, j)  # noqa: UP031
         self.show_hit(first, last)
         self.ok = True
         return True
@@ -210,7 +212,7 @@ class ReplaceDialog(SearchDialogBase):
         if not pos:
             first = last = pos = text.index("insert")
         line, col = searchengine.get_line_col(pos)
-        chars = text.get("%d.0" % line, "%d.0" % (line+1))
+        chars = text.get("%d.0" % line, "%d.0" % (line + 1))  # noqa: UP031
         m = prog.match(chars, col)
         if not prog:
             return False
@@ -259,13 +261,13 @@ class ReplaceDialog(SearchDialogBase):
 
 
 def _replace_dialog(parent):  # htest #
-    from tkinter import Toplevel, Text, END, SEL
-    from tkinter.ttk import Frame, Button
+    from tkinter import END, SEL, Text, Toplevel
+    from tkinter.ttk import Button, Frame
 
     top = Toplevel(parent)
     top.title("Test ReplaceDialog")
-    x, y = map(int, parent.geometry().split('+')[1:])
-    top.geometry("+%d+%d" % (x, y + 175))
+    x, y = map(int, parent.geometry().split("+")[1:])
+    top.geometry("+%d+%d" % (x, y + 175))  # noqa: UP031
 
     # mock undo delegator methods
     def undo_block_start():
@@ -276,11 +278,11 @@ def _replace_dialog(parent):  # htest #
 
     frame = Frame(top)
     frame.pack()
-    text = Text(frame, inactiveselectbackground='gray')
+    text = Text(frame, inactiveselectbackground="gray")
     text.undo_block_start = undo_block_start
     text.undo_block_stop = undo_block_stop
     text.pack()
-    text.insert("insert","This is a sample sTring\nPlus MORE.")
+    text.insert("insert", "This is a sample sTring\nPlus MORE.")
     text.focus_set()
 
     def show_replace():
@@ -292,9 +294,11 @@ def _replace_dialog(parent):  # htest #
     button.pack()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from unittest import main
-    main('idlelib.idle_test.test_replace', verbosity=2, exit=False)
+
+    main("idlelib.idle_test.test_replace", verbosity=2, exit=False)
 
     from idlelib.idle_test.htest import run
+
     run(_replace_dialog)

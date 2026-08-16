@@ -11,20 +11,21 @@ from .signals import registerResult
 __unittest = True
 
 
-class _WritelnDecorator(object):
+class _WritelnDecorator:
     """Used to decorate file-like objects with a handy 'writeln' method"""
-    def __init__(self,stream):
+
+    def __init__(self, stream):
         self.stream = stream
 
     def __getattr__(self, attr):
-        if attr in ('stream', '__getstate__'):
+        if attr in ("stream", "__getstate__"):
             raise AttributeError(attr)
-        return getattr(self.stream,attr)
+        return getattr(self.stream, attr)
 
     def writeln(self, arg=None):
         if arg:
             self.write(arg)
-        self.write('\n') # text-mode streams translate to \r\n if needed
+        self.write("\n")  # text-mode streams translate to \r\n if needed
 
 
 class TextTestResult(result.TestResult):
@@ -32,13 +33,14 @@ class TextTestResult(result.TestResult):
 
     Used by TextTestRunner.
     """
-    separator1 = '=' * 70
-    separator2 = '-' * 70
+
+    separator1 = "=" * 70
+    separator2 = "-" * 70
 
     def __init__(self, stream, descriptions, verbosity, *, durations=None):
         """Construct a TextTestResult. Subclasses should accept **kwargs
         to ensure compatibility as the interface changes."""
-        super(TextTestResult, self).__init__(stream, descriptions, verbosity)
+        super().__init__(stream, descriptions, verbosity)
         self.stream = stream
         self.showAll = verbosity > 1
         self.dots = verbosity == 1
@@ -49,12 +51,12 @@ class TextTestResult(result.TestResult):
     def getDescription(self, test):
         doc_first_line = test.shortDescription()
         if self.descriptions and doc_first_line:
-            return '\n'.join((str(test), doc_first_line))
+            return "\n".join((str(test), doc_first_line))
         else:
             return str(test)
 
     def startTest(self, test):
-        super(TextTestResult, self).startTest(test)
+        super().startTest(test)
         if self.showAll:
             self.stream.write(self.getDescription(test))
             self.stream.write(" ... ")
@@ -83,46 +85,46 @@ class TextTestResult(result.TestResult):
                     self._write_status(subtest, "ERROR")
             elif self.dots:
                 if issubclass(err[0], subtest.failureException):
-                    self.stream.write('F')
+                    self.stream.write("F")
                 else:
-                    self.stream.write('E')
+                    self.stream.write("E")
                 self.stream.flush()
-        super(TextTestResult, self).addSubTest(test, subtest, err)
+        super().addSubTest(test, subtest, err)
 
     def addSuccess(self, test):
-        super(TextTestResult, self).addSuccess(test)
+        super().addSuccess(test)
         if self.showAll:
             self._write_status(test, "ok")
         elif self.dots:
-            self.stream.write('.')
+            self.stream.write(".")
             self.stream.flush()
 
     def addError(self, test, err):
-        super(TextTestResult, self).addError(test, err)
+        super().addError(test, err)
         if self.showAll:
             self._write_status(test, "ERROR")
         elif self.dots:
-            self.stream.write('E')
+            self.stream.write("E")
             self.stream.flush()
 
     def addFailure(self, test, err):
-        super(TextTestResult, self).addFailure(test, err)
+        super().addFailure(test, err)
         if self.showAll:
             self._write_status(test, "FAIL")
         elif self.dots:
-            self.stream.write('F')
+            self.stream.write("F")
             self.stream.flush()
 
     def addSkip(self, test, reason):
-        super(TextTestResult, self).addSkip(test, reason)
+        super().addSkip(test, reason)
         if self.showAll:
-            self._write_status(test, "skipped {0!r}".format(reason))
+            self._write_status(test, f"skipped {reason!r}")
         elif self.dots:
             self.stream.write("s")
             self.stream.flush()
 
     def addExpectedFailure(self, test, err):
-        super(TextTestResult, self).addExpectedFailure(test, err)
+        super().addExpectedFailure(test, err)
         if self.showAll:
             self.stream.writeln("expected failure")
             self.stream.flush()
@@ -131,7 +133,7 @@ class TextTestResult(result.TestResult):
             self.stream.flush()
 
     def addUnexpectedSuccess(self, test):
-        super(TextTestResult, self).addUnexpectedSuccess(test)
+        super().addUnexpectedSuccess(test)
         if self.showAll:
             self.stream.writeln("unexpected success")
             self.stream.flush()
@@ -143,9 +145,9 @@ class TextTestResult(result.TestResult):
         if self.dots or self.showAll:
             self.stream.writeln()
             self.stream.flush()
-        self.printErrorList('ERROR', self.errors)
-        self.printErrorList('FAIL', self.failures)
-        unexpectedSuccesses = getattr(self, 'unexpectedSuccesses', ())
+        self.printErrorList("ERROR", self.errors)
+        self.printErrorList("FAIL", self.failures)
+        unexpectedSuccesses = getattr(self, "unexpectedSuccesses", ())
         if unexpectedSuccesses:
             self.stream.writeln(self.separator1)
             for test in unexpectedSuccesses:
@@ -155,23 +157,34 @@ class TextTestResult(result.TestResult):
     def printErrorList(self, flavour, errors):
         for test, err in errors:
             self.stream.writeln(self.separator1)
-            self.stream.writeln("%s: %s" % (flavour,self.getDescription(test)))
+            self.stream.writeln(f"{flavour}: {self.getDescription(test)}")
             self.stream.writeln(self.separator2)
-            self.stream.writeln("%s" % err)
+            self.stream.writeln(f"{err}")
             self.stream.flush()
 
 
-class TextTestRunner(object):
+class TextTestRunner:
     """A test runner class that displays results in textual form.
 
     It prints out the names of tests as they are run, errors as they
     occur, and a summary of the results at the end of the test run.
     """
+
     resultclass = TextTestResult
 
-    def __init__(self, stream=None, descriptions=True, verbosity=1,
-                 failfast=False, buffer=False, resultclass=None, warnings=None,
-                 *, tb_locals=False, durations=None):
+    def __init__(
+        self,
+        stream=None,
+        descriptions=True,
+        verbosity=1,
+        failfast=False,
+        buffer=False,
+        resultclass=None,
+        warnings=None,
+        *,
+        tb_locals=False,
+        durations=None,
+    ):
         """Construct a TextTestRunner.
 
         Subclasses should accept **kwargs to ensure compatibility as the
@@ -192,32 +205,32 @@ class TextTestRunner(object):
 
     def _makeResult(self):
         try:
-            return self.resultclass(self.stream, self.descriptions,
-                                    self.verbosity, durations=self.durations)
+            return self.resultclass(
+                self.stream, self.descriptions, self.verbosity, durations=self.durations
+            )
         except TypeError:
             # didn't accept the durations argument
-            return self.resultclass(self.stream, self.descriptions,
-                                    self.verbosity)
+            return self.resultclass(self.stream, self.descriptions, self.verbosity)
 
     def _printDurations(self, result):
         if not result.collectedDurations:
             return
-        ls = sorted(result.collectedDurations, key=lambda x: x[1],
-                    reverse=True)
+        ls = sorted(result.collectedDurations, key=lambda x: x[1], reverse=True)
         if self.durations > 0:
-            ls = ls[:self.durations]
+            ls = ls[: self.durations]
         self.stream.writeln("Slowest test durations")
-        if hasattr(result, 'separator2'):
+        if hasattr(result, "separator2"):
             self.stream.writeln(result.separator2)
         hidden = False
         for test, elapsed in ls:
             if self.verbosity < 2 and elapsed < 0.001:
                 hidden = True
                 continue
-            self.stream.writeln("%-10s %s" % ("%.3fs" % elapsed, test))
+            self.stream.writeln("%-10s %s" % (f"{elapsed:.3f}s", test))  # noqa: UP031
         if hidden:
-            self.stream.writeln("\n(durations < 0.001s were hidden; "
-                                "use -v to show these durations)")
+            self.stream.writeln(
+                "\n(durations < 0.001s were hidden; use -v to show these durations)"
+            )
         else:
             self.stream.writeln("")
 
@@ -233,13 +246,13 @@ class TextTestRunner(object):
                 # if self.warnings is set, use it to filter all the warnings
                 warnings.simplefilter(self.warnings)
             startTime = time.perf_counter()
-            startTestRun = getattr(result, 'startTestRun', None)
+            startTestRun = getattr(result, "startTestRun", None)
             if startTestRun is not None:
                 startTestRun()
             try:
                 test(result)
             finally:
-                stopTestRun = getattr(result, 'stopTestRun', None)
+                stopTestRun = getattr(result, "stopTestRun", None)
                 if stopTestRun is not None:
                     stopTestRun()
             stopTime = time.perf_counter()
@@ -248,19 +261,21 @@ class TextTestRunner(object):
         if self.durations is not None:
             self._printDurations(result)
 
-        if hasattr(result, 'separator2'):
+        if hasattr(result, "separator2"):
             self.stream.writeln(result.separator2)
 
         run = result.testsRun
-        self.stream.writeln("Ran %d test%s in %.3fs" %
-                            (run, run != 1 and "s" or "", timeTaken))
+        self.stream.writeln(
+            "Ran %d test%s in %.3fs" % (run, run != 1 and "s" or "", timeTaken)  # noqa: UP031
+        )
         self.stream.writeln()
 
         expectedFails = unexpectedSuccesses = skipped = 0
         try:
-            results = map(len, (result.expectedFailures,
-                                result.unexpectedSuccesses,
-                                result.skipped))
+            results = map(
+                len,
+                (result.expectedFailures, result.unexpectedSuccesses, result.skipped),
+            )
         except AttributeError:
             pass
         else:
@@ -271,21 +286,21 @@ class TextTestRunner(object):
             self.stream.write("FAILED")
             failed, errored = len(result.failures), len(result.errors)
             if failed:
-                infos.append("failures=%d" % failed)
+                infos.append("failures=%d" % failed)  # noqa: UP031
             if errored:
-                infos.append("errors=%d" % errored)
+                infos.append("errors=%d" % errored)  # noqa: UP031
         elif run == 0 and not skipped:
             self.stream.write("NO TESTS RAN")
         else:
             self.stream.write("OK")
         if skipped:
-            infos.append("skipped=%d" % skipped)
+            infos.append("skipped=%d" % skipped)  # noqa: UP031
         if expectedFails:
-            infos.append("expected failures=%d" % expectedFails)
+            infos.append("expected failures=%d" % expectedFails)  # noqa: UP031
         if unexpectedSuccesses:
-            infos.append("unexpected successes=%d" % unexpectedSuccesses)
+            infos.append("unexpected successes=%d" % unexpectedSuccesses)  # noqa: UP031
         if infos:
-            self.stream.writeln(" (%s)" % (", ".join(infos),))
+            self.stream.writeln(" ({})".format(", ".join(infos)))
         else:
             self.stream.write("\n")
         self.stream.flush()

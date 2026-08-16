@@ -44,42 +44,77 @@ AND THERE IS NO OBLIGATION WHATSOEVER TO PROVIDE MAINTENANCE,
 SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 """
 
-__all__ = ['TestResult', 'TestCase', 'IsolatedAsyncioTestCase', 'TestSuite',
-           'TextTestRunner', 'TestLoader', 'FunctionTestCase', 'main',
-           'defaultTestLoader', 'SkipTest', 'skip', 'skipIf', 'skipUnless',
-           'expectedFailure', 'TextTestResult', 'installHandler',
-           'registerResult', 'removeResult', 'removeHandler',
-           'addModuleCleanup', 'doModuleCleanups', 'enterModuleContext']
+__all__ = [
+    "FunctionTestCase",
+    "IsolatedAsyncioTestCase",
+    "SkipTest",
+    "TestCase",
+    "TestLoader",
+    "TestResult",
+    "TestSuite",
+    "TextTestResult",
+    "TextTestRunner",
+    "addModuleCleanup",
+    "defaultTestLoader",
+    "doModuleCleanups",
+    "enterModuleContext",
+    "expectedFailure",
+    "installHandler",
+    "main",
+    "registerResult",
+    "removeHandler",
+    "removeResult",
+    "skip",
+    "skipIf",
+    "skipUnless",
+]
 
 # Expose obsolete functions for backwards compatibility
 # bpo-5846: Deprecated in Python 3.11, scheduled for removal in Python 3.13.
-__all__.extend(['getTestCaseNames', 'makeSuite', 'findTestCases'])
+__all__.extend(["findTestCases", "getTestCaseNames", "makeSuite"])
 
 __unittest = True
 
-from .result import TestResult
-from .case import (addModuleCleanup, TestCase, FunctionTestCase, SkipTest, skip,
-                   skipIf, skipUnless, expectedFailure, doModuleCleanups,
-                   enterModuleContext)
-from .suite import BaseTestSuite, TestSuite
-from .loader import TestLoader, defaultTestLoader
-from .main import TestProgram, main
-from .runner import TextTestRunner, TextTestResult
-from .signals import installHandler, registerResult, removeResult, removeHandler
-# IsolatedAsyncioTestCase will be imported lazily.
-from .loader import makeSuite, getTestCaseNames, findTestCases
+from .case import (
+    FunctionTestCase,
+    SkipTest,
+    TestCase,
+    addModuleCleanup,
+    doModuleCleanups,
+    enterModuleContext,
+    expectedFailure,
+    skip,
+    skipIf,
+    skipUnless,
+)
 
+# IsolatedAsyncioTestCase will be imported lazily.
+from .loader import (
+    TestLoader,
+    defaultTestLoader,
+    findTestCases,  # noqa: F401
+    getTestCaseNames,  # noqa: F401
+    makeSuite,  # noqa: F401
+)
+from .main import TestProgram, main  # noqa: F401
+from .result import TestResult
+from .runner import TextTestResult, TextTestRunner
+from .signals import installHandler, registerResult, removeHandler, removeResult
+from .suite import BaseTestSuite, TestSuite  # noqa: F401
 
 # Lazy import of IsolatedAsyncioTestCase from .async_case
 # It imports asyncio, which is relatively heavy, but most tests
 # do not need it.
 
+
 def __dir__():
-    return globals().keys() | {'IsolatedAsyncioTestCase'}
+    return globals().keys() | {"IsolatedAsyncioTestCase"}
+
 
 def __getattr__(name):
-    if name == 'IsolatedAsyncioTestCase':
+    if name == "IsolatedAsyncioTestCase":
         global IsolatedAsyncioTestCase
         from .async_case import IsolatedAsyncioTestCase
+
         return IsolatedAsyncioTestCase
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

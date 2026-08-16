@@ -12,6 +12,7 @@ import unittest
 
 from test.test_asyncio.utils import await_without_task
 
+
 # To prevent a warning "test altered the execution environment"
 def tearDownModule():
     asyncio.set_event_loop_policy(None)
@@ -48,7 +49,6 @@ def disable_gc():
 
 
 class BaseTestTaskGroup:
-
     async def test_taskgroup_01(self):
 
         async def foo1():
@@ -300,7 +300,7 @@ class BaseTestTaskGroup:
         except ExceptionGroup as t:
             self.assertEqual(get_error_types(t), {ZeroDivisionError})
         else:
-            self.fail('ExceptionGroup was not raised')
+            self.fail("ExceptionGroup was not raised")
 
         self.assertTrue(t1.cancelled())
         self.assertTrue(t2.cancelled())
@@ -329,7 +329,7 @@ class BaseTestTaskGroup:
         except ExceptionGroup as t:
             self.assertEqual(get_error_types(t), {ZeroDivisionError})
         else:
-            self.fail('ExceptionGroup was not raised')
+            self.fail("ExceptionGroup was not raised")
 
         self.assertTrue(t1.cancelled())
         self.assertTrue(t2.cancelled())
@@ -359,7 +359,9 @@ class BaseTestTaskGroup:
             await r
 
         self.assertEqual(get_error_types(cm.exception), {ExceptionGroup})
-        self.assertEqual(get_error_types(cm.exception.exceptions[0]), {ZeroDivisionError})
+        self.assertEqual(
+            get_error_types(cm.exception.exceptions[0]), {ZeroDivisionError}
+        )
 
     async def test_taskgroup_12(self):
 
@@ -388,7 +390,9 @@ class BaseTestTaskGroup:
             await r
 
         self.assertEqual(get_error_types(cm.exception), {ExceptionGroup})
-        self.assertEqual(get_error_types(cm.exception.exceptions[0]), {ZeroDivisionError})
+        self.assertEqual(
+            get_error_types(cm.exception.exceptions[0]), {ZeroDivisionError}
+        )
 
     async def test_taskgroup_13(self):
 
@@ -526,9 +530,9 @@ class BaseTestTaskGroup:
         try:
             await r
         except ExceptionGroup as t:
-            self.assertEqual(get_error_types(t),{MyExc})
+            self.assertEqual(get_error_types(t), {MyExc})
         else:
-            self.fail('ExceptionGroup was not raised')
+            self.fail("ExceptionGroup was not raised")
 
         self.assertEqual(NUM, 10)
 
@@ -554,7 +558,7 @@ class BaseTestTaskGroup:
         except ExceptionGroup as t:
             self.assertEqual(get_error_types(t), {MyExc, ZeroDivisionError})
         else:
-            self.fail('TasgGroupError was not raised')
+            self.fail("TasgGroupError was not raised")
 
     async def test_taskgroup_20(self):
         async def crash_soon():
@@ -594,9 +598,7 @@ class BaseTestTaskGroup:
         with self.assertRaises(BaseExceptionGroup) as cm:
             await runner()
 
-        self.assertEqual(
-            get_error_types(cm.exception), {MyBaseExc, ZeroDivisionError}
-        )
+        self.assertEqual(get_error_types(cm.exception), {MyBaseExc, ZeroDivisionError})
 
     async def _test_taskgroup_21(self):
         # This test doesn't work as asyncio, currently, doesn't
@@ -727,12 +729,13 @@ class BaseTestTaskGroup:
     async def test_taskgroup_task_name(self):
         async def coro():
             await asyncio.sleep(0)
+
         async with taskgroups.TaskGroup() as g:
             t = g.create_task(coro(), name="yolo")
             self.assertEqual(t.get_name(), "yolo")
 
     async def test_taskgroup_task_context(self):
-        cvar = contextvars.ContextVar('cvar')
+        cvar = contextvars.ContextVar("cvar")
 
         async def coro(val):
             await asyncio.sleep(0)
@@ -752,6 +755,7 @@ class BaseTestTaskGroup:
         async def coro1():
             await asyncio.sleep(0.001)
             1 / 0
+
         async def coro2(g):
             try:
                 await asyncio.sleep(1)
@@ -796,7 +800,7 @@ class BaseTestTaskGroup:
                 self.assertEqual(len(err.exceptions), 2)
 
             else:
-                self.fail('CustomException not raised')
+                self.fail("CustomException not raised")
 
         await asyncio.create_task(main())
 
@@ -860,7 +864,6 @@ class BaseTestTaskGroup:
         self.assertIsNotNone(exc)
         self.assertListEqual(gc.get_referrers(exc), [])
 
-
     async def test_exception_refcycles_errors(self):
         """Test that TaskGroup deletes self._errors, and __aexit__ args"""
         tg = asyncio.TaskGroup()
@@ -877,7 +880,6 @@ class BaseTestTaskGroup:
 
         self.assertIsInstance(exc, _Done)
         self.assertListEqual(gc.get_referrers(exc), [])
-
 
     async def test_exception_refcycles_parent_task(self):
         """Test that TaskGroup deletes self._parent_task"""
@@ -899,7 +901,6 @@ class BaseTestTaskGroup:
 
         self.assertIsInstance(exc, _Done)
         self.assertListEqual(gc.get_referrers(exc), [])
-
 
     async def test_exception_refcycles_parent_task_wr(self):
         """Test that TaskGroup deletes self._parent_task and create_task() deletes task"""
@@ -941,6 +942,7 @@ class BaseTestTaskGroup:
 
     async def test_exception_refcycles_base_error(self):
         """Test that TaskGroup deletes self._base_error"""
+
         class MyKeyboardInterrupt(KeyboardInterrupt):
             pass
 
@@ -959,12 +961,14 @@ class BaseTestTaskGroup:
     async def test_cancels_task_if_created_during_creation(self):
         # regression test for gh-128550
         ran = False
+
         class MyError(Exception):
             pass
 
         exc = None
         try:
             async with asyncio.TaskGroup() as tg:
+
                 async def third_task():
                     raise MyError("third task failed")
 
@@ -1015,7 +1019,7 @@ class IsolatedAsyncioTestCase(unittest.IsolatedAsyncioTestCase):
     loop_factory = None
 
     def _setupAsyncioRunner(self):
-        assert self._asyncioRunner is None, 'asyncio runner is already initialized'
+        assert self._asyncioRunner is None, "asyncio runner is already initialized"
         runner = asyncio.Runner(debug=True, loop_factory=self.loop_factory)
         self._asyncioRunner = runner
 

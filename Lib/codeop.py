@@ -33,12 +33,12 @@ Compile():
 """
 
 import __future__
+
 import warnings
 
-_features = [getattr(__future__, fname)
-             for fname in __future__.all_feature_names]
+_features = [getattr(__future__, fname) for fname in __future__.all_feature_names]
 
-__all__ = ["compile_command", "Compile", "CommandCompiler"]
+__all__ = ["CommandCompiler", "Compile", "compile_command"]
 
 # The following flags match the values from Include/cpython/compile.h
 # Caveat emptor: These flags are undocumented on purpose and depending
@@ -46,15 +46,16 @@ __all__ = ["compile_command", "Compile", "CommandCompiler"]
 PyCF_DONT_IMPLY_DEDENT = 0x200
 PyCF_ALLOW_INCOMPLETE_INPUT = 0x4000
 
+
 def _maybe_compile(compiler, source, filename, symbol):
     # Check for source consisting of only blank lines and comments.
     for line in source.split("\n"):
         line = line.strip()
-        if line and line[0] != '#':
-            break               # Leave it alone.
+        if line and line[0] != "#":
+            break  # Leave it alone.
     else:
         if symbol != "eval":
-            source = "pass"     # Replace it with a 'pass' statement
+            source = "pass"  # Replace it with a 'pass' statement
 
     # Disable compiler warnings when checking for incomplete input.
     with warnings.catch_warnings():
@@ -72,14 +73,14 @@ def _maybe_compile(compiler, source, filename, symbol):
 
     return compiler(source, filename, symbol, incomplete_input=False)
 
+
 def _is_syntax_error(err1, err2):
     rep1 = repr(err1)
     rep2 = repr(err2)
     if "was never closed" in rep1 and "was never closed" in rep2:
         return False
-    if rep1 == rep2:
-        return True
-    return False
+    return rep1 == rep2
+
 
 def _compile(source, filename, symbol, incomplete_input=True):
     flags = 0
@@ -110,17 +111,19 @@ def compile_command(source, filename="<input>", symbol="single"):
     """
     return _maybe_compile(_compile, source, filename, symbol)
 
+
 class Compile:
     """Instances of this class behave much like the built-in compile
     function, but if one is used to compile text containing a future
     statement, it "remembers" and compiles all subsequent program texts
     with the statement in force."""
+
     def __init__(self):
         self.flags = PyCF_DONT_IMPLY_DEDENT | PyCF_ALLOW_INCOMPLETE_INPUT
 
     def __call__(self, source, filename, symbol, **kwargs):
         flags = self.flags
-        if kwargs.get('incomplete_input', True) is False:
+        if kwargs.get("incomplete_input", True) is False:
             flags &= ~PyCF_DONT_IMPLY_DEDENT
             flags &= ~PyCF_ALLOW_INCOMPLETE_INPUT
         codeob = compile(source, filename, symbol, flags, True)
@@ -129,6 +132,7 @@ class Compile:
                 self.flags |= feature.compiler_flag
         return codeob
 
+
 class CommandCompiler:
     """Instances of this class have __call__ methods identical in
     signature to compile_command; the difference is that if the
@@ -136,7 +140,9 @@ class CommandCompiler:
     the instance 'remembers' and compiles all subsequent program texts
     with the statement in force."""
 
-    def __init__(self,):
+    def __init__(
+        self,
+    ):
         self.compiler = Compile()
 
     def __call__(self, source, filename="<input>", symbol="single"):

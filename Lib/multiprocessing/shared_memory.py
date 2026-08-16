@@ -4,23 +4,24 @@ The API of this package is currently provisional. Refer to the
 documentation for details.
 """
 
+__all__ = ["ShareableList", "SharedMemory"]
 
-__all__ = [ 'SharedMemory', 'ShareableList' ]
 
-
-from functools import partial
+import errno
 import mmap
 import os
-import errno
-import struct
 import secrets
+import struct
 import types
+from functools import partial
 
 if os.name == "nt":
     import _winapi
+
     _USE_POSIX = False
 else:
     import _posixshmem
+
     _USE_POSIX = True
 
 from . import resource_tracker
@@ -32,16 +33,16 @@ _SHM_SAFE_NAME_LENGTH = 14
 
 # Shared memory block name prefix
 if _USE_POSIX:
-    _SHM_NAME_PREFIX = '/psm_'
+    _SHM_NAME_PREFIX = "/psm_"
 else:
-    _SHM_NAME_PREFIX = 'wnsm_'
+    _SHM_NAME_PREFIX = "wnsm_"
 
 
 def _make_filename():
     "Create a random filename for the shared memory object."
     # number of random bytes to use for name
     nbytes = (_SHM_SAFE_NAME_LENGTH - len(_SHM_NAME_PREFIX)) // 2
-    assert nbytes >= 2, '_SHM_NAME_PREFIX too long'
+    assert nbytes >= 2, "_SHM_NAME_PREFIX too long"
     name = _SHM_NAME_PREFIX + secrets.token_hex(nbytes)
     assert len(name) <= _SHM_SAFE_NAME_LENGTH
     return name
@@ -70,7 +71,7 @@ class SharedMemory:
     _buf = None
     _flags = os.O_RDWR
     _mode = 0o600
-    _prepend_leading_slash = True if _USE_POSIX else False
+    _prepend_leading_slash = bool(_USE_POSIX)
 
     def __init__(self, name=None, create=False, size=0):
         if not size >= 0:
@@ -83,7 +84,6 @@ class SharedMemory:
             raise ValueError("'name' can only be None if create=True")
 
         if _USE_POSIX:
-
             # POSIX Shared Memory
 
             if name is None:
@@ -91,9 +91,7 @@ class SharedMemory:
                     name = _make_filename()
                     try:
                         self._fd = _posixshmem.shm_open(
-                            name,
-                            self._flags,
-                            mode=self._mode
+                            name, self._flags, mode=self._mode
                         )
                     except FileExistsError:
                         continue
@@ -101,11 +99,7 @@ class SharedMemory:
                     break
             else:
                 name = "/" + name if self._prepend_leading_slash else name
-                self._fd = _posixshmem.shm_open(
-                    name,
-                    self._flags,
-                    mode=self._mode
-                )
+                self._fd = _posixshmem.shm_open(name, self._flags, mode=self._mode)
                 self._name = name
             try:
                 if create and size:
@@ -120,7 +114,6 @@ class SharedMemory:
             resource_tracker.register(self._name, "shared_memory")
 
         else:
-
             # Windows Named Shared Memory
 
             if create:
@@ -134,7 +127,7 @@ class SharedMemory:
                         _winapi.PAGE_READWRITE,
                         (size >> 32) & 0xFFFFFFFF,
                         size & 0xFFFFFFFF,
-                        temp_name
+                        temp_name,
                     )
                     try:
                         last_error_code = _winapi.GetLastError()
@@ -144,7 +137,7 @@ class SharedMemory:
                                     errno.EEXIST,
                                     os.strerror(errno.EEXIST),
                                     name,
-                                    _winapi.ERROR_ALREADY_EXISTS
+                                    _winapi.ERROR_ALREADY_EXISTS,
                                 )
                             else:
                                 continue
@@ -158,19 +151,9 @@ class SharedMemory:
                 self._name = name
                 # Dynamically determine the existing named shared memory
                 # block's size which is likely a multiple of mmap.PAGESIZE.
-                h_map = _winapi.OpenFileMapping(
-                    _winapi.FILE_MAP_READ,
-                    False,
-                    name
-                )
+                h_map = _winapi.OpenFileMapping(_winapi.FILE_MAP_READ, False, name)
                 try:
-                    p_buf = _winapi.MapViewOfFile(
-                        h_map,
-                        _winapi.FILE_MAP_READ,
-                        0,
-                        0,
-                        0
-                    )
+                    p_buf = _winapi.MapViewOfFile(h_map, _winapi.FILE_MAP_READ, 0, 0, 0)
                 finally:
                     _winapi.CloseHandle(h_map)
                 try:
@@ -199,7 +182,7 @@ class SharedMemory:
         )
 
     def __repr__(self):
-        return f'{self.__class__.__name__}({self.name!r}, size={self.size})'
+        return f"{self.__class__.__name__}({self.name!r}, size={self.size})"
 
     @property
     def buf(self):
@@ -210,7 +193,7 @@ class SharedMemory:
     def name(self):
         "Unique name that identifies the shared memory block."
         reported_name = self._name
-        if _USE_POSIX and self._prepend_leading_slash:
+        if _USE_POSIX and self._prepend_leading_slash:  # noqa: SIM102
             if self._name.startswith("/"):
                 reported_name = self._name[1:]
         return reported_name
@@ -246,6 +229,7 @@ class SharedMemory:
 
 _encoding = "utf8"
 
+
 class ShareableList:
     """Pattern for a mutable list-like object shareable via a shared
     memory block.  It differs from the built-in list type in that these
@@ -265,7 +249,7 @@ class ShareableList:
     # - N * 8 bytes: `struct` format string for each element
     # - N bytes: index into _back_transforms_mapping for each element
     #            (for reconstructing the corresponding Python value)
-    _types_mapping = {
+    _types_mapping = {  # noqa: RUF012
         int: "q",
         float: "d",
         bool: "xxxxxxx?",
@@ -274,11 +258,11 @@ class ShareableList:
         None.__class__: "xxxxxx?x",
     }
     _alignment = 8
-    _back_transforms_mapping = {
-        0: lambda value: value,                   # int, float, bool
-        1: lambda value: value.rstrip(b'\x00').decode(_encoding),  # str
-        2: lambda value: value.rstrip(b'\x00'),   # bytes
-        3: lambda _value: None,                   # None
+    _back_transforms_mapping = {  # noqa: RUF012
+        0: lambda value: value,  # int, float, bool
+        1: lambda value: value.rstrip(b"\x00").decode(_encoding),  # str
+        2: lambda value: value.rstrip(b"\x00"),  # bytes
+        3: lambda _value: None,  # None
     }
 
     @staticmethod
@@ -300,10 +284,9 @@ class ShareableList:
             sequence = sequence or ()
             _formats = [
                 self._types_mapping[type(item)]
-                    if not isinstance(item, (str, bytes))
-                    else self._types_mapping[type(item)] % (
-                        self._alignment * (len(item) // self._alignment + 1),
-                    )
+                if not isinstance(item, (str, bytes))
+                else self._types_mapping[type(item)]
+                % (self._alignment * (len(item) // self._alignment + 1),)
                 for item in sequence
             ]
             self._list_len = len(_formats)
@@ -320,10 +303,11 @@ class ShareableList:
                 self._extract_recreation_code(item) for item in sequence
             ]
             requested_size = struct.calcsize(
-                "q" + self._format_size_metainfo +
-                "".join(_formats) +
-                self._format_packing_metainfo +
-                self._format_back_transform_codes
+                "q"
+                + self._format_size_metainfo
+                + "".join(_formats)
+                + self._format_packing_metainfo
+                + self._format_back_transform_codes
             )
 
             self.shm = SharedMemory(name, create=True, size=requested_size)
@@ -337,35 +321,31 @@ class ShareableList:
                 self.shm.buf,
                 0,
                 self._list_len,
-                *(self._allocated_offsets)
+                *(self._allocated_offsets),
             )
             struct.pack_into(
                 "".join(_formats),
                 self.shm.buf,
                 self._offset_data_start,
-                *(v.encode(_enc) if isinstance(v, str) else v for v in sequence)
+                *(v.encode(_enc) if isinstance(v, str) else v for v in sequence),
             )
             struct.pack_into(
                 self._format_packing_metainfo,
                 self.shm.buf,
                 self._offset_packing_formats,
-                *(v.encode(_enc) for v in _formats)
+                *(v.encode(_enc) for v in _formats),
             )
             struct.pack_into(
                 self._format_back_transform_codes,
                 self.shm.buf,
                 self._offset_back_transform_codes,
-                *(_recreation_codes)
+                *(_recreation_codes),
             )
 
         else:
             self._list_len = len(self)  # Obtains size from offset 0 in buffer.
             self._allocated_offsets = list(
-                struct.unpack_from(
-                    self._format_size_metainfo,
-                    self.shm.buf,
-                    1 * 8
-                )
+                struct.unpack_from(self._format_size_metainfo, self.shm.buf, 1 * 8)
             )
 
     def _get_packing_format(self, position):
@@ -375,11 +355,9 @@ class ShareableList:
             raise IndexError("Requested position out of range.")
 
         v = struct.unpack_from(
-            "8s",
-            self.shm.buf,
-            self._offset_packing_formats + position * 8
+            "8s", self.shm.buf, self._offset_packing_formats + position * 8
         )[0]
-        fmt = v.rstrip(b'\x00')
+        fmt = v.rstrip(b"\x00")
         fmt_as_str = fmt.decode(_encoding)
 
         return fmt_as_str
@@ -391,9 +369,7 @@ class ShareableList:
             raise IndexError("Requested position out of range.")
 
         transform_code = struct.unpack_from(
-            "b",
-            self.shm.buf,
-            self._offset_back_transform_codes + position
+            "b", self.shm.buf, self._offset_back_transform_codes + position
         )[0]
         transform_function = self._back_transforms_mapping[transform_code]
 
@@ -410,7 +386,7 @@ class ShareableList:
             "8s",
             self.shm.buf,
             self._offset_packing_formats + position * 8,
-            fmt_as_str.encode(_encoding)
+            fmt_as_str.encode(_encoding),
         )
 
         transform_code = self._extract_recreation_code(value)
@@ -418,7 +394,7 @@ class ShareableList:
             "b",
             self.shm.buf,
             self._offset_back_transform_codes + position,
-            transform_code
+            transform_code,
         )
 
     def __getitem__(self, position):
@@ -426,9 +402,7 @@ class ShareableList:
         try:
             offset = self._offset_data_start + self._allocated_offsets[position]
             (v,) = struct.unpack_from(
-                self._get_packing_format(position),
-                self.shm.buf,
-                offset
+                self._get_packing_format(position), self.shm.buf, offset
             )
         except IndexError:
             raise IndexError("index out of range")
@@ -453,22 +427,15 @@ class ShareableList:
         else:
             allocated_length = self._allocated_offsets[position + 1] - item_offset
 
-            encoded_value = (value.encode(_encoding)
-                             if isinstance(value, str) else value)
+            encoded_value = value.encode(_encoding) if isinstance(value, str) else value
             if len(encoded_value) > allocated_length:
                 raise ValueError("bytes/str item exceeds available storage")
             if current_format[-1] == "s":
                 new_format = current_format
             else:
-                new_format = self._types_mapping[str] % (
-                    allocated_length,
-                )
+                new_format = self._types_mapping[str] % (allocated_length,)
 
-        self._set_packing_format_and_transform(
-            position,
-            new_format,
-            value
-        )
+        self._set_packing_format_and_transform(position, new_format, value)
         struct.pack_into(new_format, self.shm.buf, offset, encoded_value)
 
     def __reduce__(self):
@@ -478,14 +445,12 @@ class ShareableList:
         return struct.unpack_from("q", self.shm.buf, 0)[0]
 
     def __repr__(self):
-        return f'{self.__class__.__name__}({list(self)}, name={self.shm.name!r})'
+        return f"{self.__class__.__name__}({list(self)}, name={self.shm.name!r})"
 
     @property
     def format(self):
         "The struct packing format used by all currently stored items."
-        return "".join(
-            self._get_packing_format(i) for i in range(self._list_len)
-        )
+        return "".join(self._get_packing_format(i) for i in range(self._list_len))
 
     @property
     def _format_size_metainfo(self):
@@ -528,7 +493,6 @@ class ShareableList:
         for position, entry in enumerate(self):
             if value == entry:
                 return position
-        else:
-            raise ValueError(f"{value!r} not in this container")
+        raise ValueError(f"{value!r} not in this container")
 
     __class_getitem__ = classmethod(types.GenericAlias)

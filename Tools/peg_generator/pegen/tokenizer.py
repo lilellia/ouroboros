@@ -1,6 +1,6 @@
 import token
 import tokenize
-from typing import Dict, Iterator, List
+from collections.abc import Iterator
 
 Mark = int  # NewType('Mark', int)
 
@@ -8,7 +8,10 @@ exact_token_types = token.EXACT_TOKEN_TYPES
 
 
 def shorttok(tok: tokenize.TokenInfo) -> str:
-    return "%-25.25s" % f"{tok.start[0]}.{tok.start[1]}: {token.tok_name[tok.type]}:{tok.string!r}"
+    return (
+        "%-25.25s"  # noqa: UP031
+        % f"{tok.start[0]}.{tok.start[1]}: {token.tok_name[tok.type]}:{tok.string!r}"
+    )
 
 
 class Tokenizer:
@@ -17,23 +20,27 @@ class Tokenizer:
     This is pretty tied to Python's syntax.
     """
 
-    _tokens: List[tokenize.TokenInfo]
+    _tokens: list[tokenize.TokenInfo]
 
     def __init__(
-        self, tokengen: Iterator[tokenize.TokenInfo], *, path: str = "", verbose: bool = False
+        self,
+        tokengen: Iterator[tokenize.TokenInfo],
+        *,
+        path: str = "",
+        verbose: bool = False,
     ):
         self._tokengen = tokengen
         self._tokens = []
         self._index = 0
         self._verbose = verbose
-        self._lines: Dict[int, str] = {}
+        self._lines: dict[int, str] = {}
         self._path = path
         if verbose:
             self.report(False, False)
 
     def getnext(self) -> tokenize.TokenInfo:
         """Return the next token and updates the index."""
-        cached = not self._index == len(self._tokens)
+        cached = self._index != len(self._tokens)
         tok = self.peek()
         self._index += 1
         if self._verbose:
@@ -72,7 +79,7 @@ class Tokenizer:
                 break
         return tok
 
-    def get_lines(self, line_numbers: List[int]) -> List[str]:
+    def get_lines(self, line_numbers: list[int]) -> list[str]:
         """Retrieve source lines corresponding to line numbers."""
         if self._lines:
             lines = self._lines

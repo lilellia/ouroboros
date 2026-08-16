@@ -2,6 +2,7 @@
 
 # ===== SAXEXCEPTION =====
 
+
 class SAXException(Exception):
     """Encapsulate an XML error or warning. This class can contain
     basic error or warning information from either the XML parser or
@@ -38,6 +39,7 @@ class SAXException(Exception):
 
 
 # ===== SAXPARSEEXCEPTION =====
+
 
 class SAXParseException(SAXException):
     """Encapsulate an XML parse error or warning.
@@ -93,10 +95,11 @@ class SAXParseException(SAXException):
         colnum = self.getColumnNumber()
         if colnum is None:
             colnum = "?"
-        return "%s:%s:%s: %s" % (sysid, linenum, colnum, self._msg)
+        return f"{sysid}:{linenum}:{colnum}: {self._msg}"
 
 
 # ===== SAXNOTRECOGNIZEDEXCEPTION =====
+
 
 class SAXNotRecognizedException(SAXException):
     """Exception class for an unrecognized identifier.
@@ -108,6 +111,7 @@ class SAXNotRecognizedException(SAXException):
 
 # ===== SAXNOTSUPPORTEDEXCEPTION =====
 
+
 class SAXNotSupportedException(SAXException):
     """Exception class for an unsupported operation.
 
@@ -116,7 +120,9 @@ class SAXNotSupportedException(SAXException):
     applications and extensions may use this class for similar
     purposes."""
 
+
 # ===== SAXNOTSUPPORTEDEXCEPTION =====
+
 
 class SAXReaderNotAvailable(SAXNotSupportedException):
     """Exception class for a missing driver.

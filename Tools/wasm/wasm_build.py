@@ -21,9 +21,10 @@ changes.
   ./Tools/wasm/wasm_builder.py --clean build build
 
 """
+
 import argparse
-import enum
 import dataclasses
+import enum
 import logging
 import os
 import pathlib
@@ -38,9 +39,10 @@ import tempfile
 import time
 import warnings
 import webbrowser
+from collections.abc import Callable, Iterable
 
 # for Python 3.8
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any
 
 logger = logging.getLogger("wasm_build")
 
@@ -109,7 +111,7 @@ https://wasmtime.dev/ to install wasmtime.
 
 def parse_emconfig(
     emconfig: pathlib.Path = EM_CONFIG,
-) -> Tuple[pathlib.PurePath, pathlib.PurePath]:
+) -> tuple[pathlib.PurePath, pathlib.PurePath]:
     """Parse EM_CONFIG file and lookup EMSCRIPTEN_ROOT and NODE_JS.
 
     The ".emscripten" config file is a Python snippet that uses "EM_CONFIG"
@@ -121,8 +123,8 @@ def parse_emconfig(
     with open(emconfig, encoding="utf-8") as f:
         code = f.read()
     # EM_CONFIG file is a Python snippet
-    local: Dict[str, Any] = {}
-    exec(code, globals(), local)
+    local: dict[str, Any] = {}
+    exec(code, globals(), local)  # noqa: S102
     emscripten_root = pathlib.Path(local["EMSCRIPTEN_ROOT"])
     node_js = pathlib.Path(local["NODE_JS"])
     return emscripten_root, node_js
@@ -179,14 +181,14 @@ class Platform:
 
     name: str
     pythonexe: str
-    config_site: Optional[pathlib.PurePath]
-    configure_wrapper: Optional[pathlib.PurePath]
-    make_wrapper: Optional[pathlib.PurePath]
+    config_site: pathlib.PurePath | None
+    configure_wrapper: pathlib.PurePath | None
+    make_wrapper: pathlib.PurePath | None
     environ: dict
     check: Callable[[], None]
     # Used for build_emports().
-    ports: Optional[pathlib.PurePath]
-    cc: Optional[pathlib.PurePath]
+    ports: pathlib.PurePath | None
+    cc: pathlib.PurePath | None
 
     def getenv(self, profile: "BuildProfile") -> dict:
         return self.environ.copy()
@@ -247,7 +249,7 @@ def _check_emscripten():
         raise MissingDependency(os.fspath(version_txt), INSTALL_EMSDK)
     with open(version_txt) as f:
         version = f.read().strip().strip('"')
-    if version.endswith("-git"):
+    if version.endswith("-git"):  # noqa: FURB188
         # git / upstream / tot-upstream installation
         version = version[:-4]
     version_tuple = tuple(int(v) for v in version.split("."))
@@ -373,7 +375,7 @@ class Host(enum.Enum):
             return []
 
     @property
-    def emport_args(self) -> List[str]:
+    def emport_args(self) -> list[str]:
         """Host-specific port args (Emscripten)."""
         cls = type(self)
         if self is cls.wasm64_emscripten:
@@ -384,7 +386,7 @@ class Host(enum.Enum):
             return []
 
     @property
-    def embuilder_args(self) -> List[str]:
+    def embuilder_args(self) -> list[str]:
         """Host-specific embuilder args (Emscripten)."""
         cls = type(self)
         if self is cls.wasm64_emscripten:
@@ -407,7 +409,7 @@ class EmscriptenTarget(enum.Enum):
         return self in {cls.browser, cls.browser_debug}
 
     @property
-    def emport_args(self) -> List[str]:
+    def emport_args(self) -> list[str]:
         """Target-specific port args."""
         cls = type(self)
         if self in {cls.browser_debug, cls.node_debug}:
@@ -433,9 +435,9 @@ class BuildProfile:
     name: str
     support_level: SupportLevel
     host: Host
-    target: Union[EmscriptenTarget, None] = None
-    dynamic_linking: Union[bool, None] = None
-    pthreads: Union[bool, None] = None
+    target: EmscriptenTarget | None = None
+    dynamic_linking: bool | None = None
+    pthreads: bool | None = None
     default_testopts: str = "-j2"
 
     @property
@@ -459,7 +461,7 @@ class BuildProfile:
         return self.builddir / "Makefile"
 
     @property
-    def configure_cmd(self) -> List[str]:
+    def configure_cmd(self) -> list[str]:
         """Generate configure command"""
         # use relative path, so WASI tests can find lib prefix.
         # pathlib.Path.relative_to() does not work here.
@@ -494,7 +496,7 @@ class BuildProfile:
         return cmd
 
     @property
-    def make_cmd(self) -> List[str]:
+    def make_cmd(self) -> list[str]:
         """Generate make command"""
         cmd = ["make"]
         platform = self.host.platform
@@ -512,7 +514,7 @@ class BuildProfile:
                 env.pop(key, None)
             elif key == "PATH":
                 # list of path items, prefix with extra paths
-                new_path: List[pathlib.PurePath] = []
+                new_path: list[pathlib.PurePath] = []
                 new_path.extend(self.host.get_extra_paths())
                 new_path.extend(value)
                 env[key] = os.pathsep.join(os.fspath(p) for p in new_path)
@@ -530,7 +532,7 @@ class BuildProfile:
         self,
         cmd: Iterable[str],
         args: Iterable[str] = (),
-        cwd: Optional[pathlib.Path] = None,
+        cwd: pathlib.Path | None = None,
     ):
         cmd = list(cmd)
         cmd.extend(args)
@@ -568,7 +570,7 @@ class BuildProfile:
         self._check_execute()
         return self.run_make("pythoninfo", *args)
 
-    def run_test(self, target: str, testopts: Optional[str] = None):
+    def run_test(self, target: str, testopts: str | None = None):
         """Run buildbottests"""
         self._check_execute()
         if testopts is None:
@@ -799,8 +801,8 @@ parser.add_argument(
 )
 
 # Don't list broken and experimental variants in help
-platforms_choices = list(p.name for p in _profiles) + ["cleanall"]
-platforms_help = list(p.name for p in _profiles if p.support_level) + ["cleanall"]
+platforms_choices = list(p.name for p in _profiles) + ["cleanall"]  # noqa: C400
+platforms_help = list(p.name for p in _profiles if p.support_level) + ["cleanall"]  # noqa: C400
 parser.add_argument(
     "platform",
     metavar="PLATFORM",
@@ -808,7 +810,7 @@ parser.add_argument(
     choices=platforms_choices,
 )
 
-ops = dict(
+ops = dict(  # noqa: C408
     build="auto build (build 'build' Python, emports, configure, compile)",
     configure="run ./configure",
     compile="run 'make all'",

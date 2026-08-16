@@ -1,15 +1,14 @@
 #!/usr/bin/env python3.8
 
 import argparse
-import os
 import glob
+import os
+import pathlib
+import shutil
+import sys
 import tarfile
 import zipfile
-import shutil
-import pathlib
-import sys
-
-from typing import Generator
+from collections.abc import Generator
 
 sys.path.insert(0, ".")
 
@@ -32,14 +31,13 @@ def get_packages() -> Generator[str, None, None]:
         + glob.glob("./data/pypi/*.zip")
         + glob.glob("./data/pypi/*.tgz")
     )
-    for package in all_packages:
-        yield package
+    yield from all_packages
 
 
 def extract_files(filename: str) -> None:
     savedir = os.path.join("data", "pypi")
     if tarfile.is_tarfile(filename):
-        tarfile.open(filename).extractall(savedir)
+        tarfile.open(filename).extractall(savedir)  # noqa: SIM115
     elif zipfile.is_zipfile(filename):
         zipfile.ZipFile(filename).extractall(savedir)
     else:
@@ -79,7 +77,7 @@ def main() -> None:
             print(e)
             continue
 
-        print(f"Trying to parse all python files ... ")
+        print("Trying to parse all python files ... ")
         dirname = find_dirname(package)
         status = run_tests(dirname, tree)
         if status == 0:

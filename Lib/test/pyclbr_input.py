@@ -1,17 +1,25 @@
 """Test cases for test_pyclbr.py"""
 
-def f(): pass
+
+def f():
+    pass
+
 
 class Other(object):
     @classmethod
-    def foo(c): pass
+    def foo(c):
+        pass
 
-    def om(self): pass
+    def om(self):
+        pass
 
-class B (object):
-    def bm(self): pass
 
-class C (B):
+class B(object):
+    def bm(self):
+        pass
+
+
+class C(B):
     d = 10
 
     # This one is correctly considered by both test_pyclbr.py and pyclbr.py
@@ -26,60 +34,136 @@ class C (B):
     om = Other.om
     f = f
 
-    def m(self): pass
+    def m(self):
+        pass
 
     @staticmethod
-    def sm(self): pass
+    def sm(self):
+        pass
 
     @classmethod
-    def cm(self): pass
+    def cm(self):
+        pass
+
 
 # Check that mangling is correctly handled
 
+
 class a:
-    def a(self): pass
-    def _(self): pass
-    def _a(self): pass
-    def __(self): pass
-    def ___(self): pass
-    def __a(self): pass
+    def a(self):
+        pass
+
+    def _(self):
+        pass
+
+    def _a(self):
+        pass
+
+    def __(self):
+        pass
+
+    def ___(self):
+        pass
+
+    def __a(self):
+        pass
+
 
 class _:
-    def a(self): pass
-    def _(self): pass
-    def _a(self): pass
-    def __(self): pass
-    def ___(self): pass
-    def __a(self): pass
+    def a(self):
+        pass
+
+    def _(self):
+        pass
+
+    def _a(self):
+        pass
+
+    def __(self):
+        pass
+
+    def ___(self):
+        pass
+
+    def __a(self):
+        pass
+
 
 class __:
-    def a(self): pass
-    def _(self): pass
-    def _a(self): pass
-    def __(self): pass
-    def ___(self): pass
-    def __a(self): pass
+    def a(self):
+        pass
+
+    def _(self):
+        pass
+
+    def _a(self):
+        pass
+
+    def __(self):
+        pass
+
+    def ___(self):
+        pass
+
+    def __a(self):
+        pass
+
 
 class ___:
-    def a(self): pass
-    def _(self): pass
-    def _a(self): pass
-    def __(self): pass
-    def ___(self): pass
-    def __a(self): pass
+    def a(self):
+        pass
+
+    def _(self):
+        pass
+
+    def _a(self):
+        pass
+
+    def __(self):
+        pass
+
+    def ___(self):
+        pass
+
+    def __a(self):
+        pass
+
 
 class _a:
-    def a(self): pass
-    def _(self): pass
-    def _a(self): pass
-    def __(self): pass
-    def ___(self): pass
-    def __a(self): pass
+    def a(self):
+        pass
+
+    def _(self):
+        pass
+
+    def _a(self):
+        pass
+
+    def __(self):
+        pass
+
+    def ___(self):
+        pass
+
+    def __a(self):
+        pass
+
 
 class __a:
-    def a(self): pass
-    def _(self): pass
-    def _a(self): pass
-    def __(self): pass
-    def ___(self): pass
-    def __a(self): pass
+    def a(self):
+        pass
+
+    def _(self):
+        pass
+
+    def _a(self):
+        pass
+
+    def __(self):
+        pass
+
+    def ___(self):
+        pass
+
+    def __a(self):
+        pass

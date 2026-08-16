@@ -7,7 +7,7 @@ def main() -> int:
     if not Path("Doc").exists() or not Path("Doc").is_dir():
         raise RuntimeError(wrong_directory_msg)
 
-    with Path("Doc/epubcheck.txt").open(encoding="UTF-8") as f:
+    with Path("Doc/epubcheck.txt").open(encoding="UTF-8") as f:  # noqa: FURB101
         messages = [message.split(" - ") for message in f.read().splitlines()]
 
     fatal_errors = [message for message in messages if message[0] == "FATAL"]

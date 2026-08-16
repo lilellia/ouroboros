@@ -1,5 +1,8 @@
 """Binding the package attribute without importing the module."""
+
+
 class submodule:
-    attr = 'origin'
+    attr = "origin"
+
     class B:
-        attr = 'origin'
+        attr = "origin"

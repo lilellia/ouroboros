@@ -21,13 +21,13 @@ Based on https://github.com/python/cpython/blob/963904335e579bfe39101adf3fd6a0cf
 from __future__ import annotations
 
 import argparse
-import time
 import random
-
+import time
 
 # ===============
 # Data generation
 # ===============
+
 
 def _random_data(size: int, rand: random.Random) -> list[float]:
     result = [rand.random() for _ in range(size)]
@@ -112,6 +112,7 @@ def list_sort_worst_case(size: int, rand: random.Random) -> list[float]:
 # Benchmark
 # =========
 
+
 class Benchmark:
     def __init__(self, name: str, size: int, seed: int) -> None:
         self._name = name
@@ -146,7 +147,7 @@ def add_parser_args(parser: argparse.ArgumentParser) -> None:
         "benchmark",
         choices=BENCHMARKS,
         nargs="?",
-        help="Can be any of: {0}".format(", ".join(BENCHMARKS)),
+        help="Can be any of: {}".format(", ".join(BENCHMARKS)),
     )
     parser.add_argument(
         "--size",

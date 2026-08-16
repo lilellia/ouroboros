@@ -9,7 +9,7 @@ def _reset_tzpath(to=None, stacklevel=4):
     if tzpaths is not None:
         if isinstance(tzpaths, (str, bytes)):
             raise TypeError(
-                f"tzpaths must be a list or tuple, "
+                "tzpaths must be a list or tuple, "
                 + f"not {type(tzpaths)}: {tzpaths!r}"
             )
 
@@ -47,8 +47,7 @@ def _parse_python_tzpath(env_var, stacklevel):
         msg = _get_invalid_paths_message(raw_tzpath)
 
         warnings.warn(
-            "Invalid paths specified in PYTHONTZPATH environment variable. "
-            + msg,
+            "Invalid paths specified in PYTHONTZPATH environment variable. " + msg,
             InvalidTZPathWarning,
             stacklevel=stacklevel,
         )
@@ -84,9 +83,7 @@ _TEST_PATH = os.path.normpath(os.path.join("_", "_"))[:-1]
 
 def _validate_tzfile_path(path, _base=_TEST_PATH):
     if os.path.isabs(path):
-        raise ValueError(
-            f"ZoneInfo keys may not be absolute paths, got: {path}"
-        )
+        raise ValueError(f"ZoneInfo keys may not be absolute paths, got: {path}")
 
     # We only care about the kinds of path normalizations that would change the
     # length of the key - e.g. a/../b -> a/b, or a/b/ -> a/b. On Windows,
@@ -136,7 +133,7 @@ def available_timezones():
         try:
             with open(fpath, "rb") as f:
                 return f.read(4) == b"TZif"
-        except Exception:  # pragma: nocover
+        except Exception:  # pragma: nocover  # noqa: BLE001
             return False
 
     for tz_root in TZPATH:
@@ -165,10 +162,7 @@ def available_timezones():
                 if valid_key(fpath):
                     valid_zones.add(key)
 
-    if "posixrules" in valid_zones:
-        # posixrules is a special symlink-only time zone where it exists, it
-        # should not be included in the output
-        valid_zones.remove("posixrules")
+    valid_zones.discard("posixrules")
 
     return valid_zones
 

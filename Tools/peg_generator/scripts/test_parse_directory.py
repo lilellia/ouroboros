@@ -6,10 +6,9 @@ import os
 import sys
 import time
 import tokenize
-from glob import glob, escape
+from glob import escape, glob
 from pathlib import PurePath
-
-from typing import List, Optional, Any, Tuple
+from typing import Any
 
 sys.path.insert(0, os.getcwd())
 from pegen.testutil import print_memstats
@@ -26,12 +25,21 @@ argparser = argparse.ArgumentParser(
     prog="test_parse_directory",
     description="Helper program to test directories or files for pegen",
 )
-argparser.add_argument("-d", "--directory", help="Directory path containing files to test")
 argparser.add_argument(
-    "-e", "--exclude", action="append", default=[], help="Glob(s) for matching files to exclude"
+    "-d", "--directory", help="Directory path containing files to test"
 )
 argparser.add_argument(
-    "-s", "--short", action="store_true", help="Only show errors, in a more Emacs-friendly format"
+    "-e",
+    "--exclude",
+    action="append",
+    default=[],
+    help="Glob(s) for matching files to exclude",
+)
+argparser.add_argument(
+    "-s",
+    "--short",
+    action="store_true",
+    help="Only show errors, in a more Emacs-friendly format",
 )
 argparser.add_argument(
     "-v", "--verbose", action="store_true", help="Display detailed errors for failures"
@@ -42,7 +50,7 @@ def report_status(
     succeeded: bool,
     file: str,
     verbose: bool,
-    error: Optional[Exception] = None,
+    error: Exception | None = None,
     short: bool = False,
 ) -> None:
     if short and succeeded:
@@ -69,10 +77,10 @@ def report_status(
         print(f"{COLOR}{file:60} {status}{ENDC}")
 
         if error and verbose:
-            print(f"  {str(error.__class__.__name__)}: {error}")
+            print(f"  {error.__class__.__name__!s}: {error}")
 
 
-def parse_file(source: str, file: str) -> Tuple[Any, float]:
+def parse_file(source: str, file: str) -> tuple[Any, float]:
     t0 = time.time()
     result = ast.parse(source, filename=file)
     t1 = time.time()
@@ -95,19 +103,23 @@ def generate_time_stats(files, total_seconds) -> None:
     )
     if total_seconds > 0:
         print(
-            f"That's {total_lines / total_seconds :,.0f} lines/sec,",
-            f"or {total_bytes / total_seconds :,.0f} bytes/sec.",
+            f"That's {total_lines / total_seconds:,.0f} lines/sec,",
+            f"or {total_bytes / total_seconds:,.0f} bytes/sec.",
         )
 
 
-def parse_directory(directory: str, verbose: bool, excluded_files: List[str], short: bool) -> int:
+def parse_directory(
+    directory: str, verbose: bool, excluded_files: list[str], short: bool
+) -> int:
     # For a given directory, traverse files and attempt to parse each one
     # - Output success/failure for each file
     errors = 0
     files = []
     total_seconds = 0
 
-    for file in sorted(glob(os.path.join(escape(directory), f"**/*.py"), recursive=True)):
+    for file in sorted(
+        glob(os.path.join(escape(directory), "**/*.py"), recursive=True)
+    ):
         # Only attempt to parse Python files and files that are not excluded
         if any(PurePath(file).match(pattern) for pattern in excluded_files):
             continue
@@ -116,11 +128,13 @@ def parse_directory(directory: str, verbose: bool, excluded_files: List[str], sh
             source = f.read()
 
         try:
-            result, dt = parse_file(source, file)
+            _result, dt = parse_file(source, file)
             total_seconds += dt
             report_status(succeeded=True, file=file, verbose=verbose, short=short)
         except SyntaxError as error:
-            report_status(succeeded=False, file=file, verbose=verbose, error=error, short=short)
+            report_status(
+                succeeded=False, file=file, verbose=verbose, error=error, short=short
+            )
             errors += 1
         files.append(file)
 

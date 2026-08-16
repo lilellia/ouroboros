@@ -6,12 +6,12 @@ from test.support import gc_collect
 
 
 class ScopeTests(unittest.TestCase):
-
     def testSimpleNesting(self):
 
         def make_adder(x):
             def adder(y):
                 return x + y
+
             return adder
 
         inc = make_adder(1)
@@ -23,10 +23,12 @@ class ScopeTests(unittest.TestCase):
     def testExtraNesting(self):
 
         def make_adder2(x):
-            def extra(): # check freevars passing through non-use scopes
+            def extra():  # check freevars passing through non-use scopes
                 def adder(y):
                     return x + y
+
                 return adder
+
             return extra()
 
         inc = make_adder2(1)
@@ -40,7 +42,8 @@ class ScopeTests(unittest.TestCase):
         def make_adder3(x):
             def adder(y):
                 return x + y
-            x = x + 1 # check tracking of assignment to x in defining scope
+
+            x = x + 1  # check tracking of assignment to x in defining scope
             return adder
 
         inc = make_adder3(0)
@@ -51,13 +54,16 @@ class ScopeTests(unittest.TestCase):
 
     def testNestingGlobalNoFree(self):
 
-        def make_adder4(): # XXX add exta level of indirection
+        def make_adder4():  # XXX add exta level of indirection
             def nest():
                 def nest():
                     def adder(y):
-                        return global_x + y # check that plain old globals work
+                        return global_x + y  # check that plain old globals work
+
                     return adder
+
                 return nest()
+
             return nest()
 
         global_x = 1
@@ -73,6 +79,7 @@ class ScopeTests(unittest.TestCase):
             class Adder:
                 def __call__(self, y):
                     return x + y
+
             return Adder()
 
         inc = make_adder5(1)
@@ -85,25 +92,30 @@ class ScopeTests(unittest.TestCase):
 
         def make_adder6(x):
             global global_nest_x
+
             def adder(y):
                 return global_nest_x + y
+
             global_nest_x = x
             return adder
 
         inc = make_adder6(1)
         plus10 = make_adder6(10)
 
-        self.assertEqual(inc(1), 11) # there's only one global
+        self.assertEqual(inc(1), 11)  # there's only one global
         self.assertEqual(plus10(-2), 8)
 
     def testNearestEnclosingScope(self):
 
         def f(x):
             def g(y):
-                x = 42 # check that this masks binding in f()
+                x = 42  # check that this masks binding in f()
+
                 def h(z):
                     return x + z
+
                 return h
+
             return g(2)
 
         test_func = f(10)
@@ -116,13 +128,16 @@ class ScopeTests(unittest.TestCase):
 
         def f(x, y, z):
             def g(a, b, c):
-                a = a + x # 3
+                a = a + x  # 3
+
                 def h():
                     # z * (4 + 9)
                     # 3 * 13
                     return identity(z * (b + y))
-                y = c + z # 9
+
+                y = c + z  # 9
                 return h
+
             return g
 
         g = f(1, 2, 3)
@@ -133,15 +148,20 @@ class ScopeTests(unittest.TestCase):
 
         def test():
             method_and_var = "var"
+
             class Test:
                 def method_and_var(self):
                     return "method"
+
                 def test(self):
                     return method_and_var
+
                 def actual_global(self):
                     return str("global")
+
                 def str(self):
                     return str(self)
+
             return Test()
 
         t = test()
@@ -150,14 +170,18 @@ class ScopeTests(unittest.TestCase):
         self.assertEqual(t.actual_global(), "global")
 
         method_and_var = "var"
+
         class Test:
             # this class is not nested, so the rules are different
             def method_and_var(self):
                 return "method"
+
             def test(self):
                 return method_and_var
+
             def actual_global(self):
                 return str("global")
+
             def str(self):
                 return str(self)
 
@@ -172,6 +196,7 @@ class ScopeTests(unittest.TestCase):
         def foo(*, a=17):
             def bar():
                 return a + 5
+
             return bar() + 3
 
         self.assertEqual(foo(a=42), 50)
@@ -184,19 +209,23 @@ class ScopeTests(unittest.TestCase):
 
         def external():
             value = 42
+
             def inner():
                 return value
-            cell, = inner.__closure__
+
+            (cell,) = inner.__closure__
             return cell
+
         cell_ext = external()
 
         def spam(arg):
             def eggs():
                 return arg
+
             return eggs
 
         eggs = spam(cell_ext)
-        cell_closure, = eggs.__closure__
+        (cell_closure,) = eggs.__closure__
         cell_eggs = eggs()
 
         self.assertIs(cell_eggs, cell_ext)
@@ -209,20 +238,25 @@ class ScopeTests(unittest.TestCase):
 
         def external():
             value = 42
+
             def inner():
                 return value
-            cell, = inner.__closure__
+
+            (cell,) = inner.__closure__
             return cell
+
         cell_ext = external()
 
         def spam(arg):
             cell = arg
+
             def eggs():
                 return cell
+
             return eggs
 
         eggs = spam(cell_ext)
-        cell_closure, = eggs.__closure__
+        (cell_closure,) = eggs.__closure__
         cell_eggs = eggs()
 
         self.assertIs(cell_eggs, cell_ext)
@@ -236,6 +270,7 @@ class ScopeTests(unittest.TestCase):
                     return 1
                 else:
                     return n * fact(n - 1)
+
             if x >= 0:
                 return fact(x)
             else:
@@ -243,40 +278,51 @@ class ScopeTests(unittest.TestCase):
 
         self.assertEqual(f(6), 720)
 
-
     def testUnoptimizedNamespaces(self):
 
-        check_syntax_error(self, """if 1:
+        check_syntax_error(
+            self,
+            """if 1:
             def unoptimized_clash1(strip):
                 def f(s):
                     from sys import *
                     return getrefcount(s) # ambiguity: free or local
                 return f
-            """)
+            """,
+        )
 
-        check_syntax_error(self, """if 1:
+        check_syntax_error(
+            self,
+            """if 1:
             def unoptimized_clash2():
                 from sys import *
                 def f(s):
                     return getrefcount(s) # ambiguity: global or local
                 return f
-            """)
+            """,
+        )
 
-        check_syntax_error(self, """if 1:
+        check_syntax_error(
+            self,
+            """if 1:
             def unoptimized_clash2():
                 from sys import *
                 def g():
                     def f(s):
                         return getrefcount(s) # ambiguity: global or local
                     return f
-            """)
+            """,
+        )
 
-        check_syntax_error(self, """if 1:
+        check_syntax_error(
+            self,
+            """if 1:
             def f():
                 def g():
                     from sys import *
                     return getrefcount # global or local?
-            """)
+            """,
+        )
 
     def testLambdas(self):
 
@@ -286,7 +332,7 @@ class ScopeTests(unittest.TestCase):
         self.assertEqual(inc(1), 2)
         self.assertEqual(plus10(5), 15)
 
-        f2 = lambda x: (lambda : lambda y: x + y)()
+        f2 = lambda x: (lambda: lambda y: x + y)()
         inc = f2(1)
         plus10 = f2(10)
         self.assertEqual(inc(1), 2)
@@ -297,7 +343,7 @@ class ScopeTests(unittest.TestCase):
         inc = f3(None)
         self.assertEqual(inc(2), 3)
 
-        f8 = lambda x, y, z: lambda a, b, c: lambda : z * (b + y)
+        f8 = lambda x, y, z: lambda a, b, c: lambda: z * (b + y)
         g = f8(1, 2, 3)
         h = g(2, 4, 6)
         self.assertEqual(h(), 18)
@@ -306,13 +352,16 @@ class ScopeTests(unittest.TestCase):
 
         def errorInOuter():
             print(y)
+
             def inner():
                 return y
+
             y = 1
 
         def errorInInner():
             def inner():
                 return y
+
             inner()
             y = 1
 
@@ -327,12 +376,14 @@ class ScopeTests(unittest.TestCase):
             y = 1
             del y
             print(y)
+
             def inner():
                 return y
 
         def errorInInner():
             def inner():
                 return y
+
             y = 1
             del y
             inner()
@@ -342,7 +393,8 @@ class ScopeTests(unittest.TestCase):
 
     def testUnboundLocal_AugAssign(self):
         # test for bug #1501934: incorrect LOAD/STORE_GLOBAL generation
-        exec("""if 1:
+        exec(
+            """if 1:
             global_x = 1
             def f():
                 global_x += 1
@@ -352,23 +404,27 @@ class ScopeTests(unittest.TestCase):
                 pass
             else:
                 fail('scope of global_x not correctly determined')
-            """, {'fail': self.fail})
+            """,
+            {"fail": self.fail},
+        )
 
     def testComplexDefinitions(self):
 
         def makeReturner(*lst):
             def returner():
                 return lst
+
             return returner
 
-        self.assertEqual(makeReturner(1,2,3)(), (1,2,3))
+        self.assertEqual(makeReturner(1, 2, 3)(), (1, 2, 3))
 
         def makeReturner2(**kwargs):
             def returner():
                 return kwargs
+
             return returner
 
-        self.assertEqual(makeReturner2(a=11)()['a'], 11)
+        self.assertEqual(makeReturner2(a=11)()["a"], 11)
 
     def testScopeOfGlobalStmt(self):
         # Examples posted by Samuele Pedroni to python-dev on 3/1/2001
@@ -467,8 +523,10 @@ class ScopeTests(unittest.TestCase):
 
         def f1():
             x = Foo()
+
             def f2():
                 return x
+
             f2()
 
         for i in range(100):
@@ -508,15 +566,17 @@ class ScopeTests(unittest.TestCase):
             def g(y):
                 def h(z):
                     return y + z
+
                 w = x + y
                 y += 3
                 return locals()
+
             return g
 
         d = f(2)(4)
-        self.assertIn('h', d)
-        del d['h']
-        self.assertEqual(d, {'x': 2, 'y': 7, 'w': 6})
+        self.assertIn("h", d)
+        del d["h"]
+        self.assertEqual(d, {"x": 2, "y": 7, "w": 6})
 
     def testLocalsClass(self):
         # This test verifies that calling locals() does not pollute
@@ -532,9 +592,12 @@ class ScopeTests(unittest.TestCase):
         def f(x):
             class C:
                 x = 12
+
                 def m(self):
                     return x
+
                 locals()
+
             return C
 
         self.assertEqual(f(1).x, 12)
@@ -542,9 +605,12 @@ class ScopeTests(unittest.TestCase):
         def f(x):
             class C:
                 y = x
+
                 def m(self):
                     return x
+
                 z = list(locals())
+
             return C
 
         varnames = f(1).z
@@ -558,15 +624,16 @@ class ScopeTests(unittest.TestCase):
         # include free variables. But in class statements, free
         # variables are not inserted...
         import sys
+
         self.addCleanup(sys.settrace, sys.gettrace())
-        sys.settrace(lambda a,b,c:None)
+        sys.settrace(lambda a, b, c: None)
         x = 12
 
         class C:
             def f(self):
                 return x
 
-        self.assertEqual(x, 12) # Used to raise UnboundLocalError
+        self.assertEqual(x, 12)  # Used to raise UnboundLocalError
 
     def testBoundAndFree(self):
         # var is bound and free in class
@@ -575,7 +642,9 @@ class ScopeTests(unittest.TestCase):
             class C:
                 def m(self):
                     return x
+
                 a = x
+
             return C
 
         inst = f(3)()
@@ -585,12 +654,13 @@ class ScopeTests(unittest.TestCase):
     def testInteractionWithTraceFunc(self):
 
         import sys
-        def tracer(a,b,c):
+
+        def tracer(a, b, c):
             return tracer
 
         def adaptgetter(name, klass, getter):
             kind, des = getter
-            if kind == 1:       # AV happens when stepping from this line to next
+            if kind == 1:  # AV happens when stepping from this line to next
                 if des == "":
                     des = "_%s__%s" % (klass.__name__, name)
                 return lambda obj: getattr(obj, des)
@@ -630,7 +700,7 @@ class ScopeTests(unittest.TestCase):
             print("bad should not be defined")
 
         def x():
-            [bad for s in 'a b' for bad in s.split()]
+            [bad for s in "a b" for bad in s.split()]
 
         x()
         try:
@@ -644,6 +714,7 @@ class ScopeTests(unittest.TestCase):
             def g():
                 x
                 eval("x + 1")
+
             return g
 
         f(4)()
@@ -662,10 +733,12 @@ class ScopeTests(unittest.TestCase):
                 nonlocal x
                 x += 1
                 return x
+
             def dec():
                 nonlocal x
                 x -= 1
                 return x
+
             return inc, dec
 
         inc, dec = f(0)
@@ -681,11 +754,14 @@ class ScopeTests(unittest.TestCase):
                     nonlocal x
                     x += 1
                     return x
+
                 def dec(self):
                     nonlocal x
                     x -= 1
                     return x
+
             return c()
+
         c = f(0)
         self.assertEqual(c.inc(), 1)
         self.assertEqual(c.inc(), 2)
@@ -699,7 +775,8 @@ class ScopeTests(unittest.TestCase):
         # function does not affect the second function.
         local_ns = {}
         global_ns = {}
-        exec("""if 1:
+        exec(
+            """if 1:
             def f():
                 y = 1
                 def g():
@@ -712,7 +789,10 @@ class ScopeTests(unittest.TestCase):
             g, h = f()
             result9 = g()
             result2 = h()
-            """, local_ns, global_ns)
+            """,
+            local_ns,
+            global_ns,
+        )
         self.assertEqual(2, global_ns["result2"])
         self.assertEqual(9, global_ns["result9"])
 
@@ -722,14 +802,15 @@ class ScopeTests(unittest.TestCase):
             class c:
                 nonlocal x
                 x += 1
+
                 def get(self):
                     return x
+
             return c()
 
         c = f(0)
         self.assertEqual(c.get(), 1)
         self.assertNotIn("x", c.__class__.__dict__)
-
 
     def testNonLocalGenerator(self):
 
@@ -739,6 +820,7 @@ class ScopeTests(unittest.TestCase):
                 for i in range(y):
                     x += 1
                     yield x
+
             return g
 
         g = f(0)
@@ -750,11 +832,14 @@ class ScopeTests(unittest.TestCase):
             def g():
                 nonlocal x
                 x -= 2
+
                 def h():
                     nonlocal x
                     x += 4
                     return x
+
                 return h
+
             return g
 
         g = f(1)
@@ -765,19 +850,24 @@ class ScopeTests(unittest.TestCase):
         # See #9997.
         def top(a):
             pass
+
         def b():
             global a
 
     def testClassNamespaceOverridesClosure(self):
         # See #17853.
         x = 42
+
         class X:
             locals()["x"] = 43
             y = x
+
         self.assertEqual(X.y, 43)
+
         class X:
             locals()["x"] = 43
             del x
+
         self.assertFalse(hasattr(X, "x"))
         self.assertEqual(x, 42)
 
@@ -799,10 +889,11 @@ class ScopeTests(unittest.TestCase):
                 if 0:
                     lambda: self
                 try:
-                    1/0
+                    1 / 0
                 except Exception as exc:
                     self.exc = exc
                 self = None  # Break the cycle
+
         tester = Tester()
         tester.dig()
         ref = weakref.ref(tester)
@@ -815,16 +906,20 @@ class ScopeTests(unittest.TestCase):
         class MultiplyNested:
             def f1(self):
                 __arg = 1
+
                 class D:
                     def g(self, __arg):
                         return __arg
+
                 return D().g(_MultiplyNested__arg=2)
 
             def f2(self):
                 __arg = 1
+
                 class D:
                     def g(self, __arg):
                         return __arg
+
                 return D().g
 
         inst = MultiplyNested()
@@ -835,5 +930,6 @@ class ScopeTests(unittest.TestCase):
         with self.assertRaises(TypeError):
             closure(_MultiplyNested__arg=2)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

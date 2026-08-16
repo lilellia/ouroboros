@@ -6,9 +6,15 @@ module directly.
 """
 
 from .resources.simple import (
-    SimpleReader, ResourceHandle, ResourceContainer, TraversableReader,
+    ResourceContainer,
+    ResourceHandle,
+    SimpleReader,
+    TraversableReader,
 )
 
 __all__ = [
-    'SimpleReader', 'ResourceHandle', 'ResourceContainer', 'TraversableReader',
+    "ResourceContainer",
+    "ResourceHandle",
+    "SimpleReader",
+    "TraversableReader",
 ]

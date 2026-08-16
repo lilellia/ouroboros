@@ -12,21 +12,22 @@ from test import support
 from test.support import import_helper
 from test.support import threading_helper
 from test.support import os_helper
-_interpreters = import_helper.import_module('_xxsubinterpreters')
-_channels = import_helper.import_module('_xxinterpchannels')
+
+_interpreters = import_helper.import_module("_xxsubinterpreters")
+_channels = import_helper.import_module("_xxinterpchannels")
 from test.support import interpreters
 
 
 def _captured_script(script):
     r, w = os.pipe()
-    indented = script.replace('\n', '\n                ')
+    indented = script.replace("\n", "\n                ")
     wrapped = dedent(f"""
         import contextlib
         with open({w}, 'w', encoding='utf-8') as spipe:
             with contextlib.redirect_stdout(spipe):
                 {indented}
         """)
-    return wrapped, open(r, encoding='utf-8')
+    return wrapped, open(r, encoding="utf-8")
 
 
 def clean_up_interpreters():
@@ -49,27 +50,30 @@ def _run_output(interp, request, channels=None):
 @contextlib.contextmanager
 def _running(interp):
     r, w = os.pipe()
+
     def run():
-        interp.run(dedent(f"""
+        interp.run(
+            dedent(f"""
             # wait for "signal"
             with open({r}) as rpipe:
                 rpipe.read()
-            """))
+            """)
+        )
 
     t = threading.Thread(target=run)
     t.start()
 
     yield
 
-    with open(w, 'w') as spipe:
-        spipe.write('done')
+    with open(w, "w") as spipe:
+        spipe.write("done")
     t.join()
 
 
 class TestBase(unittest.TestCase):
-
     def os_pipe(self):
         r, w = os.pipe()
+
         def cleanup():
             try:
                 os.close(w)
@@ -79,6 +83,7 @@ class TestBase(unittest.TestCase):
                 os.close(r)
             except Exception:
                 pass
+
         self.addCleanup(cleanup)
         return r, w
 
@@ -87,7 +92,6 @@ class TestBase(unittest.TestCase):
 
 
 class CreateTests(TestBase):
-
     def test_in_main(self):
         interp = interpreters.create()
         self.assertIsInstance(interp, interpreters.Interpreter)
@@ -96,11 +100,13 @@ class CreateTests(TestBase):
     def test_in_thread(self):
         lock = threading.Lock()
         interp = None
+
         def f():
             nonlocal interp
             interp = interpreters.create()
             lock.acquire()
             lock.release()
+
         t = threading.Thread(target=f)
         with lock:
             t.start()
@@ -108,13 +114,16 @@ class CreateTests(TestBase):
         self.assertIn(interp, interpreters.list_all())
 
     def test_in_subinterpreter(self):
-        main, = interpreters.list_all()
+        (main,) = interpreters.list_all()
         interp = interpreters.create()
-        out = _run_output(interp, dedent("""
+        out = _run_output(
+            interp,
+            dedent("""
             from test.support import interpreters
             interp = interpreters.create()
             print(interp.id)
-            """))
+            """),
+        )
         interp2 = interpreters.Interpreter(int(out))
         self.assertEqual(interpreters.list_all(), [main, interp, interp2])
 
@@ -147,7 +156,6 @@ class CreateTests(TestBase):
 
 
 class GetCurrentTests(TestBase):
-
     def test_main(self):
         main = interpreters.get_main()
         current = interpreters.get_current()
@@ -156,17 +164,19 @@ class GetCurrentTests(TestBase):
     def test_subinterpreter(self):
         main = _interpreters.get_main()
         interp = interpreters.create()
-        out = _run_output(interp, dedent("""
+        out = _run_output(
+            interp,
+            dedent("""
             from test.support import interpreters
             cur = interpreters.get_current()
             print(cur.id)
-            """))
+            """),
+        )
         current = interpreters.Interpreter(int(out))
         self.assertNotEqual(current, main)
 
 
 class ListAllTests(TestBase):
-
     def test_initial(self):
         interps = interpreters.list_all()
         self.assertEqual(1, len(interps))
@@ -196,7 +206,6 @@ class ListAllTests(TestBase):
 
 
 class TestInterpreterAttrs(TestBase):
-
     def test_id_type(self):
         main = interpreters.get_main()
         current = interpreters.get_current()
@@ -214,19 +223,19 @@ class TestInterpreterAttrs(TestBase):
         self.assertEqual(interp.id, 1)
 
         with self.assertRaises(TypeError):
-            interpreters.Interpreter('1')
+            interpreters.Interpreter("1")
 
     def test_id_readonly(self):
         interp = interpreters.Interpreter(1)
         with self.assertRaises(AttributeError):
             interp.id = 2
 
-    @unittest.skip('not ready yet (see bpo-32604)')
+    @unittest.skip("not ready yet (see bpo-32604)")
     def test_main_isolated(self):
         main = interpreters.get_main()
         self.assertFalse(main.isolated)
 
-    @unittest.skip('not ready yet (see bpo-32604)')
+    @unittest.skip("not ready yet (see bpo-32604)")
     def test_subinterpreter_isolated_default(self):
         interp = interpreters.create()
         self.assertFalse(interp.isolated)
@@ -237,7 +246,7 @@ class TestInterpreterAttrs(TestBase):
         self.assertTrue(interp1.isolated)
         self.assertFalse(interp2.isolated)
 
-    @unittest.skip('not ready yet (see bpo-32604)')
+    @unittest.skip("not ready yet (see bpo-32604)")
     def test_custom_isolated_default(self):
         interp = interpreters.Interpreter(1)
         self.assertFalse(interp.isolated)
@@ -261,12 +270,11 @@ class TestInterpreterAttrs(TestBase):
 
 
 class TestInterpreterIsRunning(TestBase):
-
     def test_main(self):
         main = interpreters.get_main()
         self.assertTrue(main.is_running())
 
-    @unittest.skip('Fails on FreeBSD')
+    @unittest.skip("Fails on FreeBSD")
     def test_subinterpreter(self):
         interp = interpreters.create()
         self.assertFalse(interp.is_running())
@@ -283,18 +291,21 @@ class TestInterpreterIsRunning(TestBase):
             os.write({w}, b'x')
             """)
         self.assertFalse(interp.is_running())
-        self.assertEqual(os.read(r, 1), b'x')
+        self.assertEqual(os.read(r, 1), b"x")
 
     def test_from_subinterpreter(self):
         interp = interpreters.create()
-        out = _run_output(interp, dedent(f"""
+        out = _run_output(
+            interp,
+            dedent(f"""
             import _xxsubinterpreters as _interpreters
             if _interpreters.is_running({interp.id}):
                 print(True)
             else:
                 print(False)
-            """))
-        self.assertEqual(out.strip(), 'True')
+            """),
+        )
+        self.assertEqual(out.strip(), "True")
 
     def test_already_destroyed(self):
         interp = interpreters.create()
@@ -316,8 +327,8 @@ class TestInterpreterIsRunning(TestBase):
         r_interp, w_interp = self.os_pipe()
         r_thread, w_thread = self.os_pipe()
 
-        DONE = b'D'
-        FINISHED = b'F'
+        DONE = b"D"
+        FINISHED = b"F"
 
         interp = interpreters.create()
         interp.run(f"""if True:
@@ -334,22 +345,21 @@ class TestInterpreterIsRunning(TestBase):
         self.assertFalse(interp.is_running())
 
         os.write(w_thread, DONE)
-        interp.run('t.join()')
+        interp.run("t.join()")
         self.assertEqual(os.read(r_interp, 1), FINISHED)
 
 
 class TestInterpreterClose(TestBase):
-
     def test_basic(self):
         main = interpreters.get_main()
         interp1 = interpreters.create()
         interp2 = interpreters.create()
         interp3 = interpreters.create()
-        self.assertEqual(set(interpreters.list_all()),
-                         {main, interp1, interp2, interp3})
+        self.assertEqual(
+            set(interpreters.list_all()), {main, interp1, interp2, interp3}
+        )
         interp2.close()
-        self.assertEqual(set(interpreters.list_all()),
-                         {main, interp1, interp3})
+        self.assertEqual(set(interpreters.list_all()), {main, interp1, interp3})
 
     def test_all(self):
         before = set(interpreters.list_all())
@@ -363,7 +373,7 @@ class TestInterpreterClose(TestBase):
         self.assertEqual(set(interpreters.list_all()), before)
 
     def test_main(self):
-        main, = interpreters.list_all()
+        (main,) = interpreters.list_all()
         with self.assertRaises(RuntimeError):
             main.close()
 
@@ -392,36 +402,41 @@ class TestInterpreterClose(TestBase):
             interp.close()
 
     def test_from_current(self):
-        main, = interpreters.list_all()
+        (main,) = interpreters.list_all()
         interp = interpreters.create()
-        out = _run_output(interp, dedent(f"""
+        out = _run_output(
+            interp,
+            dedent(f"""
             from test.support import interpreters
             interp = interpreters.Interpreter({int(interp.id)})
             try:
                 interp.close()
             except RuntimeError:
                 print('failed')
-            """))
-        self.assertEqual(out.strip(), 'failed')
+            """),
+        )
+        self.assertEqual(out.strip(), "failed")
         self.assertEqual(set(interpreters.list_all()), {main, interp})
 
     def test_from_sibling(self):
-        main, = interpreters.list_all()
+        (main,) = interpreters.list_all()
         interp1 = interpreters.create()
         interp2 = interpreters.create()
-        self.assertEqual(set(interpreters.list_all()),
-                         {main, interp1, interp2})
-        interp1.run(dedent(f"""
+        self.assertEqual(set(interpreters.list_all()), {main, interp1, interp2})
+        interp1.run(
+            dedent(f"""
             from test.support import interpreters
             interp2 = interpreters.Interpreter(int({interp2.id}))
             interp2.close()
             interp3 = interpreters.create()
             interp3.close()
-            """))
+            """)
+        )
         self.assertEqual(set(interpreters.list_all()), {main, interp1})
 
     def test_from_other_thread(self):
         interp = interpreters.create()
+
         def f():
             interp.close()
 
@@ -429,9 +444,9 @@ class TestInterpreterClose(TestBase):
         t.start()
         t.join()
 
-    @unittest.skip('Fails on FreeBSD')
+    @unittest.skip("Fails on FreeBSD")
     def test_still_running(self):
-        main, = interpreters.list_all()
+        (main,) = interpreters.list_all()
         interp = interpreters.create()
         with _running(interp):
             with self.assertRaises(RuntimeError):
@@ -442,7 +457,7 @@ class TestInterpreterClose(TestBase):
         r_interp, w_interp = self.os_pipe()
         r_thread, w_thread = self.os_pipe()
 
-        FINISHED = b'F'
+        FINISHED = b"F"
 
         interp = interpreters.create()
         interp.run(f"""if True:
@@ -471,7 +486,6 @@ class TestInterpreterClose(TestBase):
 
 
 class TestInterpreterRun(TestBase):
-
     def test_success(self):
         interp = interpreters.create()
         script, file = _captured_script('print("it worked!", end="")')
@@ -479,12 +493,13 @@ class TestInterpreterRun(TestBase):
             interp.run(script)
             out = file.read()
 
-        self.assertEqual(out, 'it worked!')
+        self.assertEqual(out, "it worked!")
 
     def test_in_thread(self):
         interp = interpreters.create()
         script, file = _captured_script('print("it worked!", end="")')
         with file:
+
             def f():
                 interp.run(script)
 
@@ -493,17 +508,18 @@ class TestInterpreterRun(TestBase):
             t.join()
             out = file.read()
 
-        self.assertEqual(out, 'it worked!')
+        self.assertEqual(out, "it worked!")
 
     @support.requires_fork()
     def test_fork(self):
         interp = interpreters.create()
         import tempfile
-        with tempfile.NamedTemporaryFile('w+', encoding='utf-8') as file:
-            file.write('')
+
+        with tempfile.NamedTemporaryFile("w+", encoding="utf-8") as file:
+            file.write("")
             file.flush()
 
-            expected = 'spam spam spam spam spam'
+            expected = "spam spam spam spam spam"
             script = dedent(f"""
                 import os
                 try:
@@ -518,7 +534,7 @@ class TestInterpreterRun(TestBase):
             content = file.read()
             self.assertEqual(content, expected)
 
-    @unittest.skip('Fails on FreeBSD')
+    @unittest.skip("Fails on FreeBSD")
     def test_already_running(self):
         interp = interpreters.create()
         with _running(interp):
@@ -549,9 +565,9 @@ class TestInterpreterRun(TestBase):
         r_interp, w_interp = self.os_pipe()
         r_thread, w_thread = self.os_pipe()
 
-        RAN = b'R'
-        DONE = b'D'
-        FINISHED = b'F'
+        RAN = b"R"
+        DONE = b"D"
+        FINISHED = b"F"
 
         interp = interpreters.create()
         interp.run(f"""if True:
@@ -571,7 +587,7 @@ class TestInterpreterRun(TestBase):
             """)
 
         os.write(w_thread, DONE)
-        interp.run('t.join()')
+        interp.run("t.join()")
         self.assertEqual(os.read(r_interp, 1), RAN)
         self.assertEqual(os.read(r_interp, 1), RAN)
         self.assertEqual(os.read(r_interp, 1), FINISHED)
@@ -579,32 +595,34 @@ class TestInterpreterRun(TestBase):
     # test_xxsubinterpreters covers the remaining Interpreter.run() behavior.
 
 
-@unittest.skip('these are crashing, likely just due just to _xxsubinterpreters (see gh-105699)')
+@unittest.skip(
+    "these are crashing, likely just due just to _xxsubinterpreters (see gh-105699)"
+)
 class StressTests(TestBase):
-
     # In these tests we generally want a lot of interpreters,
     # but not so many that any test takes too long.
 
-    @support.requires_resource('cpu')
+    @support.requires_resource("cpu")
     def test_create_many_sequential(self):
         alive = []
         for _ in range(100):
             interp = interpreters.create()
             alive.append(interp)
 
-    @support.requires_resource('cpu')
+    @support.requires_resource("cpu")
     def test_create_many_threaded(self):
         alive = []
+
         def task():
             interp = interpreters.create()
             alive.append(interp)
+
         threads = (threading.Thread(target=task) for _ in range(200))
         with threading_helper.start_threads(threads):
             pass
 
 
 class StartupTests(TestBase):
-
     # We want to ensure the initial state of subinterpreters
     # matches expectations.
 
@@ -621,26 +639,27 @@ class StartupTests(TestBase):
                     if self._subtest_count == 1:
                         # The first subtest adds a leading newline, so we
                         # compensate here by not printing a trailing newline.
-                        print('### end subtest debug ###', end='')
+                        print("### end subtest debug ###", end="")
                     else:
-                        print('### end subtest debug ###')
+                        print("### end subtest debug ###")
                 self._debugged_in_subtest = False
 
     def debug(self, msg, *, header=None):
         if header:
-            self._debug(f'--- {header} ---')
+            self._debug(f"--- {header} ---")
             if msg:
                 if msg.endswith(os.linesep):
-                    self._debug(msg[:-len(os.linesep)])
+                    self._debug(msg[: -len(os.linesep)])
                 else:
                     self._debug(msg)
-                    self._debug('<no newline>')
-            self._debug('------')
+                    self._debug("<no newline>")
+            self._debug("------")
         else:
             self._debug(msg)
 
     _debugged = False
     _debugged_in_subtest = False
+
     def _debug(self, msg):
         if not self._debugged:
             print()
@@ -649,14 +668,15 @@ class StartupTests(TestBase):
             if True:
                 if not self._debugged_in_subtest:
                     self._debugged_in_subtest = True
-                    print('### start subtest debug ###')
+                    print("### start subtest debug ###")
                 print(msg)
         else:
             print(msg)
 
     def create_temp_dir(self):
         import tempfile
-        tmp = tempfile.mkdtemp(prefix='test_interpreters_')
+
+        tmp = tempfile.mkdtemp(prefix="test_interpreters_")
         tmp = os.path.realpath(tmp)
         self.addCleanup(os_helper.rmtree, tmp)
         return tmp
@@ -666,7 +686,7 @@ class StartupTests(TestBase):
         dirname = os.path.dirname(filename)
         if dirname:
             os.makedirs(dirname, exist_ok=True)
-        with open(filename, 'w', encoding='utf-8') as outfile:
+        with open(filename, "w", encoding="utf-8") as outfile:
             outfile.write(dedent(text))
         return filename
 
@@ -676,6 +696,7 @@ class StartupTests(TestBase):
         # EmbeddingTestsMixin.run_embedded_interpreter() in test_embed.py.
         import shlex
         import subprocess
+
         if isinstance(argv, str):
             argv = shlex.split(argv)
         argv = [sys.executable, *argv]
@@ -687,21 +708,21 @@ class StartupTests(TestBase):
                 text=True,
             )
         except Exception as exc:
-            self.debug(f'# cmd: {shlex.join(argv)}')
+            self.debug(f"# cmd: {shlex.join(argv)}")
             if isinstance(exc, FileNotFoundError) and not exc.filename:
                 if os.path.exists(argv[0]):
-                    exists = 'exists'
+                    exists = "exists"
                 else:
-                    exists = 'does not exist'
-                self.debug(f'{argv[0]} {exists}')
+                    exists = "does not exist"
+                self.debug(f"{argv[0]} {exists}")
             raise  # re-raise
-        assert proc.stderr == '' or proc.returncode != 0, proc.stderr
+        assert proc.stderr == "" or proc.returncode != 0, proc.stderr
         if proc.returncode != 0 and support.verbose:
-            self.debug(f'# python3 {shlex.join(argv[1:])} failed:')
-            self.debug(proc.stdout, header='stdout')
-            self.debug(proc.stderr, header='stderr')
+            self.debug(f"# python3 {shlex.join(argv[1:])} failed:")
+            self.debug(proc.stdout, header="stdout")
+            self.debug(proc.stderr, header="stderr")
         self.assertEqual(proc.returncode, 0)
-        self.assertEqual(proc.stderr, '')
+        self.assertEqual(proc.stderr, "")
         return proc.stdout
 
     def test_sys_path_0(self):
@@ -729,38 +750,42 @@ class StartupTests(TestBase):
         #     script.py
         #   script.py
         cwd = self.create_temp_dir()
-        self.write_script(cwd, 'pkg', '__init__.py', text='')
-        self.write_script(cwd, 'pkg', '__main__.py', text=script)
-        self.write_script(cwd, 'pkg', 'script.py', text=script)
-        self.write_script(cwd, 'script.py', text=script)
+        self.write_script(cwd, "pkg", "__init__.py", text="")
+        self.write_script(cwd, "pkg", "__main__.py", text=script)
+        self.write_script(cwd, "pkg", "script.py", text=script)
+        self.write_script(cwd, "script.py", text=script)
 
         cases = [
-            ('script.py', cwd),
-            ('-m script', cwd),
-            ('-m pkg', cwd),
-            ('-m pkg.script', cwd),
-            ('-c "import script"', ''),
+            ("script.py", cwd),
+            ("-m script", cwd),
+            ("-m pkg", cwd),
+            ("-m pkg.script", cwd),
+            ('-c "import script"', ""),
         ]
         for argv, expected in cases:
-            with self.subTest(f'python3 {argv}'):
+            with self.subTest(f"python3 {argv}"):
                 out = self.run_python(argv, cwd=cwd)
                 data = json.loads(out)
-                sp0_main, sp0_sub = data['main'], data['sub']
+                sp0_main, sp0_sub = data["main"], data["sub"]
                 self.assertEqual(sp0_sub, sp0_main)
                 self.assertEqual(sp0_sub, expected)
 
 
 class FinalizationTests(TestBase):
-
     def test_gh_109793(self):
         import subprocess
-        argv = [sys.executable, '-c', '''if True:
+
+        argv = [
+            sys.executable,
+            "-c",
+            """if True:
             import _xxsubinterpreters as _interpreters
             interpid = _interpreters.create()
             raise Exception
-            ''']
+            """,
+        ]
         proc = subprocess.run(argv, capture_output=True, text=True)
-        self.assertIn('Traceback', proc.stderr)
+        self.assertIn("Traceback", proc.stderr)
         if proc.returncode == 0 and support.verbose:
             print()
             print("--- cmd unexpected succeeded ---")
@@ -771,17 +796,16 @@ class FinalizationTests(TestBase):
 
 
 class TestIsShareable(TestBase):
-
     def test_default_shareables(self):
         shareables = [
-                # singletons
-                None,
-                # builtin objects
-                b'spam',
-                'spam',
-                10,
-                -10,
-                ]
+            # singletons
+            None,
+            # builtin objects
+            b"spam",
+            "spam",
+            10,
+            -10,
+        ]
         for obj in shareables:
             with self.subTest(obj):
                 shareable = interpreters.is_shareable(obj)
@@ -791,6 +815,7 @@ class TestIsShareable(TestBase):
         class Cheese:
             def __init__(self, name):
                 self.name = name
+
             def __str__(self):
                 return self.name
 
@@ -798,30 +823,28 @@ class TestIsShareable(TestBase):
             """A subclass of a shareable type."""
 
         not_shareables = [
-                # singletons
-                True,
-                False,
-                NotImplemented,
-                ...,
-                # builtin types and objects
-                type,
-                object,
-                object(),
-                Exception(),
-                100.0,
-                # user-defined types and objects
-                Cheese,
-                Cheese('Wensleydale'),
-                SubBytes(b'spam'),
-                ]
+            # singletons
+            True,
+            False,
+            NotImplemented,
+            ...,
+            # builtin types and objects
+            type,
+            object,
+            object(),
+            Exception(),
+            100.0,
+            # user-defined types and objects
+            Cheese,
+            Cheese("Wensleydale"),
+            SubBytes(b"spam"),
+        ]
         for obj in not_shareables:
             with self.subTest(repr(obj)):
-                self.assertFalse(
-                    interpreters.is_shareable(obj))
+                self.assertFalse(interpreters.is_shareable(obj))
 
 
 class TestChannels(TestBase):
-
     def test_create(self):
         r, s = interpreters.create_channel()
         self.assertIsInstance(r, interpreters.RecvChannel)
@@ -838,7 +861,6 @@ class TestChannels(TestBase):
 
 
 class TestRecvChannelAttrs(TestBase):
-
     def test_id_type(self):
         rch, _ = interpreters.create_channel()
         self.assertIsInstance(rch.id, _channels.ChannelID)
@@ -848,7 +870,7 @@ class TestRecvChannelAttrs(TestBase):
         self.assertEqual(rch.id, 1)
 
         with self.assertRaises(TypeError):
-            interpreters.RecvChannel('1')
+            interpreters.RecvChannel("1")
 
     def test_id_readonly(self):
         rch = interpreters.RecvChannel(1)
@@ -863,7 +885,6 @@ class TestRecvChannelAttrs(TestBase):
 
 
 class TestSendChannelAttrs(TestBase):
-
     def test_id_type(self):
         _, sch = interpreters.create_channel()
         self.assertIsInstance(sch.id, _channels.ChannelID)
@@ -873,7 +894,7 @@ class TestSendChannelAttrs(TestBase):
         self.assertEqual(sch.id, 1)
 
         with self.assertRaises(TypeError):
-            interpreters.SendChannel('1')
+            interpreters.SendChannel("1")
 
     def test_id_readonly(self):
         sch = interpreters.SendChannel(1)
@@ -888,10 +909,9 @@ class TestSendChannelAttrs(TestBase):
 
 
 class TestSendRecv(TestBase):
-
     def test_send_recv_main(self):
         r, s = interpreters.create_channel()
-        orig = b'spam'
+        orig = b"spam"
         s.send_nowait(orig)
         obj = r.recv()
 
@@ -900,7 +920,8 @@ class TestSendRecv(TestBase):
 
     def test_send_recv_same_interpreter(self):
         interp = interpreters.create()
-        interp.run(dedent("""
+        interp.run(
+            dedent("""
             from test.support import interpreters
             r, s = interpreters.create_channel()
             orig = b'spam'
@@ -908,13 +929,14 @@ class TestSendRecv(TestBase):
             obj = r.recv()
             assert obj == orig, 'expected: obj == orig'
             assert obj is not orig, 'expected: obj is not orig'
-            """))
+            """)
+        )
 
-    @unittest.skip('broken (see BPO-...)')
+    @unittest.skip("broken (see BPO-...)")
     def test_send_recv_different_interpreters(self):
         r1, s1 = interpreters.create_channel()
         r2, s2 = interpreters.create_channel()
-        orig1 = b'spam'
+        orig1 = b"spam"
         s1.send_nowait(orig1)
         out = _run_output(
             interpreters.create(),
@@ -928,10 +950,10 @@ class TestSendRecv(TestBase):
                 s.send_nowait(orig2)
                 """),
             channels=dict(r=r1, s=s2),
-            )
+        )
         obj2 = r2.recv()
 
-        self.assertEqual(obj2, b'eggs')
+        self.assertEqual(obj2, b"eggs")
         self.assertNotEqual(id(obj2), int(out))
 
     def test_send_recv_different_threads(self):
@@ -945,10 +967,11 @@ class TestSendRecv(TestBase):
                 except interpreters.ChannelEmptyError:
                     time.sleep(0.1)
             s.send(obj)
+
         t = threading.Thread(target=f)
         t.start()
 
-        orig = b'spam'
+        orig = b"spam"
         s.send(orig)
         t.join()
         obj = r.recv()
@@ -958,7 +981,7 @@ class TestSendRecv(TestBase):
 
     def test_send_recv_nowait_main(self):
         r, s = interpreters.create_channel()
-        orig = b'spam'
+        orig = b"spam"
         s.send_nowait(orig)
         obj = r.recv_nowait()
 
@@ -973,7 +996,8 @@ class TestSendRecv(TestBase):
 
     def test_send_recv_nowait_same_interpreter(self):
         interp = interpreters.create()
-        interp.run(dedent("""
+        interp.run(
+            dedent("""
             from test.support import interpreters
             r, s = interpreters.create_channel()
             orig = b'spam'
@@ -982,13 +1006,14 @@ class TestSendRecv(TestBase):
             assert obj == orig, 'expected: obj == orig'
             # When going back to the same interpreter we get the same object.
             assert obj is not orig, 'expected: obj is not orig'
-            """))
+            """)
+        )
 
-    @unittest.skip('broken (see BPO-...)')
+    @unittest.skip("broken (see BPO-...)")
     def test_send_recv_nowait_different_interpreters(self):
         r1, s1 = interpreters.create_channel()
         r2, s2 = interpreters.create_channel()
-        orig1 = b'spam'
+        orig1 = b"spam"
         s1.send_nowait(orig1)
         out = _run_output(
             interpreters.create(),
@@ -1002,10 +1027,10 @@ class TestSendRecv(TestBase):
                 s.send_nowait(orig2)
                 """),
             channels=dict(r=r1, s=s2),
-            )
+        )
         obj2 = r2.recv_nowait()
 
-        self.assertEqual(obj2, b'eggs')
+        self.assertEqual(obj2, b"eggs")
         self.assertNotEqual(id(obj2), int(out))
 
     def test_recv_channel_does_not_exist(self):
@@ -1016,7 +1041,7 @@ class TestSendRecv(TestBase):
     def test_send_channel_does_not_exist(self):
         ch = interpreters.SendChannel(1_000_000)
         with self.assertRaises(interpreters.ChannelNotFoundError):
-            ch.send(b'spam')
+            ch.send(b"spam")
 
     def test_recv_nowait_channel_does_not_exist(self):
         ch = interpreters.RecvChannel(1_000_000)
@@ -1026,7 +1051,7 @@ class TestSendRecv(TestBase):
     def test_send_nowait_channel_does_not_exist(self):
         ch = interpreters.SendChannel(1_000_000)
         with self.assertRaises(interpreters.ChannelNotFoundError):
-            ch.send_nowait(b'spam')
+            ch.send_nowait(b"spam")
 
     def test_recv_nowait_empty(self):
         ch, _ = interpreters.create_channel()
@@ -1039,8 +1064,8 @@ class TestSendRecv(TestBase):
         obj1 = rch.recv_nowait(default)
         sch.send_nowait(None)
         sch.send_nowait(1)
-        sch.send_nowait(b'spam')
-        sch.send_nowait(b'eggs')
+        sch.send_nowait(b"spam")
+        sch.send_nowait(b"eggs")
         obj2 = rch.recv_nowait(default)
         obj3 = rch.recv_nowait(default)
         obj4 = rch.recv_nowait()
@@ -1050,8 +1075,8 @@ class TestSendRecv(TestBase):
         self.assertIs(obj1, default)
         self.assertIs(obj2, None)
         self.assertEqual(obj3, 1)
-        self.assertEqual(obj4, b'spam')
-        self.assertEqual(obj5, b'eggs')
+        self.assertEqual(obj4, b"spam")
+        self.assertEqual(obj5, b"eggs")
         self.assertIs(obj6, default)
 
 

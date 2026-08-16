@@ -15,8 +15,8 @@ CRASHER_FILES = os.path.join(glob.escape(CRASHER_DIR), "*.py")
 
 infinite_loops = ["infinite_loop_re.py", "nasty_eq_vs_dict.py"]
 
-class CrasherTest(unittest.TestCase):
 
+class CrasherTest(unittest.TestCase):
     @unittest.skip("these tests are too fragile")
     @test.support.cpython_only
     def test_crashers_crash(self):
@@ -32,6 +32,7 @@ class CrasherTest(unittest.TestCase):
 
 def tearDownModule():
     test.support.reap_children()
+
 
 if __name__ == "__main__":
     unittest.main()

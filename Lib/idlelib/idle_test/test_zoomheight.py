@@ -1,18 +1,18 @@
 "Test zoomheight, coverage 66%."
 # Some code is system dependent.
 
-from idlelib import zoomheight
 import unittest
-from test.support import requires
-from tkinter import Tk
+from idlelib import zoomheight
 from idlelib.editor import EditorWindow
+from tkinter import Tk
+
+from test.support import requires
 
 
 class Test(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
-        requires('gui')
+        requires("gui")
         cls.root = Tk()
         cls.root.withdraw()
         cls.editwin = EditorWindow(root=cls.root)
@@ -21,7 +21,7 @@ class Test(unittest.TestCase):
     def tearDownClass(cls):
         cls.editwin._close()
         cls.root.update_idletasks()
-        for id in cls.root.tk.call('after', 'info'):
+        for id in cls.root.tk.call("after", "info"):
             cls.root.after_cancel(id)  # Need for EditorWindow.
         cls.root.destroy()
         del cls.root
@@ -35,5 +35,5 @@ class Test(unittest.TestCase):
         zoom.zoom_height_event()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -1,13 +1,11 @@
 """Support for running coroutines in parallel with staggered start times."""
 
-__all__ = 'staggered_race',
+__all__ = ("staggered_race",)
 
 import contextlib
 
-from . import events
+from . import events, locks, tasks
 from . import exceptions as exceptions_mod
-from . import locks
-from . import tasks
 
 
 async def staggered_race(coro_fns, delay, *, loop=None):
@@ -86,7 +84,7 @@ async def staggered_race(coro_fns, delay, *, loop=None):
         exc = task.exception()
         if exc is None:
             return
-        unhandled_exceptions.append(exc)
+        unhandled_exceptions.append(exc)  # noqa: F821
 
     async def run_one_coro(ok_to_start, previous_failed) -> None:
         # in eager tasks this waits for the calling task to append this task
@@ -116,15 +114,15 @@ async def staggered_race(coro_fns, delay, *, loop=None):
         # start.
         next_ok_to_start.set()
         # Prepare place to put this coroutine's exceptions if not won
-        exceptions.append(None)
-        assert len(exceptions) == this_index + 1
+        exceptions.append(None)  # noqa: F821
+        assert len(exceptions) == this_index + 1  # noqa: F821
 
         try:
             result = await coro_fn()
         except (SystemExit, KeyboardInterrupt):
             raise
-        except BaseException as e:
-            exceptions[this_index] = e
+        except BaseException as e:  # noqa: BLE001
+            exceptions[this_index] = e  # noqa: F821
             this_failed.set()  # Kickstart the next coroutine
         else:
             # Store winner's results
@@ -166,7 +164,7 @@ async def staggered_race(coro_fns, delay, *, loop=None):
         if __debug__ and unhandled_exceptions:
             # If run_one_coro raises an unhandled exception, it's probably a
             # programming error, and I want to see it.
-            raise ExceptionGroup("staggered race failed", unhandled_exceptions)
+            raise ExceptionGroup("staggered race failed", unhandled_exceptions)  # noqa: F821
         if propagate_cancellation_error is not None:
             raise propagate_cancellation_error
         return winner_result, winner_index, exceptions

@@ -13,12 +13,14 @@ how this parsing engine works.
 # Local imports
 from . import token
 
+
 class ParseError(Exception):
     """Exception to signal the parser is stuck."""
 
     def __init__(self, msg, type, value, context):
-        Exception.__init__(self, "%s: type=%r, value=%r, context=%r" %
-                           (msg, type, value, context))
+        Exception.__init__(
+            self, f"{msg}: type={type!r}, value={value!r}, context={context!r}"
+        )
         self.msg = msg
         self.type = type
         self.value = value
@@ -27,7 +29,8 @@ class ParseError(Exception):
     def __reduce__(self):
         return type(self), (self.msg, self.type, self.value, self.context)
 
-class Parser(object):
+
+class Parser:
     """Parser engine.
 
     The proper usage sequence is:
@@ -111,7 +114,7 @@ class Parser(object):
         stackentry = (self.grammar.dfas[start], 0, newnode)
         self.stack = [stackentry]
         self.rootnode = None
-        self.used_names = set() # Aliased to self.rootnode.used_names in pop()
+        self.used_names = set()  # Aliased to self.rootnode.used_names in pop()
 
     def addtoken(self, type, value, context):
         """Add a token; return True iff this is the end of the program."""
@@ -119,12 +122,12 @@ class Parser(object):
         ilabel = self.classify(type, value, context)
         # Loop until the token is shifted; may raise exceptions
         while True:
-            dfa, state, node = self.stack[-1]
-            states, first = dfa
+            dfa, state, node = self.stack[-1]  # noqa: RUF059
+            states, first = dfa  # noqa: RUF059
             arcs = states[state]
             # Look for a state with this label
             for i, newstate in arcs:
-                t, v = self.grammar.labels[i]
+                t, _v = self.grammar.labels[i]
                 if ilabel == i:
                     # Look it up in the list of labels
                     assert t < 256
@@ -137,26 +140,25 @@ class Parser(object):
                         if not self.stack:
                             # Done parsing!
                             return True
-                        dfa, state, node = self.stack[-1]
-                        states, first = dfa
+                        dfa, state, _node = self.stack[-1]
+                        states, _first = dfa
                     # Done with this token
                     return False
                 elif t >= 256:
                     # See if it's a symbol and if we're in its first set
                     itsdfa = self.grammar.dfas[t]
-                    itsstates, itsfirst = itsdfa
+                    _itsstates, itsfirst = itsdfa
                     if ilabel in itsfirst:
                         # Push a symbol
                         self.push(t, self.grammar.dfas[t], newstate, context)
-                        break # To continue the outer while loop
+                        break  # To continue the outer while loop
             else:
                 if (0, state) in arcs:
                     # An accepting state, pop it and try something else
                     self.pop()
                     if not self.stack:
                         # Done parsing, but another token is input
-                        raise ParseError("too much input",
-                                         type, value, context)
+                        raise ParseError("too much input", type, value, context)
                 else:
                     # No success finding a transition
                     raise ParseError("bad input", type, value, context)
@@ -177,7 +179,7 @@ class Parser(object):
 
     def shift(self, type, value, newstate, context):
         """Shift a token.  (Internal)"""
-        dfa, state, node = self.stack[-1]
+        dfa, _state, node = self.stack[-1]
         newnode = (type, value, context, None)
         newnode = self.convert(self.grammar, newnode)
         if newnode is not None:
@@ -186,18 +188,18 @@ class Parser(object):
 
     def push(self, type, newdfa, newstate, context):
         """Push a nonterminal.  (Internal)"""
-        dfa, state, node = self.stack[-1]
+        dfa, _state, node = self.stack[-1]
         newnode = (type, None, context, [])
         self.stack[-1] = (dfa, newstate, node)
         self.stack.append((newdfa, 0, newnode))
 
     def pop(self):
         """Pop a nonterminal.  (Internal)"""
-        popdfa, popstate, popnode = self.stack.pop()
+        _popdfa, _popstate, popnode = self.stack.pop()
         newnode = self.convert(self.grammar, popnode)
         if newnode is not None:
             if self.stack:
-                dfa, state, node = self.stack[-1]
+                _dfa, _state, node = self.stack[-1]
                 node[-1].append(newnode)
             else:
                 self.rootnode = newnode

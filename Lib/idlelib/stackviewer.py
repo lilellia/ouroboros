@@ -2,11 +2,10 @@
 
 import linecache
 import os
-
 import tkinter as tk
-
 from idlelib.debugobj import ObjectTreeItem, make_objecttreeitem
-from idlelib.tree import TreeNode, TreeItem, ScrolledCanvas
+from idlelib.tree import ScrolledCanvas, TreeItem, TreeNode
+
 
 def StackBrowser(root, exc, flist=None, top=None):
     global sc, item, node  # For testing.
@@ -20,11 +19,10 @@ def StackBrowser(root, exc, flist=None, top=None):
 
 
 class StackTreeItem(TreeItem):
-
     def __init__(self, exc, flist=None):
         self.flist = flist
         self.stack = self.get_stack(None if exc is None else exc.__traceback__)
-        self.text = f"{type(exc).__name__}: {str(exc)}"
+        self.text = f"{type(exc).__name__}: {exc!s}"
 
     def get_stack(self, tb):
         stack = []
@@ -47,7 +45,6 @@ class StackTreeItem(TreeItem):
 
 
 class FrameTreeItem(TreeItem):
-
     def __init__(self, info, flist):
         self.info = info
         self.flist = flist
@@ -56,7 +53,7 @@ class FrameTreeItem(TreeItem):
         frame, lineno = self.info
         try:
             modname = frame.f_globals["__name__"]
-        except:
+        except:  # noqa: E722
             modname = "?"
         code = frame.f_code
         filename = code.co_filename
@@ -64,14 +61,13 @@ class FrameTreeItem(TreeItem):
         sourceline = linecache.getline(filename, lineno)
         sourceline = sourceline.strip()
         if funcname in ("?", "", None):
-            item = "%s, line %d: %s" % (modname, lineno, sourceline)
+            item = "%s, line %d: %s" % (modname, lineno, sourceline)  # noqa: UP031
         else:
-            item = "%s.%s(...), line %d: %s" % (modname, funcname,
-                                             lineno, sourceline)
+            item = "%s.%s(...), line %d: %s" % (modname, funcname, lineno, sourceline)  # noqa: UP031
         return item
 
     def GetSubList(self):
-        frame, lineno = self.info
+        frame, _lineno = self.info
         sublist = []
         if frame.f_globals is not frame.f_locals:
             item = VariablesTreeItem("<locals>", frame.f_locals, self.flist)
@@ -89,7 +85,6 @@ class FrameTreeItem(TreeItem):
 
 
 class VariablesTreeItem(ObjectTreeItem):
-
     def GetText(self):
         return self.labeltext
 
@@ -101,13 +96,15 @@ class VariablesTreeItem(ObjectTreeItem):
 
     def GetSubList(self):
         sublist = []
-        for key in self.object.keys():  # self.object not necessarily dict.
+        for key in self.object:  # self.object not necessarily dict.
             try:
                 value = self.object[key]
             except KeyError:
                 continue
+
             def setfunction(value, key=key, object_=self.object):
                 object_[key] = value
+
             item = make_objecttreeitem(key + " =", value, setfunction)
             sublist.append(item)
         return sublist
@@ -115,20 +112,23 @@ class VariablesTreeItem(ObjectTreeItem):
 
 def _stackbrowser(parent):  # htest #
     from idlelib.pyshell import PyShellFileList
+
     top = tk.Toplevel(parent)
     top.title("Test StackViewer")
-    x, y = map(int, parent.geometry().split('+')[1:])
-    top.geometry("+%d+%d" % (x + 50, y + 175))
+    x, y = map(int, parent.geometry().split("+")[1:])
+    top.geometry("+%d+%d" % (x + 50, y + 175))  # noqa: UP031
     flist = PyShellFileList(top)
-    try: # to obtain a traceback object
-        intentional_name_error
+    try:  # to obtain a traceback object
+        intentional_name_error  # noqa: B018
     except NameError as e:
         StackBrowser(top, e, flist=flist, top=top)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from unittest import main
-    main('idlelib.idle_test.test_stackviewer', verbosity=2, exit=False)
+
+    main("idlelib.idle_test.test_stackviewer", verbosity=2, exit=False)
 
     from idlelib.idle_test.htest import run
+
     run(_stackbrowser)

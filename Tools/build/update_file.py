@@ -24,69 +24,69 @@ def updating_file_with_tmpfile(filename, tmpfile=None):
     """
     # XXX Optionally use tempfile.TemporaryFile?
     if not tmpfile:
-        tmpfile = filename + '.tmp'
+        tmpfile = filename + ".tmp"
     elif os.path.isdir(tmpfile):
-        tmpfile = os.path.join(tmpfile, filename + '.tmp')
+        tmpfile = os.path.join(tmpfile, filename + ".tmp")
 
-    with open(filename, 'rb') as infile:
+    with open(filename, "rb") as infile:
         line = infile.readline()
 
-    if line.endswith(b'\r\n'):
+    if line.endswith(b"\r\n"):
         newline = "\r\n"
-    elif line.endswith(b'\r'):
+    elif line.endswith(b"\r"):
         newline = "\r"
-    elif line.endswith(b'\n'):
+    elif line.endswith(b"\n"):
         newline = "\n"
     else:
         raise ValueError(f"unknown end of line: {filename}: {line!a}")
 
-    with open(tmpfile, 'w', newline=newline) as outfile:
-        with open(filename) as infile:
-            yield infile, outfile
+    with open(tmpfile, "w", newline=newline) as outfile, open(filename) as infile:
+        yield infile, outfile
     update_file_with_tmpfile(filename, tmpfile)
 
 
 def update_file_with_tmpfile(filename, tmpfile, *, create=False):
     try:
-        targetfile = open(filename, 'rb')
+        targetfile = open(filename, "rb")  # noqa: SIM115
     except FileNotFoundError:
         if not create:
             raise  # re-raise
-        outcome = 'created'
+        outcome = "created"
         os.replace(tmpfile, filename)
     else:
         with targetfile:
             old_contents = targetfile.read()
-        with open(tmpfile, 'rb') as f:
+        with open(tmpfile, "rb") as f:
             new_contents = f.read()
         # Now compare!
         if old_contents != new_contents:
-            outcome = 'updated'
+            outcome = "updated"
             os.replace(tmpfile, filename)
         else:
-            outcome = 'same'
+            outcome = "same"
             os.unlink(tmpfile)
     return outcome
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import argparse
+
     parser = argparse.ArgumentParser()
-    parser.add_argument('--create', action='store_true')
-    parser.add_argument('--exitcode', action='store_true')
-    parser.add_argument('filename', help='path to be updated')
-    parser.add_argument('tmpfile', help='path with new contents')
+    parser.add_argument("--create", action="store_true")
+    parser.add_argument("--exitcode", action="store_true")
+    parser.add_argument("filename", help="path to be updated")
+    parser.add_argument("tmpfile", help="path with new contents")
     args = parser.parse_args()
     kwargs = vars(args)
-    setexitcode = kwargs.pop('exitcode')
+    setexitcode = kwargs.pop("exitcode")
 
     outcome = update_file_with_tmpfile(**kwargs)
     if setexitcode:
-        if outcome == 'same':
+        if outcome == "same":
             sys.exit(0)
-        elif outcome == 'updated':
+        elif outcome == "updated":
             sys.exit(1)
-        elif outcome == 'created':
+        elif outcome == "created":
             sys.exit(2)
         else:
             raise NotImplementedError

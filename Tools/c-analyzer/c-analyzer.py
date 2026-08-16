@@ -1,5 +1,4 @@
-from cpython.__main__ import parse_args, main, configure_logger
-
+from cpython.__main__ import configure_logger, main, parse_args
 
 cmd, cmd_kwargs, verbosity, traceback_cm = parse_args()
 configure_logger(verbosity)

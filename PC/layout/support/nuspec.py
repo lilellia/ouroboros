@@ -18,13 +18,13 @@ NUSPEC_DATA = {
     "GIT": sys._git,
 }
 
-NUSPEC_PLATFORM_DATA = dict(
-    _keys=("PYTHON_BITNESS", "PACKAGENAME", "PACKAGETITLE"),
-    win32=("32-bit", "pythonx86", "Python (32-bit)"),
-    amd64=("64-bit", "python", "Python"),
-    arm32=("ARM", "pythonarm", "Python (ARM)"),
-    arm64=("ARM64", "pythonarm64", "Python (ARM64)"),
-)
+NUSPEC_PLATFORM_DATA = {
+    "_keys": ("PYTHON_BITNESS", "PACKAGENAME", "PACKAGETITLE"),
+    "win32": ("32-bit", "pythonx86", "Python (32-bit)"),
+    "amd64": ("64-bit", "python", "Python"),
+    "arm32": ("ARM", "pythonarm", "Python (ARM)"),
+    "arm64": ("ARM64", "pythonarm64", "Python (ARM64)"),
+}
 
 if not NUSPEC_DATA["PYTHON_VERSION"]:
     NUSPEC_DATA["PYTHON_VERSION"] = "{}.{}{}{}".format(

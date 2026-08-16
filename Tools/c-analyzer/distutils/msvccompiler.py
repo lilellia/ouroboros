@@ -8,10 +8,11 @@ for the Microsoft Visual Studio.
 # hacked by Robin Becker and Thomas Heller to do a better job of
 #   finding DevStudio (through the registry)
 
-import sys, os
-from distutils.errors import DistutilsPlatformError
-from distutils.ccompiler import CCompiler
+import os
+import sys
 from distutils import log
+from distutils.ccompiler import CCompiler
+from distutils.errors import DistutilsPlatformError
 
 _can_read_reg = False
 try:
@@ -29,6 +30,7 @@ except ImportError:
     try:
         import win32api
         import win32con
+
         _can_read_reg = True
         hkey_mod = win32con
 
@@ -37,16 +39,21 @@ except ImportError:
         RegEnumValue = win32api.RegEnumValue
         RegError = win32api.error
     except ImportError:
-        log.info("Warning: Can't read registry to find the "
-                 "necessary compiler setting\n"
-                 "Make sure that Python modules winreg, "
-                 "win32api or win32con are installed.")
+        log.info(
+            "Warning: Can't read registry to find the "
+            "necessary compiler setting\n"
+            "Make sure that Python modules winreg, "
+            "win32api or win32con are installed."
+        )
 
 if _can_read_reg:
-    HKEYS = (hkey_mod.HKEY_USERS,
-             hkey_mod.HKEY_CURRENT_USER,
-             hkey_mod.HKEY_LOCAL_MACHINE,
-             hkey_mod.HKEY_CLASSES_ROOT)
+    HKEYS = (
+        hkey_mod.HKEY_USERS,
+        hkey_mod.HKEY_CURRENT_USER,
+        hkey_mod.HKEY_LOCAL_MACHINE,
+        hkey_mod.HKEY_CLASSES_ROOT,
+    )
+
 
 def read_keys(base, key):
     """Return list of registry keys."""
@@ -65,6 +72,7 @@ def read_keys(base, key):
         i += 1
     return L
 
+
 def read_values(base, key):
     """Return dict of registry keys and values.
 
@@ -78,13 +86,14 @@ def read_values(base, key):
     i = 0
     while True:
         try:
-            name, value, type = RegEnumValue(handle, i)
+            name, value, _type = RegEnumValue(handle, i)
         except RegError:
             break
         name = name.lower()
         d[convert_mbcs(name)] = convert_mbcs(value)
         i += 1
     return d
+
 
 def convert_mbcs(s):
     dec = getattr(s, "decode", None)
@@ -95,6 +104,7 @@ def convert_mbcs(s):
             pass
     return s
 
+
 class MacroExpander:
     def __init__(self, version):
         self.macros = {}
@@ -104,11 +114,11 @@ class MacroExpander:
         for base in HKEYS:
             d = read_values(base, path)
             if d:
-                self.macros["$(%s)" % macro] = d[key]
+                self.macros[f"$({macro})"] = d[key]
                 break
 
     def load_macros(self, version):
-        vsbase = r"Software\Microsoft\VisualStudio\%0.1f" % version
+        vsbase = rf"Software\Microsoft\VisualStudio\{version:0.1f}"
         self.set_macro("VCInstallDir", vsbase + r"\Setup\VC", "productdir")
         self.set_macro("VSInstallDir", vsbase + r"\Setup\VS", "productdir")
         net = r"Software\Microsoft\.NETFramework"
@@ -118,12 +128,13 @@ class MacroExpander:
                 self.set_macro("FrameworkSDKDir", net, "sdkinstallrootv1.1")
             else:
                 self.set_macro("FrameworkSDKDir", net, "sdkinstallroot")
-        except KeyError as exc: #
+        except KeyError:
             raise DistutilsPlatformError(
-            """Python was built with Visual Studio 2003;
+                """Python was built with Visual Studio 2003;
 extensions must be built with a compiler than can generate compatible binaries.
 Visual Studio 2003 was not found on this system. If you have Cygwin installed,
-you can try compiling with MingW32, by passing "-c mingw32" to setup.py.""")
+you can try compiling with MingW32, by passing "-c mingw32" to setup.py."""
+            )
 
         p = r"Software\Microsoft\NET Framework Setup\Product"
         for base in HKEYS:
@@ -132,13 +143,14 @@ you can try compiling with MingW32, by passing "-c mingw32" to setup.py.""")
             except RegError:
                 continue
             key = RegEnumKey(h, 0)
-            d = read_values(base, r"%s\%s" % (p, key))
+            d = read_values(base, rf"{p}\{key}")
             self.macros["$(FrameworkVersion)"] = d["version"]
 
     def sub(self, s):
         for k, v in self.macros.items():
             s = s.replace(k, v)
         return s
+
 
 def get_build_version():
     """Return the version of MSVC that was used to build Python.
@@ -151,7 +163,7 @@ def get_build_version():
     if i == -1:
         return 6
     i = i + len(prefix)
-    s, rest = sys.version[i:].split(" ", 1)
+    s, _rest = sys.version[i:].split(" ", 1)
     majorVersion = int(s[:-2]) - 6
     if majorVersion >= 13:
         # v13 was skipped and should be v14
@@ -165,6 +177,7 @@ def get_build_version():
     # else we don't know what version of the compiler this is
     return None
 
+
 def get_build_architecture():
     """Return the processor architecture.
 
@@ -176,7 +189,8 @@ def get_build_architecture():
     if i == -1:
         return "Intel"
     j = sys.version.find(")", i)
-    return sys.version[i+len(prefix):j]
+    return sys.version[i + len(prefix) : j]
+
 
 def normalize_and_reduce_paths(paths):
     """Return a list of normalized paths with duplicates removed.
@@ -193,38 +207,37 @@ def normalize_and_reduce_paths(paths):
     return reduced_paths
 
 
-class MSVCCompiler(CCompiler) :
+class MSVCCompiler(CCompiler):
     """Concrete class that implements an interface to Microsoft Visual C++,
-       as defined by the CCompiler abstract class."""
+    as defined by the CCompiler abstract class."""
 
-    compiler_type = 'msvc'
+    compiler_type = "msvc"
 
     # Just set this so CCompiler's constructor doesn't barf.  We currently
     # don't use the 'set_executables()' bureaucracy provided by CCompiler,
     # as it really isn't necessary for this sort of single-compiler class.
     # Would be nice to have a consistent interface with UnixCCompiler,
     # though, so it's worth thinking about.
-    executables = {}
+    executables = {}  # noqa: RUF012
 
     # Private class data (need to distinguish C from C++ source for compiler)
-    _c_extensions = ['.c']
-    _cpp_extensions = ['.cc', '.cpp', '.cxx']
-    _rc_extensions = ['.rc']
-    _mc_extensions = ['.mc']
+    _c_extensions = [".c"]  # noqa: RUF012
+    _cpp_extensions = [".cc", ".cpp", ".cxx"]  # noqa: RUF012
+    _rc_extensions = [".rc"]  # noqa: RUF012
+    _mc_extensions = [".mc"]  # noqa: RUF012
 
     # Needed for the filename generation methods provided by the
     # base class, CCompiler.
-    src_extensions = (_c_extensions + _cpp_extensions +
-                      _rc_extensions + _mc_extensions)
-    res_extension = '.res'
-    obj_extension = '.obj'
-    static_lib_extension = '.lib'
-    shared_lib_extension = '.dll'
-    static_lib_format = shared_lib_format = '%s%s'
-    exe_extension = '.exe'
+    src_extensions = _c_extensions + _cpp_extensions + _rc_extensions + _mc_extensions
+    res_extension = ".res"
+    obj_extension = ".obj"
+    static_lib_extension = ".lib"
+    shared_lib_extension = ".dll"
+    static_lib_format = shared_lib_format = "%s%s"
+    exe_extension = ".exe"
 
     def __init__(self, verbose=0, dry_run=0, force=0):
-        CCompiler.__init__ (self, verbose, dry_run, force)
+        CCompiler.__init__(self, verbose, dry_run, force)
         self.__version = get_build_version()
         self.__arch = get_build_architecture()
         if self.__arch == "Intel":
@@ -234,13 +247,12 @@ class MSVCCompiler(CCompiler) :
                 self.__macros = MacroExpander(self.__version)
             else:
                 self.__root = r"Software\Microsoft\Devstudio"
-            self.__product = "Visual Studio version %s" % self.__version
+            self.__product = f"Visual Studio version {self.__version}"
         else:
             # Win64. Assume this was built with the platform SDK
             self.__product = "Microsoft SDK compiler %s" % (self.__version + 6)
 
         self.initialized = False
-
 
     # -- Miscellaneous methods -----------------------------------------
 
@@ -261,14 +273,14 @@ class MSVCCompiler(CCompiler) :
                 return fn
 
         # didn't find it; try existing path
-        for p in os.environ['Path'].split(';'):
-            fn = os.path.join(os.path.abspath(p),exe)
+        for p in os.environ["Path"].split(";"):
+            fn = os.path.join(os.path.abspath(p), exe)
             if os.path.isfile(fn):
                 return fn
 
         return exe
 
-    def get_msvc_paths(self, path, platform='x86'):
+    def get_msvc_paths(self, path, platform="x86"):
         """Get a list of devstudio directories (include, lib or path).
 
         Return a list of strings.  The list will be empty if unable to
@@ -279,11 +291,12 @@ class MSVCCompiler(CCompiler) :
 
         path = path + " dirs"
         if self.__version >= 7:
-            key = (r"%s\%0.1f\VC\VC_OBJECTS_PLATFORM_INFO\Win32\Directories"
-                   % (self.__root, self.__version))
+            key = rf"{self.__root}\{self.__version:0.1f}\VC\VC_OBJECTS_PLATFORM_INFO\Win32\Directories"
         else:
-            key = (r"%s\6.0\Build System\Components\Platforms"
-                   r"\Win32 (%s)\Directories" % (self.__root, platform))
+            key = (
+                rf"{self.__root}\6.0\Build System\Components\Platforms"
+                rf"\Win32 ({platform})\Directories"
+            )
 
         for base in HKEYS:
             d = read_values(base, key)
@@ -296,11 +309,13 @@ class MSVCCompiler(CCompiler) :
         # the GUI is run.
         if self.__version == 6:
             for base in HKEYS:
-                if read_values(base, r"%s\6.0" % self.__root) is not None:
-                    self.warn("It seems you have Visual Studio 6 installed, "
+                if read_values(base, rf"{self.__root}\6.0") is not None:
+                    self.warn(
+                        "It seems you have Visual Studio 6 installed, "
                         "but the expected registry settings are not present.\n"
                         "You must at least run the Visual Studio GUI once "
-                        "so that these entries are created.")
+                        "so that these entries are created."
+                    )
                     break
         return []
 
@@ -316,12 +331,11 @@ class MSVCCompiler(CCompiler) :
         else:
             p = self.get_msvc_paths(name)
         if p:
-            os.environ[name] = ';'.join(p)
+            os.environ[name] = ";".join(p)
 
 
 if get_build_version() >= 8.0:
     log.debug("Importing new compiler from distutils.msvc9compiler")
     OldMSVCCompiler = MSVCCompiler
-    from distutils.msvc9compiler import MSVCCompiler
     # get_build_architecture not really relevant now we support cross-compile
-    from distutils.msvc9compiler import MacroExpander
+    from distutils.msvc9compiler import MacroExpander, MSVCCompiler

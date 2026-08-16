@@ -3,12 +3,13 @@ import sys
 from collections import namedtuple
 from test.support import import_helper
 
-_testcapi = import_helper.import_module('_testcapi')
+_testcapi = import_helper.import_module("_testcapi")
 _testlimitedcapi = _testcapi
 
 NULL = None
 PY_SSIZE_T_MIN = _testcapi.PY_SSIZE_T_MIN
 PY_SSIZE_T_MAX = _testcapi.PY_SSIZE_T_MAX
+
 
 class TupleSubclass(tuple):
     pass
@@ -256,6 +257,7 @@ class CAPITest(unittest.TestCase):
         # non-tuple
         self.assertRaises(SystemError, resize, [1, 2, 3], 0, False)
         self.assertRaises(SystemError, resize, NULL, 0, False)
+
 
 if __name__ == "__main__":
     unittest.main()

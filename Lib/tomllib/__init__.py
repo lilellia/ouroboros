@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2021 Taneli Hukkinen
 # Licensed to PSF under a Contributor Agreement.
 
-__all__ = ("loads", "load", "TOMLDecodeError")
+__all__ = ("TOMLDecodeError", "load", "loads")
 
 from ._parser import TOMLDecodeError, load, loads
 

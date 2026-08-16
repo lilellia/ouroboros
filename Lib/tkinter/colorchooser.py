@@ -41,7 +41,7 @@ class Chooser(Dialog):
             color = self.options["initialcolor"]
             if isinstance(color, tuple):
                 # Assume an RGB triplet.
-                self.options["initialcolor"] = "#%02x%02x%02x" % color
+                self.options["initialcolor"] = "#{:02x}{:02x}{:02x}".format(*color)
         except KeyError:
             pass
 
@@ -59,11 +59,12 @@ class Chooser(Dialog):
         # To simplify application code, the color chooser returns
         # an RGB tuple together with the Tk color string.
         r, g, b = widget.winfo_rgb(result)
-        return (r//256, g//256, b//256), str(result)
+        return (r // 256, g // 256, b // 256), str(result)
 
 
 #
 # convenience stuff
+
 
 def askcolor(color=None, **options):
     """Display dialog window for selection of a color.

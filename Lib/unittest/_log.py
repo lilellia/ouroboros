@@ -1,11 +1,10 @@
-import logging
 import collections
+import logging
 
 from .case import _BaseTestCaseContext
 
+_LoggingWatcher = collections.namedtuple("_LoggingWatcher", ["records", "output"])
 
-_LoggingWatcher = collections.namedtuple("_LoggingWatcher",
-                                         ["records", "output"])
 
 class _CapturingHandler(logging.Handler):
     """
@@ -26,7 +25,7 @@ class _CapturingHandler(logging.Handler):
 
 
 class _AssertLogsContext(_BaseTestCaseContext):
-    """A context manager for assertLogs() and assertNoLogs() """
+    """A context manager for assertLogs() and assertNoLogs()"""
 
     LOGGING_FORMAT = "%(levelname)s:%(name)s:%(message)s"
 
@@ -72,15 +71,11 @@ class _AssertLogsContext(_BaseTestCaseContext):
         if self.no_logs:
             # assertNoLogs
             if len(self.watcher.records) > 0:
-                self._raiseFailure(
-                    "Unexpected logs found: {!r}".format(
-                        self.watcher.output
-                    )
-                )
+                self._raiseFailure(f"Unexpected logs found: {self.watcher.output!r}")
 
         else:
             # assertLogs
             if len(self.watcher.records) == 0:
                 self._raiseFailure(
-                    "no logs of level {} or higher triggered on {}"
-                    .format(logging.getLevelName(self.level), self.logger.name))
+                    f"no logs of level {logging.getLevelName(self.level)} or higher triggered on {self.logger.name}"
+                )

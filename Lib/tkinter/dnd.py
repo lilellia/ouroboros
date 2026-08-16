@@ -101,10 +101,11 @@ active; it will never call dnd_commit().
 
 import tkinter
 
-__all__ = ["dnd_start", "DndHandler"]
+__all__ = ["DndHandler", "dnd_start"]
 
 
 # The factory function
+
 
 def dnd_start(source, event):
     h = DndHandler(source, event)
@@ -116,8 +117,8 @@ def dnd_start(source, event):
 
 # The class that does the work
 
-class DndHandler:
 
+class DndHandler:
     root = None
 
     def __init__(self, source, event):
@@ -125,8 +126,8 @@ class DndHandler:
             return
         root = event.widget._root()
         try:
-            root.__dnd
-            return # Don't start recursive dnd
+            root.__dnd  # noqa: B018
+            return  # Don't start recursive dnd
         except AttributeError:
             root.__dnd = self
             self.root = root
@@ -134,11 +135,11 @@ class DndHandler:
         self.target = None
         self.initial_button = button = event.num
         self.initial_widget = widget = event.widget
-        self.release_pattern = "<B%d-ButtonRelease-%d>" % (button, button)
-        self.save_cursor = widget['cursor'] or ""
+        self.release_pattern = "<B%d-ButtonRelease-%d>" % (button, button)  # noqa: UP031
+        self.save_cursor = widget["cursor"] or ""
         widget.bind(self.release_pattern, self.on_release)
         widget.bind("<Motion>", self.on_motion)
-        widget['cursor'] = "hand2"
+        widget["cursor"] = "hand2"
 
     def __del__(self):
         root = self.root
@@ -191,7 +192,7 @@ class DndHandler:
             del root.__dnd
             self.initial_widget.unbind(self.release_pattern)
             self.initial_widget.unbind("<Motion>")
-            widget['cursor'] = self.save_cursor
+            widget["cursor"] = self.save_cursor
             self.target = self.source = self.initial_widget = self.root = None
             if target is not None:
                 if commit:
@@ -205,8 +206,8 @@ class DndHandler:
 # ----------------------------------------------------------------------
 # The rest is here for testing and demonstration purposes only!
 
-class Icon:
 
+class Icon:
     def __init__(self, name):
         self.name = name
         self.canvas = self.label = self.id = None
@@ -219,8 +220,7 @@ class Icon:
             self.detach()
         if canvas is None:
             return
-        label = tkinter.Label(canvas, text=self.name,
-                              borderwidth=2, relief="raised")
+        label = tkinter.Label(canvas, text=self.name, borderwidth=2, relief="raised")
         id = canvas.create_window(x, y, window=label, anchor="nw")
         self.canvas = canvas
         self.label = label
@@ -267,7 +267,6 @@ class Icon:
 
 
 class Tester:
-
     def __init__(self, root):
         self.top = tkinter.Toplevel(root)
         self.canvas = tkinter.Canvas(self.top, width=100, height=100)
@@ -278,20 +277,20 @@ class Tester:
         return self
 
     def dnd_enter(self, source, event):
-        self.canvas.focus_set() # Show highlight border
+        self.canvas.focus_set()  # Show highlight border
         x, y = source.where(self.canvas, event)
         x1, y1, x2, y2 = source.canvas.bbox(source.id)
-        dx, dy = x2-x1, y2-y1
-        self.dndid = self.canvas.create_rectangle(x, y, x+dx, y+dy)
+        dx, dy = x2 - x1, y2 - y1
+        self.dndid = self.canvas.create_rectangle(x, y, x + dx, y + dy)
         self.dnd_motion(source, event)
 
     def dnd_motion(self, source, event):
         x, y = source.where(self.canvas, event)
-        x1, y1, x2, y2 = self.canvas.bbox(self.dndid)
-        self.canvas.move(self.dndid, x-x1, y-y1)
+        x1, y1, _x2, _y2 = self.canvas.bbox(self.dndid)
+        self.canvas.move(self.dndid, x - x1, y - y1)
 
     def dnd_leave(self, source, event):
-        self.top.focus_set() # Hide highlight border
+        self.top.focus_set()  # Hide highlight border
         self.canvas.delete(self.dndid)
         self.dndid = None
 
@@ -320,5 +319,5 @@ def test():
     root.mainloop()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test()

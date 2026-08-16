@@ -41,9 +41,9 @@ Signed integers are encoded by converting them to unsigned integers, using the f
 ```Python
 def convert(s):
     if s < 0:
-        return ((-s)<<1) | 1
+        return ((-s) << 1) | 1
     else:
-        return (s<<1)
+        return s << 1
 ```
 
 ## Location entries

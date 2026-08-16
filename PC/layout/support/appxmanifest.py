@@ -9,7 +9,6 @@ __version__ = "3.8"
 import ctypes
 import io
 import os
-
 from pathlib import PureWindowsPath
 from xml.etree import ElementTree as ET
 
@@ -18,57 +17,57 @@ from .constants import *
 __all__ = ["get_appx_layout"]
 
 
-APPX_DATA = dict(
-    Name="PythonSoftwareFoundation.Python.{}".format(VER_DOT),
-    Version="{}.{}.{}.0".format(VER_MAJOR, VER_MINOR, VER_FIELD3),
-    Publisher=os.getenv(
+APPX_DATA = {
+    "Name": f"PythonSoftwareFoundation.Python.{VER_DOT}",
+    "Version": f"{VER_MAJOR}.{VER_MINOR}.{VER_FIELD3}.0",
+    "Publisher": os.getenv(
         "APPX_DATA_PUBLISHER", "CN=4975D53F-AA7E-49A5-8B49-EA4FDC1BB66B"
     ),
-    DisplayName="Python {}".format(VER_DOT),
-    Description="The Python {} runtime and console.".format(VER_DOT),
-)
+    "DisplayName": f"Python {VER_DOT}",
+    "Description": f"The Python {VER_DOT} runtime and console.",
+}
 
-APPX_PLATFORM_DATA = dict(
-    _keys=("ProcessorArchitecture",),
-    win32=("x86",),
-    amd64=("x64",),
-    arm32=("arm",),
-    arm64=("arm64",),
-)
+APPX_PLATFORM_DATA = {
+    "_keys": ("ProcessorArchitecture",),
+    "win32": ("x86",),
+    "amd64": ("x64",),
+    "arm32": ("arm",),
+    "arm64": ("arm64",),
+}
 
-PYTHON_VE_DATA = dict(
-    DisplayName="Python {}".format(VER_DOT),
-    Description="Python interactive console",
-    Square150x150Logo="_resources/pythonx150.png",
-    Square44x44Logo="_resources/pythonx44.png",
-    BackgroundColor="transparent",
-)
+PYTHON_VE_DATA = {
+    "DisplayName": f"Python {VER_DOT}",
+    "Description": "Python interactive console",
+    "Square150x150Logo": "_resources/pythonx150.png",
+    "Square44x44Logo": "_resources/pythonx44.png",
+    "BackgroundColor": "transparent",
+}
 
-PYTHONW_VE_DATA = dict(
-    DisplayName="Python {} (Windowed)".format(VER_DOT),
-    Description="Python windowed app launcher",
-    Square150x150Logo="_resources/pythonwx150.png",
-    Square44x44Logo="_resources/pythonwx44.png",
-    BackgroundColor="transparent",
-    AppListEntry="none",
-)
+PYTHONW_VE_DATA = {
+    "DisplayName": f"Python {VER_DOT} (Windowed)",
+    "Description": "Python windowed app launcher",
+    "Square150x150Logo": "_resources/pythonwx150.png",
+    "Square44x44Logo": "_resources/pythonwx44.png",
+    "BackgroundColor": "transparent",
+    "AppListEntry": "none",
+}
 
-PIP_VE_DATA = dict(
-    DisplayName="pip (Python {})".format(VER_DOT),
-    Description="pip package manager for Python {}".format(VER_DOT),
-    Square150x150Logo="_resources/pythonx150.png",
-    Square44x44Logo="_resources/pythonx44.png",
-    BackgroundColor="transparent",
-    AppListEntry="none",
-)
+PIP_VE_DATA = {
+    "DisplayName": f"pip (Python {VER_DOT})",
+    "Description": f"pip package manager for Python {VER_DOT}",
+    "Square150x150Logo": "_resources/pythonx150.png",
+    "Square44x44Logo": "_resources/pythonx44.png",
+    "BackgroundColor": "transparent",
+    "AppListEntry": "none",
+}
 
-IDLE_VE_DATA = dict(
-    DisplayName="IDLE (Python {})".format(VER_DOT),
-    Description="IDLE editor for Python {}".format(VER_DOT),
-    Square150x150Logo="_resources/idlex150.png",
-    Square44x44Logo="_resources/idlex44.png",
-    BackgroundColor="transparent",
-)
+IDLE_VE_DATA = {
+    "DisplayName": f"IDLE (Python {VER_DOT})",
+    "Description": f"IDLE editor for Python {VER_DOT}",
+    "Square150x150Logo": "_resources/idlex150.png",
+    "Square44x44Logo": "_resources/idlex44.png",
+    "BackgroundColor": "transparent",
+}
 
 PY_PNG = "_resources/py.png"
 
@@ -162,25 +161,23 @@ REGISTRY = {
             "SupportUrl": "https://www.python.org/",
             "SysArchitecture": SPECIAL_LOOKUP,
             "SysVersion": VER_DOT,
-            "Version": "{}.{}.{}".format(VER_MAJOR, VER_MINOR, VER_MICRO),
+            "Version": f"{VER_MAJOR}.{VER_MINOR}.{VER_MICRO}",
             "InstallPath": {
                 "": "[{AppVPackageRoot}]",
-                "ExecutablePath": "[{{AppVPackageRoot}}]\\python{}.exe".format(VER_DOT),
-                "WindowedExecutablePath": "[{{AppVPackageRoot}}]\\pythonw{}.exe".format(
-                    VER_DOT
-                ),
+                "ExecutablePath": f"[{{AppVPackageRoot}}]\\python{VER_DOT}.exe",
+                "WindowedExecutablePath": f"[{{AppVPackageRoot}}]\\pythonw{VER_DOT}.exe",
             },
             "Help": {
                 "Main Python Documentation": {
                     "_condition": lambda ns: ns.include_chm,
-                    "": "[{{AppVPackageRoot}}]\\Doc\\{}".format(PYTHON_CHM_NAME),
+                    "": f"[{{AppVPackageRoot}}]\\Doc\\{PYTHON_CHM_NAME}",
                 },
                 "Local Python Documentation": {
                     "_condition": lambda ns: ns.include_html_doc,
                     "": "[{AppVPackageRoot}]\\Doc\\html\\index.html",
                 },
                 "Online Python Documentation": {
-                    "": "https://docs.python.org/{}".format(VER_DOT)
+                    "": f"https://docs.python.org/{VER_DOT}"
                 },
             },
             "Idle": {
@@ -220,7 +217,7 @@ def _fixup_sccd(ns, sccd, new_hash=None):
     if not new_hash:
         return sccd
 
-    NS = dict(s="http://schemas.microsoft.com/appx/2016/sccd")
+    NS = {"s": "http://schemas.microsoft.com/appx/2016/sccd"}
     with open(sccd, "rb") as f:
         xml = ET.parse(f)
 
@@ -263,9 +260,7 @@ def find_or_add(xml, element, attr=None, always_add=False):
 
 def _get_app(xml, appid):
     if appid:
-        app = xml.find(
-            "m:Applications/m:Application[@Id='{}']".format(appid), APPXMANIFEST_NS
-        )
+        app = xml.find(f"m:Applications/m:Application[@Id='{appid}']", APPXMANIFEST_NS)
         if app is None:
             raise LookupError(appid)
     else:
@@ -401,7 +396,7 @@ def get_appxmanifest(ns):
         data[k] = v
 
     node = xml.find("m:Identity", NS)
-    for k in node.keys():
+    for k in node:
         value = data.get(k)
         if value:
             node.set(k, value)
@@ -412,15 +407,16 @@ def get_appxmanifest(ns):
             node.text = value
 
     try:
-        winver = tuple(int(i) for i in os.getenv("APPX_DATA_WINVER", "").split(".", maxsplit=3))
+        winver = tuple(
+            int(i) for i in os.getenv("APPX_DATA_WINVER", "").split(".", maxsplit=3)
+        )
     except (TypeError, ValueError):
         winver = ()
 
     # Default "known good" version is 10.0.22000, first Windows 11 release
     winver = winver or (10, 0, 22000)
 
-    if winver < (10, 0, 17763):
-        winver = 10, 0, 17763
+    winver = max(winver, (10, 0, 17763))
     find_or_add(xml, "m:Dependencies/m:TargetDeviceFamily").set(
         "MaxVersionTested", "{}.{}.{}.{}".format(*(winver + (0, 0, 0, 0)[:4]))
     )
@@ -429,12 +425,12 @@ def get_appxmanifest(ns):
     if (VER_MAJOR, VER_MINOR) >= (3, 11) and winver > (10, 0, 17763):
         disable_registry_virtualization(xml)
 
-    app = add_application(
+    add_application(
         ns,
         xml,
         "Python",
-        "python{}".format(VER_DOT),
-        ["python", "python{}".format(VER_MAJOR), "python{}".format(VER_DOT)],
+        f"python{VER_DOT}",
+        ["python", f"python{VER_MAJOR}", f"python{VER_DOT}"],
         PYTHON_VE_DATA,
         "console",
         ("python.file", [".py"], '"%1" %*', "Python File", PY_PNG),
@@ -444,11 +440,17 @@ def get_appxmanifest(ns):
         ns,
         xml,
         "PythonW",
-        "pythonw{}".format(VER_DOT),
-        ["pythonw", "pythonw{}".format(VER_MAJOR), "pythonw{}".format(VER_DOT)],
+        f"pythonw{VER_DOT}",
+        ["pythonw", f"pythonw{VER_MAJOR}", f"pythonw{VER_DOT}"],
         PYTHONW_VE_DATA,
         "windows",
-        ("python.windowedfile", [".pyw"], '"%1" %*', "Python File (no console)", PY_PNG),
+        (
+            "python.windowedfile",
+            [".pyw"],
+            '"%1" %*',
+            "Python File (no console)",
+            PY_PNG,
+        ),
     )
 
     if ns.include_pip and ns.include_launchers:
@@ -456,8 +458,8 @@ def get_appxmanifest(ns):
             ns,
             xml,
             "Pip",
-            "pip{}".format(VER_DOT),
-            ["pip", "pip{}".format(VER_MAJOR), "pip{}".format(VER_DOT)],
+            f"pip{VER_DOT}",
+            ["pip", f"pip{VER_MAJOR}", f"pip{VER_DOT}"],
             PIP_VE_DATA,
             "console",
             ("python.wheel", [".whl"], 'install "%1"', "Python Wheel"),
@@ -468,8 +470,8 @@ def get_appxmanifest(ns):
             ns,
             xml,
             "Idle",
-            "idle{}".format(VER_DOT),
-            ["idle", "idle{}".format(VER_MAJOR), "idle{}".format(VER_DOT)],
+            f"idle{VER_DOT}",
+            ["idle", f"idle{VER_MAJOR}", f"idle{VER_DOT}"],
             IDLE_VE_DATA,
             "windows",
             None,
@@ -498,19 +500,19 @@ def get_appx_layout(ns):
     yield "_resources.xml", ("_resources.xml", get_resources_xml(ns))
     icons = ns.source / "PC" / "icons"
     for px in [44, 50, 150]:
-        src = icons / "pythonx{}.png".format(px)
+        src = icons / f"pythonx{px}.png"
         yield f"_resources/pythonx{px}.png", src
         yield f"_resources/pythonx{px}$targetsize-{px}_altform-unplated.png", src
     for px in [44, 150]:
-        src = icons / "pythonwx{}.png".format(px)
+        src = icons / f"pythonwx{px}.png"
         yield f"_resources/pythonwx{px}.png", src
         yield f"_resources/pythonwx{px}$targetsize-{px}_altform-unplated.png", src
     if ns.include_idle and ns.include_launchers:
         for px in [44, 150]:
-            src = icons / "idlex{}.png".format(px)
+            src = icons / f"idlex{px}.png"
             yield f"_resources/idlex{px}.png", src
             yield f"_resources/idlex{px}$targetsize-{px}_altform-unplated.png", src
-    yield f"_resources/py.png", icons / "py.png"
+    yield "_resources/py.png", icons / "py.png"
     sccd = ns.source / SCCD_FILENAME
     if sccd.is_file():
         # This should only be set for side-loading purposes.

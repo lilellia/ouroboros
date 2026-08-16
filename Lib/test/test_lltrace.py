@@ -6,6 +6,7 @@ from test import support
 from test.support import os_helper
 from test.support.script_helper import assert_python_ok
 
+
 def example():
     x = []
     for i in range(0):
@@ -17,16 +18,15 @@ def example():
 
 @unittest.skipUnless(support.Py_DEBUG, "lltrace requires Py_DEBUG")
 class TestLLTrace(unittest.TestCase):
-
     def run_code(self, code):
         code = textwrap.dedent(code).strip()
-        with open(os_helper.TESTFN, 'w', encoding='utf-8') as fd:
+        with open(os_helper.TESTFN, "w", encoding="utf-8") as fd:
             self.addCleanup(os_helper.unlink, os_helper.TESTFN)
             fd.write(code)
         status, stdout, stderr = assert_python_ok(os_helper.TESTFN)
         self.assertEqual(stderr, b"")
         self.assertEqual(status, 0)
-        result = stdout.decode('utf-8')
+        result = stdout.decode("utf-8")
         if support.verbose:
             print("\n\n--- code ---")
             print(code)
@@ -70,9 +70,9 @@ class TestLLTrace(unittest.TestCase):
             test_lltrace.example()
         """)
         self.assertIn("'example' in module 'test.test_lltrace'", stdout)
-        self.assertIn('LOAD_CONST', stdout)
-        self.assertIn('FOR_ITER', stdout)
-        self.assertIn('this is an example', stdout)
+        self.assertIn("LOAD_CONST", stdout)
+        self.assertIn("FOR_ITER", stdout)
+        self.assertIn("this is an example", stdout)
 
         # check that offsets match the output of dis.dis()
         instr_map = {i.offset: i for i in dis.get_instructions(example, adaptive=True)}
@@ -106,6 +106,7 @@ class TestLLTrace(unittest.TestCase):
             print('unreachable if bug exists')
         """)
         self.assertIn("unreachable if bug exists", stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

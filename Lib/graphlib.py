@@ -1,6 +1,6 @@
 from types import GenericAlias
 
-__all__ = ["TopologicalSorter", "CycleError"]
+__all__ = ["CycleError", "TopologicalSorter"]
 
 _NODE_OUT = -1
 _NODE_DONE = -2
@@ -34,8 +34,6 @@ class CycleError(ValueError):
     next node in the list. In the reported list, the first and the last node will be
     the same, to make it clear that it is cyclic.
     """
-
-    pass
 
 
 class TopologicalSorter:
@@ -103,7 +101,7 @@ class TopologicalSorter:
         # nodes as possible before cycles block more progress
         cycle = self._find_cycle()
         if cycle:
-            raise CycleError(f"nodes are in a cycle", cycle)
+            raise CycleError("nodes are in a cycle", cycle)
 
     def get_ready(self):
         """Return a tuple of all the nodes that are ready.
@@ -166,7 +164,6 @@ class TopologicalSorter:
         n2i = self._node2info
 
         for node in nodes:
-
             # Check if we know about this node (it was added previously using add()
             if (nodeinfo := n2i.get(node)) is None:
                 raise ValueError(f"node {node!r} was not added using add()")

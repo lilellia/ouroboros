@@ -12,6 +12,7 @@ class GeneralTest(unittest.TestCase):
         script = support.findfile("_test_atexit.py")
         script_helper.run_test_script(script)
 
+
 class FunctionalTest(unittest.TestCase):
     def test_shutdown(self):
         # Actually test the shutdown mechanism in a subprocess
@@ -49,7 +50,6 @@ class FunctionalTest(unittest.TestCase):
 
 @support.cpython_only
 class SubinterpreterTest(unittest.TestCase):
-
     def test_callbacks_leak(self):
         # This test shows a leak in refleak mode if atexit doesn't
         # take care to free callbacks in its per-subinterpreter module
@@ -88,13 +88,15 @@ class SubinterpreterTest(unittest.TestCase):
         expected = b"The test has passed!"
         r, w = os.pipe()
 
-        code = textwrap.dedent(r"""
+        code = textwrap.dedent(
+            r"""
             import os
             import atexit
             def callback():
                 os.write({:d}, b"The test has passed!")
             atexit.register(callback)
-        """.format(w))
+        """.format(w)
+        )
         ret = support.run_in_subinterp(code)
         os.close(w)
         self.assertEqual(os.read(r, len(expected)), expected)

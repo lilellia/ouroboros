@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-
+# noqa: EXE001
 import argparse
 import ast
-import sys
 import os
+import sys
 from time import time
 
 try:
@@ -33,12 +33,14 @@ subcommands = argparser.add_subparsers(title="Benchmarks", dest="subcommand")
 command_compile = subcommands.add_parser(
     "compile", help="Benchmark parsing and compiling to bytecode"
 )
-command_parse = subcommands.add_parser("parse", help="Benchmark parsing and generating an ast.AST")
+command_parse = subcommands.add_parser(
+    "parse", help="Benchmark parsing and generating an ast.AST"
+)
 
 
 def benchmark(func):
     def wrapper(*args):
-        times = list()
+        times = []
         for _ in range(3):
             start = time()
             result = func(*args)
@@ -46,7 +48,7 @@ def benchmark(func):
             times.append(end - start)
         memory = memory_profiler.memory_usage((func, args))
         print(f"{func.__name__}")
-        print(f"\tTime: {sum(times)/3:.3f} seconds on an average of 3 runs")
+        print(f"\tTime: {sum(times) / 3:.3f} seconds on an average of 3 runs")
         print(f"\tMemory: {max(memory)} MiB on an average of 3 runs")
         return result
 

@@ -1,12 +1,11 @@
 """An XML Reader is the SAX 2 name for an XML parser. XML Parsers
-should be based on this code. """
+should be based on this code."""
 
 from . import handler
-
-from ._exceptions import SAXNotSupportedException, SAXNotRecognizedException
-
+from ._exceptions import SAXNotRecognizedException, SAXNotSupportedException
 
 # ===== XMLREADER =====
+
 
 class XMLReader:
     """Interface for reading an XML document using callbacks.
@@ -74,19 +73,20 @@ class XMLReader:
 
     def getFeature(self, name):
         "Looks up and returns the state of a SAX2 feature."
-        raise SAXNotRecognizedException("Feature '%s' not recognized" % name)
+        raise SAXNotRecognizedException(f"Feature '{name}' not recognized")
 
     def setFeature(self, name, state):
         "Sets the state of a SAX2 feature."
-        raise SAXNotRecognizedException("Feature '%s' not recognized" % name)
+        raise SAXNotRecognizedException(f"Feature '{name}' not recognized")
 
     def getProperty(self, name):
         "Looks up and returns the value of a SAX2 property."
-        raise SAXNotRecognizedException("Property '%s' not recognized" % name)
+        raise SAXNotRecognizedException(f"Property '{name}' not recognized")
 
     def setProperty(self, name, value):
         "Sets the value of a SAX2 property."
-        raise SAXNotRecognizedException("Property '%s' not recognized" % name)
+        raise SAXNotRecognizedException(f"Property '{name}' not recognized")
+
 
 class IncrementalParser(XMLReader):
     """This interface adds three extra methods to the XMLReader
@@ -114,6 +114,7 @@ class IncrementalParser(XMLReader):
 
     def parse(self, source):
         from . import saxutils
+
         source = saxutils.prepare_input_source(source)
 
         self.prepareParser(source)
@@ -158,7 +159,9 @@ class IncrementalParser(XMLReader):
         reset are undefined."""
         raise NotImplementedError("This method must be implemented!")
 
+
 # ===== LOCATOR =====
+
 
 class Locator:
     """Interface for associating a SAX event with a document
@@ -176,13 +179,15 @@ class Locator:
 
     def getPublicId(self):
         "Return the public identifier for the current event."
-        return None
+        return
 
     def getSystemId(self):
         "Return the system identifier for the current event."
-        return None
+        return
+
 
 # ===== INPUTSOURCE =====
+
 
 class InputSource:
     """Encapsulation of the information needed by the XMLReader to
@@ -200,12 +205,12 @@ class InputSource:
     allowed to modify InputSource objects passed to it from the
     application, although it may make copies and modify those."""
 
-    def __init__(self, system_id = None):
+    def __init__(self, system_id=None):
         self.__system_id = system_id
         self.__public_id = None
-        self.__encoding  = None
-        self.__bytefile  = None
-        self.__charfile  = None
+        self.__encoding = None
+        self.__bytefile = None
+        self.__charfile = None
 
     def setPublicId(self, public_id):
         "Sets the public identifier of this InputSource."
@@ -271,10 +276,11 @@ class InputSource:
         "Get the character stream for this input source."
         return self.__charfile
 
+
 # ===== ATTRIBUTESIMPL =====
 
-class AttributesImpl:
 
+class AttributesImpl:
     def __init__(self, attrs):
         """Non-NS-aware implementation.
 
@@ -333,10 +339,11 @@ class AttributesImpl:
     def values(self):
         return list(self._attrs.values())
 
+
 # ===== ATTRIBUTESNSIMPL =====
 
-class AttributesNSImpl(AttributesImpl):
 
+class AttributesNSImpl(AttributesImpl):
     def __init__(self, attrs, qnames):
         """NS-aware implementation.
 
@@ -346,14 +353,14 @@ class AttributesNSImpl(AttributesImpl):
         self._qnames = qnames
 
     def getValueByQName(self, name):
-        for (nsname, qname) in self._qnames.items():
+        for nsname, qname in self._qnames.items():
             if qname == name:
                 return self._attrs[nsname]
 
         raise KeyError(name)
 
     def getNameByQName(self, name):
-        for (nsname, qname) in self._qnames.items():
+        for nsname, qname in self._qnames.items():
             if qname == name:
                 return nsname
 
@@ -373,6 +380,7 @@ def _test():
     XMLReader()
     IncrementalParser()
     Locator()
+
 
 if __name__ == "__main__":
     _test()

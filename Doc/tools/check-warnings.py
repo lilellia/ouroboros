@@ -311,7 +311,7 @@ def main(argv: list[str] | None = None) -> int:
     if not Path("Doc").exists() or not Path("Doc").is_dir():
         raise RuntimeError(wrong_directory_msg)
 
-    with Path("Doc/sphinx-warnings.txt").open(encoding="UTF-8") as f:
+    with Path("Doc/sphinx-warnings.txt").open(encoding="UTF-8") as f:  # noqa: FURB101
         warnings = f.read().splitlines()
 
     cwd = str(Path.cwd()) + os.path.sep

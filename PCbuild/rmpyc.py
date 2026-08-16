@@ -6,14 +6,15 @@ def deltree(root):
     from os.path import join
 
     npyc = 0
-    for root, dirs, files in os.walk(root):
+    for root, dirs, files in os.walk(root):  # noqa: B020, PLR1704
         for name in files:
             # to be thorough
-            if name.endswith(('.pyc', '.pyo')):
+            if name.endswith((".pyc", ".pyo")):
                 npyc += 1
                 os.remove(join(root, name))
 
     return npyc
+
 
 npyc = deltree("../Lib")
 print(npyc, ".pyc deleted")

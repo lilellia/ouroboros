@@ -6,9 +6,11 @@ def peek_and_iter(items):
         peeked = next(items)
     except StopIteration:
         return None, None
+
     def chain():
         yield peeked
         yield from items
+
     return chain(), peeked
 
 
@@ -17,7 +19,7 @@ def iter_many(items, onempty=None):
         if onempty is None:
             return
         if not callable(onempty):
-            raise onEmpty
+            raise onEmpty  # noqa: F821
         items = onempty(items)
         yield from iter_many(items, onempty=None)
         return
@@ -28,7 +30,7 @@ def iter_many(items, onempty=None):
         if onempty is None:
             return
         if not callable(onempty):
-            raise onEmpty
+            raise onEmpty  # noqa: F821
         items = onempty(items)
         yield from iter_many(items, onempty=None)
     else:

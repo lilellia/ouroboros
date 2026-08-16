@@ -6,7 +6,7 @@ import warnings
 
 from test.support import cpython_only, import_helper
 
-_testcapi = import_helper.import_module('_testcapi')
+_testcapi = import_helper.import_module("_testcapi")
 from _testcapi import PY_SSIZE_T_MAX, PY_SSIZE_T_MIN
 
 try:
@@ -16,9 +16,11 @@ except ImportError:
 
 NULL = None
 
+
 class BadDescr:
     def __get__(self, obj, objtype=None):
         raise RuntimeError
+
 
 class WithDunder:
     def _meth(self, *args):
@@ -26,6 +28,7 @@ class WithDunder:
             return self.val
         if self.exc:
             raise self.exc
+
     @classmethod
     def with_val(cls, val):
         obj = super().__new__(cls)
@@ -42,6 +45,7 @@ class WithDunder:
         setattr(cls, cls.methname, cls._meth)
         return obj
 
+
 class HasBadAttr:
     def __new__(cls):
         obj = super().__new__(cls)
@@ -50,21 +54,24 @@ class HasBadAttr:
 
 
 class IndexLike(WithDunder):
-    methname = '__index__'
+    methname = "__index__"
+
 
 class IntLike(WithDunder):
-    methname = '__int__'
+    methname = "__int__"
+
 
 class FloatLike(WithDunder):
-    methname = '__float__'
+    methname = "__float__"
 
 
 def subclassof(base):
-    return type(base.__name__ + 'Subclass', (base,), {})
+    return type(base.__name__ + "Subclass", (base,), {})
 
 
 class SomeError(Exception):
     pass
+
 
 class OtherError(Exception):
     pass
@@ -80,7 +87,7 @@ class CAPITest(unittest.TestCase):
         self.assertTrue(check(IntLike.with_val(99)))
         self.assertTrue(check(0.5))
         self.assertTrue(check(FloatLike.with_val(4.25)))
-        self.assertTrue(check(1+2j))
+        self.assertTrue(check(1 + 2j))
 
         self.assertFalse(check([]))
         self.assertFalse(check("abc"))
@@ -88,10 +95,12 @@ class CAPITest(unittest.TestCase):
         self.assertFalse(check(NULL))
 
     def test_unary_ops(self):
-        methmap = {'__neg__': _testcapi.number_negative,   # PyNumber_Negative()
-                   '__pos__': _testcapi.number_positive,   # PyNumber_Positive()
-                   '__abs__': _testcapi.number_absolute,   # PyNumber_Absolute()
-                   '__invert__': _testcapi.number_invert}  # PyNumber_Invert()
+        methmap = {
+            "__neg__": _testcapi.number_negative,  # PyNumber_Negative()
+            "__pos__": _testcapi.number_positive,  # PyNumber_Positive()
+            "__abs__": _testcapi.number_absolute,  # PyNumber_Absolute()
+            "__invert__": _testcapi.number_invert,
+        }  # PyNumber_Invert()
 
         for name, func in methmap.items():
             # Generic object, has no tp_as_number structure
@@ -102,7 +111,7 @@ class CAPITest(unittest.TestCase):
 
             # Behave as corresponding unary operation
             op = getattr(operator, name)
-            for x in [0, 42, -1, 3.14, 1+2j]:
+            for x in [0, 42, -1, 3.14, 1 + 2j]:
                 try:
                     op(x)
                 except TypeError:
@@ -111,37 +120,38 @@ class CAPITest(unittest.TestCase):
                     self.assertEqual(func(x), op(x))
 
     def test_binary_ops(self):
-        methmap = {'__add__': _testcapi.number_add,   # PyNumber_Add()
-                   '__sub__': _testcapi.number_subtract,  # PyNumber_Subtract()
-                   '__mul__': _testcapi.number_multiply,  # PyNumber_Multiply()
-                   '__matmul__': _testcapi.number_matrixmultiply,  # PyNumber_MatrixMultiply()
-                   '__floordiv__': _testcapi.number_floordivide,  # PyNumber_FloorDivide()
-                   '__truediv__': _testcapi.number_truedivide,  # PyNumber_TrueDivide()
-                   '__mod__': _testcapi.number_remainder,  # PyNumber_Remainder()
-                   '__divmod__': _testcapi.number_divmod,  # PyNumber_Divmod()
-                   '__lshift__': _testcapi.number_lshift,  # PyNumber_Lshift()
-                   '__rshift__': _testcapi.number_rshift,  # PyNumber_Rshift()
-                   '__and__': _testcapi.number_and,  # PyNumber_And()
-                   '__xor__': _testcapi.number_xor,  # PyNumber_Xor()
-                   '__or__': _testcapi.number_or,  # PyNumber_Or()
-                   '__pow__': _testcapi.number_power,  # PyNumber_Power()
-                   '__iadd__': _testcapi.number_inplaceadd,   # PyNumber_InPlaceAdd()
-                   '__isub__': _testcapi.number_inplacesubtract,  # PyNumber_InPlaceSubtract()
-                   '__imul__': _testcapi.number_inplacemultiply,  # PyNumber_InPlaceMultiply()
-                   '__imatmul__': _testcapi.number_inplacematrixmultiply,  # PyNumber_InPlaceMatrixMultiply()
-                   '__ifloordiv__': _testcapi.number_inplacefloordivide,  # PyNumber_InPlaceFloorDivide()
-                   '__itruediv__': _testcapi.number_inplacetruedivide,  # PyNumber_InPlaceTrueDivide()
-                   '__imod__': _testcapi.number_inplaceremainder,  # PyNumber_InPlaceRemainder()
-                   '__ilshift__': _testcapi.number_inplacelshift,  # PyNumber_InPlaceLshift()
-                   '__irshift__': _testcapi.number_inplacershift,  # PyNumber_InPlaceRshift()
-                   '__iand__': _testcapi.number_inplaceand,  # PyNumber_InPlaceAnd()
-                   '__ixor__': _testcapi.number_inplacexor,  # PyNumber_InPlaceXor()
-                   '__ior__': _testcapi.number_inplaceor,  # PyNumber_InPlaceOr()
-                   '__ipow__': _testcapi.number_inplacepower,  # PyNumber_InPlacePower()
-                   }
+        methmap = {
+            "__add__": _testcapi.number_add,  # PyNumber_Add()
+            "__sub__": _testcapi.number_subtract,  # PyNumber_Subtract()
+            "__mul__": _testcapi.number_multiply,  # PyNumber_Multiply()
+            "__matmul__": _testcapi.number_matrixmultiply,  # PyNumber_MatrixMultiply()
+            "__floordiv__": _testcapi.number_floordivide,  # PyNumber_FloorDivide()
+            "__truediv__": _testcapi.number_truedivide,  # PyNumber_TrueDivide()
+            "__mod__": _testcapi.number_remainder,  # PyNumber_Remainder()
+            "__divmod__": _testcapi.number_divmod,  # PyNumber_Divmod()
+            "__lshift__": _testcapi.number_lshift,  # PyNumber_Lshift()
+            "__rshift__": _testcapi.number_rshift,  # PyNumber_Rshift()
+            "__and__": _testcapi.number_and,  # PyNumber_And()
+            "__xor__": _testcapi.number_xor,  # PyNumber_Xor()
+            "__or__": _testcapi.number_or,  # PyNumber_Or()
+            "__pow__": _testcapi.number_power,  # PyNumber_Power()
+            "__iadd__": _testcapi.number_inplaceadd,  # PyNumber_InPlaceAdd()
+            "__isub__": _testcapi.number_inplacesubtract,  # PyNumber_InPlaceSubtract()
+            "__imul__": _testcapi.number_inplacemultiply,  # PyNumber_InPlaceMultiply()
+            "__imatmul__": _testcapi.number_inplacematrixmultiply,  # PyNumber_InPlaceMatrixMultiply()
+            "__ifloordiv__": _testcapi.number_inplacefloordivide,  # PyNumber_InPlaceFloorDivide()
+            "__itruediv__": _testcapi.number_inplacetruedivide,  # PyNumber_InPlaceTrueDivide()
+            "__imod__": _testcapi.number_inplaceremainder,  # PyNumber_InPlaceRemainder()
+            "__ilshift__": _testcapi.number_inplacelshift,  # PyNumber_InPlaceLshift()
+            "__irshift__": _testcapi.number_inplacershift,  # PyNumber_InPlaceRshift()
+            "__iand__": _testcapi.number_inplaceand,  # PyNumber_InPlaceAnd()
+            "__ixor__": _testcapi.number_inplacexor,  # PyNumber_InPlaceXor()
+            "__ior__": _testcapi.number_inplaceor,  # PyNumber_InPlaceOr()
+            "__ipow__": _testcapi.number_inplacepower,  # PyNumber_InPlacePower()
+        }
 
         for name, func in methmap.items():
-            cases = [0, 42, 3.14, -1, 123, 1+2j]
+            cases = [0, 42, 3.14, -1, 123, 1 + 2j]
 
             # Generic object, has no tp_as_number structure
             for x in cases:
@@ -193,7 +203,7 @@ class CAPITest(unittest.TestCase):
         self.assertRaises(TypeError, multiply, ndarray([1], (1,)), 2)
         self.assertRaises(TypeError, multiply, [1], 0.5)
         self.assertRaises(OverflowError, multiply, [1], PY_SSIZE_T_MAX + 1)
-        self.assertRaises(MemoryError, multiply, [1, 2], PY_SSIZE_T_MAX//2 + 1)
+        self.assertRaises(MemoryError, multiply, [1, 2], PY_SSIZE_T_MAX // 2 + 1)
         a, b, r = [1], 2, [1, 1]
         self.assertEqual(inplacemultiply(a, b), r)
         self.assertEqual((a, b), (r, 2))
@@ -202,7 +212,7 @@ class CAPITest(unittest.TestCase):
         self.assertEqual((a, b), ([1], 2))
         self.assertRaises(TypeError, inplacemultiply, ndarray([1], (1,)), 2)
         self.assertRaises(OverflowError, inplacemultiply, [1], PY_SSIZE_T_MAX + 1)
-        self.assertRaises(MemoryError, inplacemultiply, [1, 2], PY_SSIZE_T_MAX//2 + 1)
+        self.assertRaises(MemoryError, inplacemultiply, [1, 2], PY_SSIZE_T_MAX // 2 + 1)
 
     def test_misc_power(self):
         # PyNumber_Power(), PyNumber_InPlacePower()
@@ -210,7 +220,7 @@ class CAPITest(unittest.TestCase):
         inplacepower = _testcapi.number_inplacepower
 
         class HasPow(WithDunder):
-            methname = '__pow__'
+            methname = "__pow__"
 
         # ternary op
         self.assertEqual(power(4, 11, 5), pow(4, 11, 5))
@@ -258,11 +268,13 @@ class CAPITest(unittest.TestCase):
 
         with self.assertRaises(TypeError) as context:
             rshift(print, 42)
-        self.assertIn('Did you mean "print(<message>, '
-                      'file=<output_stream>)"?', str(context.exception))
+        self.assertIn(
+            'Did you mean "print(<message>, file=<output_stream>)"?',
+            str(context.exception),
+        )
         with self.assertRaises(TypeError) as context:
             rshift(max, sys.stderr)
-        self.assertNotIn('Did you mean ', str(context.exception))
+        self.assertNotIn("Did you mean ", str(context.exception))
         with self.assertRaises(TypeError) as context:
             rshift(1, "spam")
 
@@ -296,7 +308,7 @@ class CAPITest(unittest.TestCase):
         float_ = _testcapi.number_float
 
         self.assertEqual(float_(1.25), 1.25)
-        self.assertEqual(float_(123), 123.)
+        self.assertEqual(float_(123), 123.0)
         self.assertEqual(float_("1.25"), 1.25)
 
         self.assertEqual(float_(FloatLike.with_val(4.25)), 4.25)
@@ -306,7 +318,9 @@ class CAPITest(unittest.TestCase):
         self.assertRaises(TypeError, float_, FloatLike.with_val(687))
         with warnings.catch_warnings():
             warnings.simplefilter("error", DeprecationWarning)
-            self.assertRaises(DeprecationWarning, float_, FloatLike.with_val(subclassof(float)(4.25)))
+            self.assertRaises(
+                DeprecationWarning, float_, FloatLike.with_val(subclassof(float)(4.25))
+            )
         with self.assertWarns(DeprecationWarning):
             self.assertEqual(float_(FloatLike.with_val(subclassof(float)(4.25))), 4.25)
         self.assertRaises(RuntimeError, float_, FloatLike.with_exc(RuntimeError))
@@ -357,8 +371,8 @@ class CAPITest(unittest.TestCase):
 
         for n in [*range(-6, 7), PY_SSIZE_T_MIN, PY_SSIZE_T_MAX]:
             self.assertEqual(asssizet(n, OverflowError), n)
-        self.assertEqual(asssizet(PY_SSIZE_T_MAX+10, NULL), PY_SSIZE_T_MAX)
-        self.assertEqual(asssizet(PY_SSIZE_T_MIN-10, NULL), PY_SSIZE_T_MIN)
+        self.assertEqual(asssizet(PY_SSIZE_T_MAX + 10, NULL), PY_SSIZE_T_MAX)
+        self.assertEqual(asssizet(PY_SSIZE_T_MIN - 10, NULL), PY_SSIZE_T_MIN)
 
         self.assertRaises(OverflowError, asssizet, PY_SSIZE_T_MAX + 10, OverflowError)
         self.assertRaises(RuntimeError, asssizet, PY_SSIZE_T_MAX + 10, RuntimeError)

@@ -16,14 +16,12 @@ from .runtests import RunTests
 from .save_env import saved_test_environment
 from .setup import setup_tests
 from .testresult import get_test_runner
-from .utils import (
-    TestName,
-    clear_caches, remove_testfn, abs_module_name, print_warning)
+from .utils import TestName, clear_caches, remove_testfn, abs_module_name, print_warning
 
 
 # Minimum duration of a test to display its duration or to mention that
 # the test is running in background
-PROGRESS_MIN_TIME = 30.0   # seconds
+PROGRESS_MIN_TIME = 30.0  # seconds
 
 
 def run_unittest(test_mod):
@@ -35,6 +33,7 @@ def run_unittest(test_mod):
         raise Exception("errors while loading tests")
     _filter_suite(tests, match_test)
     return _run_suite(tests)
+
 
 def _filter_suite(suite, pred):
     """Recursively filter test cases in a suite based on a predicate."""
@@ -48,18 +47,22 @@ def _filter_suite(suite, pred):
                 newtests.append(test)
     suite._tests = newtests
 
+
 def _run_suite(suite):
     """Run tests from a unittest.TestSuite-derived class."""
-    runner = get_test_runner(sys.stdout,
-                             verbosity=support.verbose,
-                             capture_output=(support.junit_xml_list is not None))
+    runner = get_test_runner(
+        sys.stdout,
+        verbosity=support.verbose,
+        capture_output=(support.junit_xml_list is not None),
+    )
 
     result = runner.run(suite)
 
     if support.junit_xml_list is not None:
         import xml.etree.ElementTree as ET
+
         xml_elem = result.get_xml_element()
-        xml_str = ET.tostring(xml_elem).decode('ascii')
+        xml_str = ET.tostring(xml_elem).decode("ascii")
         support.junit_xml_list.append(xml_str)
 
     if not result.testsRun and not result.skipped and not result.errors:
@@ -72,7 +75,8 @@ def _run_suite(suite):
             err = result.failures[0][1]
         else:
             err = "multiple errors occurred"
-            if not support.verbose: err += "; run in verbose mode for details"
+            if not support.verbose:
+                err += "; run in verbose mode for details"
         errors = [(str(tc), exc_str) for tc, exc_str in result.errors]
         failures = [(str(tc), exc_str) for tc, exc_str in result.failures]
         raise support.TestFailedWithDetails(err, errors, failures, stats=stats)
@@ -84,9 +88,10 @@ def regrtest_runner(result: TestResult, test_func, runtests: RunTests) -> None:
     # leaks.
     if runtests.hunt_refleak:
         from .refleak import runtest_refleak
-        refleak, test_result = runtest_refleak(result.test_name, test_func,
-                                               runtests.hunt_refleak,
-                                               runtests.quiet)
+
+        refleak, test_result = runtest_refleak(
+            result.test_name, test_func, runtests.hunt_refleak, runtests.quiet
+        )
     else:
         test_result = test_func()
         refleak = False
@@ -108,6 +113,7 @@ def regrtest_runner(result: TestResult, test_func, runtests: RunTests) -> None:
             # Don't import doctest at top level since only few tests return
             # a doctest.TestResult instance.
             import doctest
+
             if isinstance(test_result, doctest.TestResults):
                 stats = TestStats.from_doctest(test_result)
             else:
@@ -129,8 +135,11 @@ def _load_run_test(result: TestResult, runtests: RunTests) -> None:
 
     if hasattr(test_mod, "test_main"):
         # https://github.com/python/cpython/issues/89392
-        raise Exception(f"Module {test_name} defines test_main() which "
-                        f"is no longer supported by regrtest")
+        raise Exception(
+            f"Module {test_name} defines test_main() which "
+            f"is no longer supported by regrtest"
+        )
+
     def test_func():
         return run_unittest(test_mod)
 
@@ -147,8 +156,7 @@ def _load_run_test(result: TestResult, runtests: RunTests) -> None:
 
     if gc.garbage:
         support.environment_altered = True
-        print_warning(f"{test_name} created {len(gc.garbage)} "
-                      f"uncollectable object(s)")
+        print_warning(f"{test_name} created {len(gc.garbage)} uncollectable object(s)")
 
         # move the uncollectable objects somewhere,
         # so we don't see them again
@@ -158,8 +166,9 @@ def _load_run_test(result: TestResult, runtests: RunTests) -> None:
     support.reap_children()
 
 
-def _runtest_env_changed_exc(result: TestResult, runtests: RunTests,
-                             display_failure: bool = True) -> None:
+def _runtest_env_changed_exc(
+    result: TestResult, runtests: RunTests, display_failure: bool = True
+) -> None:
     # Handle exceptions, detect environment changes.
 
     # Reset the environment_altered flag to detect if a test altered
@@ -176,8 +185,7 @@ def _runtest_env_changed_exc(result: TestResult, runtests: RunTests,
         clear_caches()
         support.gc_collect()
 
-        with saved_test_environment(test_name,
-                                    runtests.verbose, quiet, pgo=pgo):
+        with saved_test_environment(test_name, runtests.verbose, quiet, pgo=pgo):
             _load_run_test(result, runtests)
     except support.ResourceDenied as exc:
         if not quiet and not pgo:
@@ -217,8 +225,7 @@ def _runtest_env_changed_exc(result: TestResult, runtests: RunTests,
     except:
         if not pgo:
             msg = traceback.format_exc()
-            print(f"test {test_name} crashed -- {msg}",
-                  file=sys.stderr, flush=True)
+            print(f"test {test_name} crashed -- {msg}", file=sys.stderr, flush=True)
         result.state = State.UNCAUGHT_EXC
         return
 
@@ -278,8 +285,7 @@ def _runtest(result: TestResult, runtests: RunTests) -> None:
         else:
             # Tell tests to be moderately quiet
             support.verbose = verbose
-            _runtest_env_changed_exc(result, runtests,
-                                     display_failure=not verbose)
+            _runtest_env_changed_exc(result, runtests, display_failure=not verbose)
 
         xml_list = support.junit_xml_list
         if xml_list:
@@ -308,8 +314,7 @@ def run_single_test(test_name: TestName, runtests: RunTests) -> TestResult:
     except:
         if not pgo:
             msg = traceback.format_exc()
-            print(f"test {test_name} crashed -- {msg}",
-                  file=sys.stderr, flush=True)
+            print(f"test {test_name} crashed -- {msg}", file=sys.stderr, flush=True)
         result.state = State.UNCAUGHT_EXC
 
     sys.stdout.flush()

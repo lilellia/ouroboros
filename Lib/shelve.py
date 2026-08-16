@@ -56,22 +56,23 @@ entries in the cache, and empty the cache (d.sync() also synchronizes
 the persistent dictionary on disk, if feasible).
 """
 
-from pickle import DEFAULT_PROTOCOL, Pickler, Unpickler
-from io import BytesIO
-
 import collections.abc
+from io import BytesIO
+from pickle import DEFAULT_PROTOCOL, Pickler, Unpickler
 
-__all__ = ["Shelf", "BsdDbShelf", "DbfilenameShelf", "open"]
+__all__ = ["BsdDbShelf", "DbfilenameShelf", "Shelf", "open"]
+
 
 class _ClosedDict(collections.abc.MutableMapping):
-    'Marker for a closed dict.  Access attempts raise a ValueError.'
+    "Marker for a closed dict.  Access attempts raise a ValueError."
 
     def closed(self, *args):
-        raise ValueError('invalid operation on closed shelf')
+        raise ValueError("invalid operation on closed shelf")
+
     __iter__ = __len__ = __getitem__ = __setitem__ = __delitem__ = keys = closed
 
     def __repr__(self):
-        return '<Closed Dictionary>'
+        return "<Closed Dictionary>"
 
 
 class Shelf(collections.abc.MutableMapping):
@@ -81,8 +82,7 @@ class Shelf(collections.abc.MutableMapping):
     See the module's __doc__ string for an overview of the interface.
     """
 
-    def __init__(self, dict, protocol=None, writeback=False,
-                 keyencoding="utf-8"):
+    def __init__(self, dict, protocol=None, writeback=False, keyencoding="utf-8"):
         self.dict = dict
         if protocol is None:
             protocol = DEFAULT_PROTOCOL
@@ -92,7 +92,7 @@ class Shelf(collections.abc.MutableMapping):
         self.keyencoding = keyencoding
 
     def __iter__(self):
-        for k in self.dict.keys():
+        for k in self.dict:
             yield k.decode(self.keyencoding)
 
     def __len__(self):
@@ -151,11 +151,11 @@ class Shelf(collections.abc.MutableMapping):
             # because CPython is in interpreter shutdown.
             try:
                 self.dict = _ClosedDict()
-            except:
+            except:  # noqa: E722
                 self.dict = None
 
     def __del__(self):
-        if not hasattr(self, 'writeback'):
+        if not hasattr(self, "writeback"):
             # __init__ didn't succeed, so don't bother closing
             # see http://bugs.python.org/issue1339007 for details
             return
@@ -168,7 +168,7 @@ class Shelf(collections.abc.MutableMapping):
                 self[key] = entry
             self.writeback = True
             self.cache = {}
-        if hasattr(self.dict, 'sync'):
+        if hasattr(self.dict, "sync"):
             self.dict.sync()
 
 
@@ -185,8 +185,7 @@ class BsdDbShelf(Shelf):
     See the module's __doc__ string for an overview of the interface.
     """
 
-    def __init__(self, dict, protocol=None, writeback=False,
-                 keyencoding="utf-8"):
+    def __init__(self, dict, protocol=None, writeback=False, keyencoding="utf-8"):
         Shelf.__init__(self, dict, protocol, writeback, keyencoding)
 
     def set_location(self, key):
@@ -222,12 +221,13 @@ class DbfilenameShelf(Shelf):
     See the module's __doc__ string for an overview of the interface.
     """
 
-    def __init__(self, filename, flag='c', protocol=None, writeback=False):
+    def __init__(self, filename, flag="c", protocol=None, writeback=False):
         import dbm
-        Shelf.__init__(self, dbm.open(filename, flag), protocol, writeback)
+
+        Shelf.__init__(self, dbm.open(filename, flag), protocol, writeback)  # noqa: SIM115
 
 
-def open(filename, flag='c', protocol=None, writeback=False):
+def open(filename, flag="c", protocol=None, writeback=False):
     """Open a persistent dictionary for reading and writing.
 
     The filename parameter is the base filename for the underlying

@@ -109,6 +109,7 @@ def test_block_add_hook_baseexception():
 
 def test_marshal():
     import marshal
+
     o = ("a", "b", "c", 1, 2, 3)
     payload = marshal.dumps(o)
 
@@ -286,7 +287,7 @@ def test_excepthook():
     def hook(event, args):
         if event == "sys.excepthook":
             if not isinstance(args[2], args[1]):
-                raise TypeError(f"Expected isinstance({args[2]!r}, " f"{args[1]!r})")
+                raise TypeError(f"Expected isinstance({args[2]!r}, {args[1]!r})")
             if args[0] != excepthook:
                 raise ValueError(f"Expected {args[0]} == {excepthook}")
             print(event, repr(args[2]))
@@ -351,7 +352,7 @@ def test_socket():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         # Don't care if this fails, we just want the audit message
-        sock.bind(('127.0.0.1', 8080))
+        sock.bind(("127.0.0.1", 8080))
     except Exception:
         pass
     finally:
@@ -385,11 +386,11 @@ def test_http_client():
 
     sys.addaudithook(hook)
 
-    conn = http.client.HTTPConnection('www.python.org')
+    conn = http.client.HTTPConnection("www.python.org")
     try:
-        conn.request('GET', '/')
+        conn.request("GET", "/")
     except OSError:
-        print('http.client.send', '[cannot send]')
+        print("http.client.send", "[cannot send]")
     finally:
         conn.close()
 
@@ -451,7 +452,9 @@ def test_threading():
     lock.acquire()
 
     class test_func:
-        def __repr__(self): return "<test_func>"
+        def __repr__(self):
+            return "<test_func>"
+
         def __call__(self):
             sys.audit("test.test_func")
             lock.release()
@@ -490,6 +493,7 @@ def test_wmi_exec_query():
     sys.addaudithook(hook)
     _wmi.exec_query("SELECT * FROM Win32_OperatingSystem")
 
+
 def test_syslog():
     import syslog
 
@@ -498,12 +502,12 @@ def test_syslog():
             print(event, *args)
 
     sys.addaudithook(hook)
-    syslog.openlog('python')
-    syslog.syslog('test')
+    syslog.openlog("python")
+    syslog.syslog("test")
     syslog.setlogmask(syslog.LOG_DEBUG)
     syslog.closelog()
     # implicit open
-    syslog.syslog('test2')
+    syslog.syslog("test2")
     # open with default ident
     syslog.openlog(logoption=syslog.LOG_NDELAY, facility=syslog.LOG_LOCAL0)
     sys.argv = None

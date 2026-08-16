@@ -24,10 +24,11 @@ import os
 import sys
 import tokenize
 
-__all__ = ["check", "NannyNag", "process_tokens"]
+__all__ = ["NannyNag", "check", "process_tokens"]
 
 verbose = 0
 filename_only = 0
+
 
 def errprint(*args):
     sep = ""
@@ -36,6 +37,7 @@ def errprint(*args):
         sep = " "
     sys.stderr.write("\n")
     sys.exit(1)
+
 
 def main():
     import getopt
@@ -46,28 +48,34 @@ def main():
     except getopt.error as msg:
         errprint(msg)
     for o, a in opts:
-        if o == '-q':
+        if o == "-q":
             filename_only = filename_only + 1
-        if o == '-v':
+        if o == "-v":
             verbose = verbose + 1
     if not args:
         errprint("Usage:", sys.argv[0], "[-v] file_or_directory ...")
     for arg in args:
         check(arg)
 
+
 class NannyNag(Exception):
     """
     Raised by process_tokens() if detecting an ambiguous indent.
     Captured and handled in check().
     """
+
     def __init__(self, lineno, msg, line):
         self.lineno, self.msg, self.line = lineno, msg, line
+
     def get_lineno(self):
         return self.lineno
+
     def get_msg(self):
         return self.msg
+
     def get_line(self):
         return self.line
+
 
 def check(file):
     """check(file_or_dir)
@@ -81,62 +89,68 @@ def check(file):
 
     if os.path.isdir(file) and not os.path.islink(file):
         if verbose:
-            print("%r: listing directory" % (file,))
+            print(f"{file!r}: listing directory")
         names = os.listdir(file)
         for name in names:
             fullname = os.path.join(file, name)
-            if (os.path.isdir(fullname) and
-                not os.path.islink(fullname) or
-                os.path.normcase(name[-3:]) == ".py"):
+            if (
+                os.path.isdir(fullname)
+                and not os.path.islink(fullname)
+                or os.path.normcase(name[-3:]) == ".py"
+            ):
                 check(fullname)
         return
 
     try:
-        f = tokenize.open(file)
+        f = tokenize.open(file)  # noqa: SIM115
     except OSError as msg:
-        errprint("%r: I/O Error: %s" % (file, msg))
+        errprint(f"{file!r}: I/O Error: {msg}")
         return
 
     if verbose > 1:
-        print("checking %r ..." % file)
+        print(f"checking {file!r} ...")
 
     try:
         process_tokens(tokenize.generate_tokens(f.readline))
 
     except tokenize.TokenError as msg:
-        errprint("%r: Token Error: %s" % (file, msg))
+        errprint(f"{file!r}: Token Error: {msg}")
         return
 
     except IndentationError as msg:
-        errprint("%r: Indentation Error: %s" % (file, msg))
+        errprint(f"{file!r}: Indentation Error: {msg}")
         return
 
     except SyntaxError as msg:
-        errprint("%r: Syntax Error: %s" % (file, msg))
+        errprint(f"{file!r}: Syntax Error: {msg}")
         return
 
     except NannyNag as nag:
         badline = nag.get_lineno()
         line = nag.get_line()
         if verbose:
-            print("%r: *** Line %d: trouble in tab city! ***" % (file, badline))
-            print("offending line: %r" % (line,))
+            print("%r: *** Line %d: trouble in tab city! ***" % (file, badline))  # noqa: UP031
+            print(f"offending line: {line!r}")
             print(nag.get_msg())
         else:
-            if ' ' in file: file = '"' + file + '"'
-            if filename_only: print(file)
-            else: print(file, badline, repr(line))
+            if " " in file:
+                file = '"' + file + '"'
+            if filename_only:
+                print(file)
+            else:
+                print(file, badline, repr(line))
         return
 
     finally:
         f.close()
 
     if verbose:
-        print("%r: Clean bill of health." % (file,))
+        print(f"{file!r}: Clean bill of health.")
+
 
 class Whitespace:
     # the characters used for space and tab
-    S, T = ' \t'
+    S, T = " \t"
 
     # members:
     #   raw
@@ -158,7 +172,7 @@ class Whitespace:
     #       true iff raw[:n] is of the form (T*)(S*)
 
     def __init__(self, ws):
-        self.raw  = ws
+        self.raw = ws
         S, T = Whitespace.S, Whitespace.T
         count = []
         b = n = nt = 0
@@ -175,8 +189,8 @@ class Whitespace:
                 b = 0
             else:
                 break
-        self.n    = n
-        self.nt   = nt
+        self.n = n
+        self.nt = nt
         self.norm = tuple(count), b
         self.is_simple = len(count) <= 1
 
@@ -184,7 +198,7 @@ class Whitespace:
     # preceding a tab)
     def longest_run_of_spaces(self):
         count, trailing = self.norm
-        return max(len(count)-1, trailing)
+        return max(len(count) - 1, trailing)
 
     def indent_level(self, tabsize):
         # count, il = self.norm
@@ -204,7 +218,7 @@ class Whitespace:
         count, trailing = self.norm
         il = 0
         for i in range(tabsize, len(count)):
-            il = il + i//tabsize * count[i]
+            il = il + i // tabsize * count[i]
         return trailing + tabsize * (il + self.nt)
 
     # return true iff self.indent_level(t) == other.indent_level(t)
@@ -217,14 +231,11 @@ class Whitespace:
     # Intended to be used after not self.equal(other) is known, in which
     # case it will return at least one witnessing tab size.
     def not_equal_witness(self, other):
-        n = max(self.longest_run_of_spaces(),
-                other.longest_run_of_spaces()) + 1
+        n = max(self.longest_run_of_spaces(), other.longest_run_of_spaces()) + 1
         a = []
-        for ts in range(1, n+1):
+        for ts in range(1, n + 1):
             if self.indent_level(ts) != other.indent_level(ts):
-                a.append( (ts,
-                           self.indent_level(ts),
-                           other.indent_level(ts)) )
+                a.append((ts, self.indent_level(ts), other.indent_level(ts)))
         return a
 
     # Return True iff self.indent_level(t) < other.indent_level(t)
@@ -245,10 +256,9 @@ class Whitespace:
             return False
         if self.is_simple and other.is_simple:
             return self.nt <= other.nt
-        n = max(self.longest_run_of_spaces(),
-                other.longest_run_of_spaces()) + 1
+        n = max(self.longest_run_of_spaces(), other.longest_run_of_spaces()) + 1
         # the self.n >= other.n test already did it for ts=1
-        for ts in range(2, n+1):
+        for ts in range(2, n + 1):
             if self.indent_level(ts) >= other.indent_level(ts):
                 return False
         return True
@@ -258,28 +268,28 @@ class Whitespace:
     # Intended to be used after not self.less(other) is known, in which
     # case it will return at least one witnessing tab size.
     def not_less_witness(self, other):
-        n = max(self.longest_run_of_spaces(),
-                other.longest_run_of_spaces()) + 1
+        n = max(self.longest_run_of_spaces(), other.longest_run_of_spaces()) + 1
         a = []
-        for ts in range(1, n+1):
+        for ts in range(1, n + 1):
             if self.indent_level(ts) >= other.indent_level(ts):
-                a.append( (ts,
-                           self.indent_level(ts),
-                           other.indent_level(ts)) )
+                a.append((ts, self.indent_level(ts), other.indent_level(ts)))
         return a
+
 
 def format_witnesses(w):
     firsts = (str(tup[0]) for tup in w)
     prefix = "at tab size"
     if len(w) > 1:
         prefix = prefix + "s"
-    return prefix + " " + ', '.join(firsts)
+    return prefix + " " + ", ".join(firsts)
+
 
 def process_tokens(tokens):
     try:
         _process_tokens(tokens)
     except TabError as e:
         raise NannyNag(e.lineno, e.msg, e.text)
+
 
 def _process_tokens(tokens):
     INDENT = tokenize.INDENT
@@ -289,7 +299,7 @@ def _process_tokens(tokens):
     indents = [Whitespace("")]
     check_equal = 0
 
-    for (type, token, start, end, line) in tokens:
+    for type, token, start, end, line in tokens:
         if type == NEWLINE:
             # a program statement, or ENDMARKER, will eventually follow,
             # after some (possibly empty) run of tokens of the form
@@ -336,5 +346,5 @@ def _process_tokens(tokens):
                 raise NannyNag(start[0], msg, line)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

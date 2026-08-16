@@ -1,15 +1,15 @@
 __all__ = [
-    # Functions
-    'calcsize', 'pack', 'pack_into', 'unpack', 'unpack_from',
-    'iter_unpack',
-
     # Classes
-    'Struct',
-
+    "Struct",
+    # Functions
+    "calcsize",
     # Exceptions
-    'error'
-    ]
+    "error",
+    "iter_unpack",
+    "pack",
+    "pack_into",
+    "unpack",
+    "unpack_from",
+]
 
 from _struct import *
-from _struct import _clearcache
-from _struct import __doc__

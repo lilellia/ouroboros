@@ -96,8 +96,9 @@ Make sure that None is a valid return value
 
 
 class ListComprehensionTest(unittest.TestCase):
-    def _check_in_scopes(self, code, outputs=None, ns=None, scopes=None, raises=(),
-                         exec_func=exec):
+    def _check_in_scopes(
+        self, code, outputs=None, ns=None, scopes=None, raises=(), exec_func=exec
+    ):
         code = textwrap.dedent(code)
         scopes = scopes or ["module", "class", "function"]
         for scope in scopes:
@@ -107,6 +108,7 @@ class ListComprehensionTest(unittest.TestCase):
                         class _C:
                             {code}
                     """).format(code=textwrap.indent(code, "    "))
+
                     def get_output(moddict, name):
                         return getattr(moddict["_C"], name)
                 elif scope == "function":
@@ -116,12 +118,15 @@ class ListComprehensionTest(unittest.TestCase):
                             return locals()
                         _out = _f()
                     """).format(code=textwrap.indent(code, "    "))
+
                     def get_output(moddict, name):
                         return moddict["_out"][name]
                 else:
                     newcode = code
+
                     def get_output(moddict, name):
                         return moddict[name]
+
                 newns = ns.copy() if ns else {}
                 try:
                     exec_func(newcode, newns)
@@ -153,6 +158,7 @@ class ListComprehensionTest(unittest.TestCase):
             def method(self):
                 super()
                 return __class__
+
             items = [(lambda: i) for i in range(5)]
             y = [x() for x in items]
 
@@ -176,8 +182,7 @@ class ListComprehensionTest(unittest.TestCase):
             __class__ = 2
             res = [__class__ for x in [1]]
         """
-        self._check_in_scopes(
-                code, outputs={"res": [2]}, scopes=["module", "function"])
+        self._check_in_scopes(code, outputs={"res": [2]}, scopes=["module", "function"])
         self._check_in_scopes(code, raises=NameError, scopes=["class"])
 
     def test_references___class___enclosing(self):
@@ -432,7 +437,8 @@ class ListComprehensionTest(unittest.TestCase):
             x = f()
         """
         self._check_in_scopes(
-            code, {"x": (2, 1)}, ns={"b": 2}, scopes=["function", "module"])
+            code, {"x": (2, 1)}, ns={"b": 2}, scopes=["function", "module"]
+        )
         # inside a class, the `a = 1` assignment is not visible
         self._check_in_scopes(code, raises=NameError, scopes=["class"])
 
@@ -445,7 +451,8 @@ class ListComprehensionTest(unittest.TestCase):
             x = f()
         """
         self._check_in_scopes(
-            code, {"x": (2, 2, 1)}, ns={"b": 2}, scopes=["function", "module"])
+            code, {"x": (2, 2, 1)}, ns={"b": 2}, scopes=["function", "module"]
+        )
         # inside a class, the `a = 1` assignment is not visible
         self._check_in_scopes(code, raises=NameError, scopes=["class"])
 
@@ -599,8 +606,8 @@ class ListComprehensionTest(unittest.TestCase):
                 "items2": [1, 2],
                 "items3": [True, True],
                 "items4": [1, 2],
-                "y": 0
-            }
+                "y": 0,
+            },
         )
 
     def test_comp_in_try_except(self):
@@ -614,12 +621,15 @@ class ListComprehensionTest(unittest.TestCase):
                 raise
         """
         # No exception.
-        code = template.format(func='len')
+        code = template.format(func="len")
         self._check_in_scopes(code, {"value": ["ab"], "result": [2], "snapshot": None})
         # Handles exception.
-        code = template.format(func='int')
-        self._check_in_scopes(code, {"value": ["ab"], "result": None, "snapshot": ["ab"]},
-                              raises=ValueError)
+        code = template.format(func="int")
+        self._check_in_scopes(
+            code,
+            {"value": ["ab"], "result": None, "snapshot": ["ab"]},
+            raises=ValueError,
+        )
 
     def test_comp_in_try_finally(self):
         template = """
@@ -631,12 +641,17 @@ class ListComprehensionTest(unittest.TestCase):
                 snapshot = value
         """
         # No exception.
-        code = template.format(func='len')
-        self._check_in_scopes(code, {"value": ["ab"], "result": [2], "snapshot": ["ab"]})
+        code = template.format(func="len")
+        self._check_in_scopes(
+            code, {"value": ["ab"], "result": [2], "snapshot": ["ab"]}
+        )
         # Handles exception.
-        code = template.format(func='int')
-        self._check_in_scopes(code, {"value": ["ab"], "result": None, "snapshot": ["ab"]},
-                              raises=ValueError)
+        code = template.format(func="int")
+        self._check_in_scopes(
+            code,
+            {"value": ["ab"], "result": None, "snapshot": ["ab"]},
+            raises=ValueError,
+        )
 
     def test_exception_in_post_comp_call(self):
         code = """
@@ -653,14 +668,15 @@ class ListComprehensionTest(unittest.TestCase):
             val = [sys._getframe().f_locals for a in [0]][0]["a"]
         """
         import sys
+
         self._check_in_scopes(code, {"val": 0}, ns={"sys": sys})
 
     def _recursive_replace(self, maybe_code):
         if not isinstance(maybe_code, types.CodeType):
             return maybe_code
-        return maybe_code.replace(co_consts=tuple(
-            self._recursive_replace(c) for c in maybe_code.co_consts
-        ))
+        return maybe_code.replace(
+            co_consts=tuple(self._recursive_replace(c) for c in maybe_code.co_consts)
+        )
 
     def _replacing_exec(self, code_string, ns):
         co = compile(code_string, "<string>", "exec")
@@ -683,7 +699,7 @@ class ListComprehensionTest(unittest.TestCase):
         name_list = ", ".join(f"x{i}" for i in range(num_names))
         expected = {
             "y": list(range(num_names)),
-            **{f"x{i}": i for i in range(num_names)}
+            **{f"x{i}": i for i in range(num_names)},
         }
         code = f"""
             {assignments}
@@ -707,7 +723,9 @@ class ListComprehensionTest(unittest.TestCase):
             y = [x for _ in [1]]
         """
         self._check_in_scopes(code, {"x": 2, "y": [3]}, ns={"x": 3}, scopes=["class"])
-        self._check_in_scopes(code, {"x": 2, "y": [2]}, ns={"x": 3}, scopes=["function", "module"])
+        self._check_in_scopes(
+            code, {"x": 2, "y": [2]}, ns={"x": 3}, scopes=["function", "module"]
+        )
 
     def test_name_collision_locals(self):
         # GH-130809: The existence of a hidden fast from list comprehension
@@ -724,7 +742,9 @@ class ListComprehensionTest(unittest.TestCase):
             from abc import *
             same_f_locals = frame.f_locals is f_locals
         """
-        self._check_in_scopes(code, {"foo": 1, "same_f_locals": True}, scopes=["module"])
+        self._check_in_scopes(
+            code, {"foo": 1, "same_f_locals": True}, scopes=["module"]
+        )
 
     def test_exception_locations(self):
         # The location of an exception raised from __init__ or
@@ -748,10 +768,11 @@ class ListComprehensionTest(unittest.TestCase):
             except Exception as e:
                 return e
 
-        for func, expected in [(init_raises, "BrokenIter(init_raises=True)"),
-                               (next_raises, "BrokenIter(next_raises=True)"),
-                               (iter_raises, "BrokenIter(iter_raises=True)"),
-                              ]:
+        for func, expected in [
+            (init_raises, "BrokenIter(init_raises=True)"),
+            (next_raises, "BrokenIter(next_raises=True)"),
+            (iter_raises, "BrokenIter(iter_raises=True)"),
+        ]:
             with self.subTest(func):
                 exc = func()
                 f = traceback.extract_tb(exc.__traceback__)[0]
@@ -759,10 +780,13 @@ class ListComprehensionTest(unittest.TestCase):
                 co = func.__code__
                 self.assertEqual(f.lineno, co.co_firstlineno + 2)
                 self.assertEqual(f.end_lineno, co.co_firstlineno + 2)
-                self.assertEqual(f.line[f.colno - indent : f.end_colno - indent],
-                                 expected)
+                self.assertEqual(
+                    f.line[f.colno - indent : f.end_colno - indent], expected
+                )
 
-__test__ = {'doctests' : doctests}
+
+__test__ = {"doctests": doctests}
+
 
 def load_tests(loader, tests, pattern):
     tests.addTest(doctest.DocTestSuite())

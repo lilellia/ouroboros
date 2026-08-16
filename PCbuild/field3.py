@@ -15,21 +15,22 @@
 import sys
 
 major, minor, micro, level, serial = sys.version_info
-levelnum = {'alpha': 0xA,
-            'beta': 0xB,
-            'candidate': 0xC,
-            'final': 0xF,
-           }[level]
-string = sys.version.split()[0] # like '2.3a0'
+levelnum = {
+    "alpha": 0xA,
+    "beta": 0xB,
+    "candidate": 0xC,
+    "final": 0xF,
+}[level]
+string = sys.version.split()[0]  # like '2.3a0'
 
-print(" * For %s," % string)
-print(" * PY_MICRO_VERSION = %d" % micro)
-print(" * PY_RELEASE_LEVEL = %r = %s" % (level, hex(levelnum)))
-print(" * PY_RELEASE_SERIAL = %d" % serial)
+print(f" * For {string},")
+print(" * PY_MICRO_VERSION = %d" % micro)  # noqa: UP031
+print(f" * PY_RELEASE_LEVEL = {level!r} = {hex(levelnum)}")
+print(" * PY_RELEASE_SERIAL = %d" % serial)  # noqa: UP031
 print(" *")
 
 field3 = micro * 1000 + levelnum * 10 + serial
 
-print(" * and %d*1000 + %d*10 + %d = %d" % (micro, levelnum, serial, field3))
+print(" * and %d*1000 + %d*10 + %d = %d" % (micro, levelnum, serial, field3))  # noqa: UP031
 print(" */")
 print("#define FIELD3", field3)

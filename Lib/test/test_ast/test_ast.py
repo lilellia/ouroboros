@@ -19,7 +19,12 @@ from test.support import os_helper, script_helper
 from test.support.ast_helper import ASTTestMixin
 from test.test_ast.utils import to_tuple
 from test.test_ast.snippets import (
-    eval_tests, eval_results, exec_tests, exec_results, single_tests, single_results
+    eval_tests,
+    eval_results,
+    exec_tests,
+    exec_results,
+    single_tests,
+    single_results,
 )
 
 
@@ -72,6 +77,7 @@ class AST_Tests(unittest.TestCase):
 
         def cleanup():
             ast.AST._fields = old_value
+
         self.addCleanup(cleanup)
 
         del ast.AST._fields
@@ -162,17 +168,17 @@ class AST_Tests(unittest.TestCase):
 
     def test_negative_locations_for_compile(self):
         # See https://github.com/python/cpython/issues/130775
-        alias = ast.alias(name='traceback', lineno=0, col_offset=0)
+        alias = ast.alias(name="traceback", lineno=0, col_offset=0)
         for attrs in (
-            {'lineno': -2, 'col_offset': 0},
-            {'lineno': 0, 'col_offset': -2},
-            {'lineno': 0, 'col_offset': -2, 'end_col_offset': -2},
-            {'lineno': -2, 'end_lineno': -2, 'col_offset': 0},
+            {"lineno": -2, "col_offset": 0},
+            {"lineno": 0, "col_offset": -2},
+            {"lineno": 0, "col_offset": -2, "end_col_offset": -2},
+            {"lineno": -2, "end_lineno": -2, "col_offset": 0},
         ):
             with self.subTest(attrs=attrs):
-                tree = ast.Module(body=[
-                    ast.Import(names=[alias], **attrs)
-                ], type_ignores=[])
+                tree = ast.Module(
+                    body=[ast.Import(names=[alias], **attrs)], type_ignores=[]
+                )
 
                 # It used to crash on this step:
                 compile(tree, "<string>", "exec")
@@ -2083,7 +2089,7 @@ class ConstantTests(unittest.TestCase):
             compile(tree, "string", "exec")
         self.assertEqual(
             str(cm.exception),
-            "expression which can't be assigned " "to in Store context",
+            "expression which can't be assigned to in Store context",
         )
 
     def test_get_docstring(self):
@@ -2457,7 +2463,7 @@ class EndPositionTests(unittest.TestCase):
                 def fun(self) -> None:
                     "ЖЖЖЖЖ"
         """).strip()
-        s_method = "    def fun(self) -> None:\n" '        "ЖЖЖЖЖ"'
+        s_method = '    def fun(self) -> None:\n        "ЖЖЖЖЖ"'
         cdef = ast.parse(s_orig).body[0]
         self.assertEqual(
             ast.get_source_segment(s_orig, cdef.body[0], padded=True), s_method
@@ -2478,7 +2484,7 @@ class EndPositionTests(unittest.TestCase):
               \t\f  def fun(self) -> None:
               \t\f      pass
         """).strip()
-        s_method = "  \t\f  def fun(self) -> None:\n" "  \t\f      pass"
+        s_method = "  \t\f  def fun(self) -> None:\n  \t\f      pass"
 
         cdef = ast.parse(s).body[0]
         self.assertEqual(ast.get_source_segment(s, cdef.body[0], padded=True), s_method)

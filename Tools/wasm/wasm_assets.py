@@ -27,9 +27,7 @@ WASM_LIB = pathlib.PurePath("lib")
 WASM_STDLIB_ZIP = (
     WASM_LIB / f"python{sys.version_info.major}{sys.version_info.minor}.zip"
 )
-WASM_STDLIB = (
-    WASM_LIB / f"python{sys.version_info.major}.{sys.version_info.minor}"
-)
+WASM_STDLIB = WASM_LIB / f"python{sys.version_info.major}.{sys.version_info.minor}"
 WASM_DYNLOAD = WASM_STDLIB / "lib-dynload"
 
 
@@ -125,9 +123,7 @@ def get_sysconfigdata(args: argparse.Namespace) -> pathlib.Path:
     """Get path to sysconfigdata relative to build root"""
     data_name = sysconfig._get_sysconfigdata_name()
     if not data_name.startswith(SYSCONFIG_NAMES):
-        raise ValueError(
-            f"Invalid sysconfig data name '{data_name}'.", SYSCONFIG_NAMES
-        )
+        raise ValueError(f"Invalid sysconfig data name '{data_name}'.", SYSCONFIG_NAMES)
     filename = data_name + ".py"
     return args.builddir / filename
 
@@ -175,7 +171,7 @@ def detect_extension_modules(args: argparse.Namespace):
     with open(args.sysconfig_data) as f:
         data = f.read()
     loc = {}
-    exec(data, globals(), loc)
+    exec(data, globals(), loc)  # noqa: S102
 
     for key, value in loc["build_time_vars"].items():
         if not key.startswith("MODULE_") or not key.endswith("_STATE"):

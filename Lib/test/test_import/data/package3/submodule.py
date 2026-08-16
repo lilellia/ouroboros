@@ -1,7 +1,12 @@
-attr = 'submodule'
+attr = "submodule"
+
+
 class A:
-    attr = 'submodule'
+    attr = "submodule"
+
+
 class submodule:
-    attr = 'rebound'
+    attr = "rebound"
+
     class B:
-        attr = 'rebound'
+        attr = "rebound"

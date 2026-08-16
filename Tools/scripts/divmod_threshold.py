@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-#
+#  # noqa: EXE001
 # Determine threshold for switching from longobject.c divmod to
 # _pylong.int_divmod().
 
 from random import randrange
 from time import perf_counter as now
+
 from _pylong import int_divmod as divmod_fast
 
 BITS_PER_DIGIT = 30
@@ -52,5 +53,5 @@ def main():
         probe_den(nd)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

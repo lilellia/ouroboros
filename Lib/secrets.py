@@ -6,14 +6,19 @@ https://peps.python.org/pep-0506/
 
 """
 
-__all__ = ['choice', 'randbelow', 'randbits', 'SystemRandom',
-           'token_bytes', 'token_hex', 'token_urlsafe',
-           'compare_digest',
-           ]
+__all__ = [
+    "SystemRandom",
+    "choice",
+    "compare_digest",
+    "randbelow",
+    "randbits",
+    "token_bytes",
+    "token_hex",
+    "token_urlsafe",
+]
 
 
 import base64
-
 from hmac import compare_digest
 from random import SystemRandom
 
@@ -22,13 +27,16 @@ _sysrand = SystemRandom()
 randbits = _sysrand.getrandbits
 choice = _sysrand.choice
 
+
 def randbelow(exclusive_upper_bound):
     """Return a random int in the range [0, n)."""
     if exclusive_upper_bound <= 0:
         raise ValueError("Upper bound must be positive.")
     return _sysrand._randbelow(exclusive_upper_bound)
 
+
 DEFAULT_ENTROPY = 32  # number of bytes to return by default
+
 
 def token_bytes(nbytes=None):
     """Return a random byte string containing *nbytes* bytes.
@@ -44,6 +52,7 @@ def token_bytes(nbytes=None):
         nbytes = DEFAULT_ENTROPY
     return _sysrand.randbytes(nbytes)
 
+
 def token_hex(nbytes=None):
     """Return a random text string, in hexadecimal.
 
@@ -57,6 +66,7 @@ def token_hex(nbytes=None):
     """
     return token_bytes(nbytes).hex()
 
+
 def token_urlsafe(nbytes=None):
     """Return a random URL-safe text string, in Base64 encoding.
 
@@ -68,4 +78,4 @@ def token_urlsafe(nbytes=None):
 
     """
     tok = token_bytes(nbytes)
-    return base64.urlsafe_b64encode(tok).rstrip(b'=').decode('ascii')
+    return base64.urlsafe_b64encode(tok).rstrip(b"=").decode("ascii")

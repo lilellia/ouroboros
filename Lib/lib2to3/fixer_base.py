@@ -6,13 +6,14 @@
 # Python imports
 import itertools
 
-# Local imports
-from .patcomp import PatternCompiler
 from . import pygram
 from .fixer_util import does_tree_import
 
-class BaseFix(object):
+# Local imports
+from .patcomp import PatternCompiler
 
+
+class BaseFix:
     """Optional base class for fixers.
 
     The subclass name must be FixFooBar where FooBar is the result of
@@ -23,23 +24,23 @@ class BaseFix(object):
 
     PATTERN = None  # Most subclasses should override with a string literal
     pattern = None  # Compiled pattern, set by compile_pattern()
-    pattern_tree = None # Tree representation of the pattern
+    pattern_tree = None  # Tree representation of the pattern
     options = None  # Options object passed to initializer
-    filename = None # The filename (set by set_filename)
-    numbers = itertools.count(1) # For new_name()
-    used_names = set() # A set of all used NAMEs
-    order = "post" # Does the fixer prefer pre- or post-order traversal
-    explicit = False # Is this ignored by refactor.py -f all?
-    run_order = 5   # Fixers will be sorted by run order before execution
-                    # Lower numbers will be run first.
-    _accept_type = None # [Advanced and not public] This tells RefactoringTool
-                        # which node type to accept when there's not a pattern.
+    filename = None  # The filename (set by set_filename)
+    numbers = itertools.count(1)  # For new_name()
+    used_names = set()  # A set of all used NAMEs  # noqa: RUF012
+    order = "post"  # Does the fixer prefer pre- or post-order traversal
+    explicit = False  # Is this ignored by refactor.py -f all?
+    run_order = 5  # Fixers will be sorted by run order before execution
+    # Lower numbers will be run first.
+    _accept_type = None  # [Advanced and not public] This tells RefactoringTool
+    # which node type to accept when there's not a pattern.
 
-    keep_line_order = False # For the bottom matcher: match with the
-                            # original line order
-    BM_compatible = False # Compatibility with the bottom matching
-                          # module; every fixer should set this
-                          # manually
+    keep_line_order = False  # For the bottom matcher: match with the
+    # original line order
+    BM_compatible = False  # Compatibility with the bottom matching
+    # module; every fixer should set this
+    # manually
 
     # Shortcut for access to Python grammar symbols
     syms = pygram.python_symbols
@@ -64,8 +65,9 @@ class BaseFix(object):
         """
         if self.PATTERN is not None:
             PC = PatternCompiler()
-            self.pattern, self.pattern_tree = PC.compile_pattern(self.PATTERN,
-                                                                 with_tree=True)
+            self.pattern, self.pattern_tree = PC.compile_pattern(
+                self.PATTERN, with_tree=True
+            )
 
     def set_filename(self, filename):
         """Set the filename.
@@ -116,7 +118,7 @@ class BaseFix(object):
     def log_message(self, message):
         if self.first_log:
             self.first_log = False
-            self.log.append("### In file %s ###" % self.filename)
+            self.log.append(f"### In file {self.filename} ###")
         self.log.append(message)
 
     def cannot_convert(self, node, reason=None):
@@ -142,7 +144,7 @@ class BaseFix(object):
         Optional second argument is why it can't be converted.
         """
         lineno = node.get_lineno()
-        self.log_message("Line %d: %s" % (lineno, reason))
+        self.log_message("Line %d: %s" % (lineno, reason))  # noqa: UP031
 
     def start_tree(self, tree, filename):
         """Some fixers need to maintain tree-wide state.
@@ -163,17 +165,16 @@ class BaseFix(object):
         tree - the root node of the tree to be processed.
         filename - the name of the file the tree came from.
         """
-        pass
 
 
 class ConditionalFix(BaseFix):
-    """ Base class for fixers which not execute if an import is found. """
+    """Base class for fixers which not execute if an import is found."""
 
     # This is the name of the import which, if found, will cause the test to be skipped
     skip_on = None
 
     def start_tree(self, *args):
-        super(ConditionalFix, self).start_tree(*args)
+        super().start_tree(*args)
         self._should_skip = None
 
     def should_skip(self, node):

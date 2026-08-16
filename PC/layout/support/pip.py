@@ -35,8 +35,7 @@ def get_pip_layout(ns):
             yield pkg_root.format(dest), src
         if ns.include_pip_user:
             content = "\n".join(
-                "[{}]\nuser=yes".format(n)
-                for n in ["install", "uninstall", "freeze", "list"]
+                f"[{n}]\nuser=yes" for n in ["install", "uninstall", "freeze", "list"]
             )
             yield "pip.ini", ("pip.ini", content.encode())
 
@@ -45,7 +44,7 @@ def extract_pip_files(ns):
     dest = get_pip_dir(ns)
     try:
         dest.mkdir(parents=True, exist_ok=False)
-    except IOError:
+    except OSError:
         return
 
     src = ns.source / "Lib" / "ensurepip" / "_bundled"
@@ -59,7 +58,7 @@ def extract_pip_files(ns):
     env = os.environ.copy()
     env["PYTHONPATH"] = search_path
 
-    output = subprocess.check_output(
+    subprocess.check_output(
         [
             sys.executable,
             "-m",

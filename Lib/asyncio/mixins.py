@@ -1,6 +1,7 @@
 """Event loop mixins."""
 
 import threading
+
 from . import events
 
 _global_lock = threading.Lock()
@@ -17,5 +18,5 @@ class _LoopBoundMixin:
                 if self._loop is None:
                     self._loop = loop
         if loop is not self._loop:
-            raise RuntimeError(f'{self!r} is bound to a different event loop')
+            raise RuntimeError(f"{self!r} is bound to a different event loop")
         return loop

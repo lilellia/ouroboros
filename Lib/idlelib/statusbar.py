@@ -1,15 +1,14 @@
-from tkinter.ttk import Label, Frame
+from tkinter.ttk import Frame, Label
 
 
 class MultiStatusBar(Frame):
-
     def __init__(self, master, **kw):
         Frame.__init__(self, master, **kw)
         self.labels = {}
 
-    def set_label(self, name, text='', side='left', width=0):
+    def set_label(self, name, text="", side="left", width=0):
         if name not in self.labels:
-            label = Label(self, borderwidth=0, anchor='w')
+            label = Label(self, borderwidth=0, anchor="w")
             label.pack(side=side, pady=0, padx=4)
             self.labels[name] = label
         else:
@@ -20,11 +19,12 @@ class MultiStatusBar(Frame):
 
 
 def _multistatus_bar(parent):  # htest #
-    from tkinter import Toplevel, Text
-    from tkinter.ttk import Frame, Button
+    from tkinter import Text, Toplevel
+    from tkinter.ttk import Button, Frame
+
     top = Toplevel(parent)
-    x, y = map(int, parent.geometry().split('+')[1:])
-    top.geometry("+%d+%d" %(x, y + 175))
+    x, y = map(int, parent.geometry().split("+")[1:])
+    top.geometry("+%d+%d" % (x, y + 175))  # noqa: UP031
     top.title("Test multistatus bar")
 
     frame = Frame(top)
@@ -33,20 +33,22 @@ def _multistatus_bar(parent):  # htest #
     msb = MultiStatusBar(frame)
     msb.set_label("one", "hello")
     msb.set_label("two", "world")
-    msb.pack(side='bottom', fill='x')
+    msb.pack(side="bottom", fill="x")
 
     def change():
         msb.set_label("one", "foo")
         msb.set_label("two", "bar")
 
     button = Button(top, text="Update status", command=change)
-    button.pack(side='bottom')
+    button.pack(side="bottom")
     frame.pack()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from unittest import main
-    main('idlelib.idle_test.test_statusbar', verbosity=2, exit=False)
+
+    main("idlelib.idle_test.test_statusbar", verbosity=2, exit=False)
 
     from idlelib.idle_test.htest import run
+
     run(_multistatus_bar)

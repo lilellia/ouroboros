@@ -13,7 +13,6 @@ import shutil
 import sys
 import tempfile
 import zipfile
-
 from pathlib import Path
 
 if __name__ == "__main__":
@@ -25,10 +24,10 @@ from .support.catalog import *
 from .support.constants import *
 from .support.filesets import *
 from .support.logging import *
+from .support.nuspec import *
 from .support.options import *
 from .support.pip import *
 from .support.props import *
-from .support.nuspec import *
 
 TEST_PYDS_ONLY = FileStemSet("xxlimited", "xxlimited_35", "_ctypes_test", "_test*")
 TEST_DIRS_ONLY = FileNameSet("test", "tests")
@@ -96,8 +95,7 @@ def get_lib_layout(ns):
                 return ns.include_tcltk
         return True
 
-    for dest, src in rglob(ns.source / "Lib", "**/*", _c):
-        yield dest, src
+    yield from rglob(ns.source / "Lib", "**/*", _c)
 
 
 def get_tcltk_lib(ns):
@@ -116,7 +114,7 @@ def get_tcltk_lib(ns):
             return
 
     for dest, src in rglob(Path(tcl_lib).parent, "**/*"):
-        yield "tcl/{}".format(dest), src
+        yield f"tcl/{dest}", src
 
 
 def get_layout(ns):
@@ -141,8 +139,8 @@ def get_layout(ns):
                 yield "libs/" + n + ".lib", lib
 
     if ns.include_appxmanifest:
-        yield from in_build("python_uwp.exe", new_name="python{}".format(VER_DOT))
-        yield from in_build("pythonw_uwp.exe", new_name="pythonw{}".format(VER_DOT))
+        yield from in_build("python_uwp.exe", new_name=f"python{VER_DOT}")
+        yield from in_build("pythonw_uwp.exe", new_name=f"pythonw{VER_DOT}")
         # For backwards compatibility, but we don't reference these ourselves.
         yield from in_build("python_uwp.exe", new_name="python")
         yield from in_build("pythonw_uwp.exe", new_name="pythonw")
@@ -154,9 +152,9 @@ def get_layout(ns):
 
     if ns.include_launchers and ns.include_appxmanifest:
         if ns.include_pip:
-            yield from in_build("python_uwp.exe", new_name="pip{}".format(VER_DOT))
+            yield from in_build("python_uwp.exe", new_name=f"pip{VER_DOT}")
         if ns.include_idle:
-            yield from in_build("pythonw_uwp.exe", new_name="idle{}".format(VER_DOT))
+            yield from in_build("pythonw_uwp.exe", new_name=f"idle{VER_DOT}")
 
     if ns.include_stable:
         yield from in_build(PYTHON_STABLE_DLL_NAME)
@@ -187,7 +185,7 @@ def get_layout(ns):
         yield zip_name, ns.temp / zip_name
     else:
         for dest, src in get_lib_layout(ns):
-            yield "Lib/{}".format(dest), src
+            yield f"Lib/{dest}", src
 
         if ns.include_venv:
             yield from in_build("venvlauncher.exe", "Lib/venv/scripts/nt/", "python")
@@ -201,15 +199,14 @@ def get_layout(ns):
             return d in TOOLS_FILES
 
         for dest, src in rglob(ns.source / "Tools", "**/*", _c):
-            yield "Tools/{}".format(dest), src
+            yield f"Tools/{dest}", src
 
     if ns.include_underpth:
         yield PYTHON_PTH_NAME, ns.temp / PYTHON_PTH_NAME
 
     if ns.include_dev:
-
         for dest, src in rglob(ns.source / "Include", "**/*.h"):
-            yield "include/{}".format(dest), src
+            yield f"include/{dest}", src
         src = ns.source / "PC" / "pyconfig.h"
         yield "include/pyconfig.h", src
 
@@ -226,11 +223,11 @@ def get_layout(ns):
 
     if ns.include_chm:
         for dest, src in rglob(ns.doc_build / "htmlhelp", PYTHON_CHM_NAME):
-            yield "Doc/{}".format(dest), src
+            yield f"Doc/{dest}", src
 
     if ns.include_html_doc:
         for dest, src in rglob(ns.doc_build / "html", "**/*"):
-            yield "Doc/html/{}".format(dest), src
+            yield f"Doc/html/{dest}", src
 
     if ns.include_props:
         for dest, src in get_props_layout(ns):
@@ -247,7 +244,7 @@ def get_layout(ns):
         if ns.flat_dlls:
             yield ns.include_cat.name, ns.include_cat
         else:
-            yield "DLLs/{}".format(ns.include_cat.name), ns.include_cat
+            yield f"DLLs/{ns.include_cat.name}", ns.include_cat
 
 
 def _compile_one_py(src, dest, name, optimize, checked=True):
@@ -294,7 +291,7 @@ def _write_to_zip(zf, dest, src, ns, checked=True):
         finally:
             try:
                 pyc.unlink()
-            except:
+            except:  # noqa: E722
                 log_exception("Failed to delete {}", pyc)
         return
 
@@ -309,14 +306,14 @@ def _write_to_zip(zf, dest, src, ns, checked=True):
                 zf.write(str(f), str(dest.parent / f.name))
                 try:
                     f.unlink()
-                except:
+                except:  # noqa: E722
                     log_exception("Failed to delete {}", f)
-        except:
+        except:  # noqa: E722
             log_exception("Failed to compile {}", src)
         finally:
             try:
                 tmp.unlink()
-            except:
+            except:  # noqa: E722
                 log_exception("Failed to delete {}", tmp)
 
     zf.write(str(src), str(dest))
@@ -595,7 +592,7 @@ def main():
     if ns.include_cat and not ns.include_cat.is_absolute():
         ns.include_cat = (Path.cwd() / ns.include_cat).resolve()
     if not ns.arch:
-        ns.arch = "amd64" if sys.maxsize > 2 ** 32 else "win32"
+        ns.arch = "amd64" if sys.maxsize > 2**32 else "win32"
 
     if ns.zip and not ns.zip.is_absolute():
         ns.zip = (Path.cwd() / ns.zip).resolve()
@@ -623,7 +620,9 @@ Catalog: {ns.catalog}""",
     if ns.arch in ("arm32", "arm64"):
         for n in ("include_idle", "include_tcltk"):
             if getattr(ns, n):
-                log_warning(f"Disabling --{n.replace('_', '-')} on unsupported platform")
+                log_warning(
+                    f"Disabling --{n.replace('_', '-')} on unsupported platform"
+                )
                 setattr(ns, n, False)
 
     if ns.include_idle and not ns.include_tcltk:
@@ -639,7 +638,7 @@ Catalog: {ns.catalog}""",
         return 3
     except SystemExit:
         raise
-    except:
+    except:  # noqa: E722
         log_exception("Unhandled error")
 
     if error_was_logged():

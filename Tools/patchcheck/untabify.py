@@ -2,10 +2,11 @@
 
 "Replace tabs with spaces in argument files.  Print names of changed files."
 
+import getopt
 import os
 import sys
-import getopt
 import tokenize
+
 
 def main():
     tabsize = 8
@@ -18,7 +19,7 @@ def main():
         print("usage:", sys.argv[0], "[-t tabwidth] file ...")
         return
     for optname, optvalue in opts:
-        if optname == '-t':
+        if optname == "-t":
             tabsize = int(optvalue)
 
     return max(process(filename, tabsize) for filename in args)
@@ -29,8 +30,8 @@ def process(filename, tabsize, verbose=True):
         with tokenize.open(filename) as f:
             text = f.read()
             encoding = f.encoding
-    except IOError as msg:
-        print("%r: I/O error: %s" % (filename, msg))
+    except OSError as msg:
+        print(f"{filename!r}: I/O error: {msg}")
         return 2
     newtext = text.expandtabs(tabsize)
     if newtext == text:
@@ -51,5 +52,5 @@ def process(filename, tabsize, verbose=True):
     return 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     raise SystemExit(main())
