@@ -3372,34 +3372,6 @@ class _DeprecatedType(type):
         return super().__getattribute__(name)
 
 
-class io(metaclass=_DeprecatedType):
-    """Wrapper namespace for IO generic classes."""
-
-    __all__ = ["IO", "TextIO", "BinaryIO"]  # noqa: RUF012
-    IO = IO
-    TextIO = TextIO
-    BinaryIO = BinaryIO
-
-
-io.__name__ = __name__ + ".io"
-sys.modules[io.__name__] = io
-
-Pattern = _alias(stdlib_re.Pattern, 1)
-Match = _alias(stdlib_re.Match, 1)
-
-
-class re(metaclass=_DeprecatedType):
-    """Wrapper namespace for re type aliases."""
-
-    __all__ = ["Pattern", "Match"]  # noqa: RUF012
-    Pattern = Pattern
-    Match = Match
-
-
-re.__name__ = __name__ + ".re"
-sys.modules[re.__name__] = re
-
-
 def reveal_type[T](obj: T, /) -> T:
     """Ask a static type checker to reveal the inferred type of an expression.
 
